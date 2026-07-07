@@ -95,22 +95,22 @@
                 </div>
 
                 <div class="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                    @foreach ([
-                        ['idade' => '6 a 7 anos', 'distancia' => '100 m', 'tipo' => 'Infantil'],
-                        ['idade' => '8 a 9 anos', 'distancia' => '200 m', 'tipo' => 'Infantil'],
-                        ['idade' => '10 a 11 anos', 'distancia' => '300 m', 'tipo' => 'Infantil'],
-                        ['idade' => '12 a 13 anos', 'distancia' => '400 m', 'tipo' => 'Infantil'],
-                        ['idade' => 'A partir de 14 anos', 'distancia' => '3 km', 'tipo' => 'Adulto'],
-                        ['idade' => 'A partir de 16 anos', 'distancia' => '6 km', 'tipo' => 'Adulto'],
-                    ] as $modality)
+                    @forelse ($modalities as $modality)
                         <article class="rounded-md border border-zinc-200 bg-white p-6 shadow-sm">
                             <div class="flex items-center justify-between gap-4">
-                                <span class="rounded-md bg-emerald-100 px-3 py-1 text-sm font-bold text-emerald-800">{{ $modality['tipo'] }}</span>
-                                <span class="text-sm font-semibold text-zinc-500">{{ $modality['idade'] }}</span>
+                                <span class="rounded-md bg-emerald-100 px-3 py-1 text-sm font-bold text-emerald-800">{{ $modality->type }}</span>
+                                <span class="text-sm font-semibold text-zinc-500">{{ $modality->age_range }}</span>
                             </div>
-                            <p class="mt-6 text-5xl font-black text-zinc-950">{{ $modality['distancia'] }}</p>
+                            <p class="mt-6 text-5xl font-black text-zinc-950">{{ $modality->distance }}</p>
+                            <p class="mt-4 text-sm font-bold text-zinc-700">
+                                {{ $modality->price === null ? 'Valor a definir' : 'R$ '.number_format((float) $modality->price, 2, ',', '.') }}
+                            </p>
                         </article>
-                    @endforeach
+                    @empty
+                        <div class="rounded-md border border-amber-200 bg-amber-50 p-5 text-sm font-semibold text-amber-950 sm:col-span-2 lg:col-span-3">
+                            As modalidades serao divulgadas em breve.
+                        </div>
+                    @endforelse
                 </div>
             </section>
 
@@ -126,14 +126,20 @@
 
                     <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
                         @foreach ([
-                            ['titulo' => 'Data', 'valor' => 'A confirmar'],
-                            ['titulo' => 'Local', 'valor' => 'A confirmar'],
-                            ['titulo' => 'Kit atleta', 'valor' => 'Em definicao'],
-                            ['titulo' => 'Regulamento', 'valor' => 'Em revisao'],
+                            ['titulo' => 'Data', 'valor' => $eventSetting->event_date ?: 'A confirmar', 'compacto' => true],
+                            ['titulo' => 'Local', 'valor' => $eventSetting->event_location ?: 'A confirmar', 'compacto' => true],
+                            ['titulo' => 'Kit atleta', 'valor' => $eventSetting->kit_information ?: 'Em definicao', 'compacto' => false],
+                            ['titulo' => 'Regulamento', 'valor' => $eventSetting->regulation ?: 'Em revisao', 'compacto' => false],
                         ] as $item)
                             <div class="rounded-md border border-zinc-200 p-5">
                                 <p class="text-sm font-semibold text-zinc-500">{{ $item['titulo'] }}</p>
-                                <p class="mt-2 text-xl font-black">{{ $item['valor'] }}</p>
+                                @if ($item['compacto'])
+                                    <p class="mt-2 whitespace-pre-line text-xl font-black">{{ $item['valor'] }}</p>
+                                @else
+                                    <div class="event-rich-content mt-2">
+                                        {{ \Filament\Forms\Components\RichEditor\RichContentRenderer::make($item['valor']) }}
+                                    </div>
+                                @endif
                             </div>
                         @endforeach
                     </div>

@@ -10,7 +10,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class ParticipantRegistrationReceived extends Mailable
+class ParticipantRegistrationUpdated extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -27,7 +27,9 @@ class ParticipantRegistrationReceived extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Inscricao recebida - Corrida Ave Branca',
+            subject: $this->registration->payment_status === 'cancelled'
+                ? 'Inscricao cancelada - Corrida Ave Branca'
+                : 'Atualizacao da inscricao - Corrida Ave Branca',
         );
     }
 
@@ -37,7 +39,7 @@ class ParticipantRegistrationReceived extends Mailable
     public function content(): Content
     {
         return new Content(
-            markdown: 'mail.participant-registration-received',
+            markdown: 'mail.participant-registration-updated',
             with: [
                 'registration' => $this->registration,
             ],

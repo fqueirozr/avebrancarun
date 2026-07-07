@@ -121,21 +121,23 @@
                     <fieldset class="grid gap-3">
                         <legend class="text-sm font-bold text-zinc-800">Modalidade</legend>
                         <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
-                            @foreach ([
-                                'Infantil 6-7 anos - 100 m',
-                                'Infantil 8-9 anos - 200 m',
-                                'Infantil 10-11 anos - 300 m',
-                                'Infantil 12-13 anos - 400 m',
-                                'Adulto a partir de 14 anos - 3 km',
-                                'Adulto a partir de 16 anos - 6 km',
-                            ] as $modality)
-                                <label class="flex min-h-16 items-center gap-3 rounded-md border border-zinc-200 px-4 py-3 text-sm font-semibold transition has-checked:border-emerald-700 has-checked:bg-emerald-50">
-                                    <input type="radio" name="modality" value="{{ $modality }}" @checked(old('modality') === $modality) class="size-4 accent-emerald-800" required>
-                                    <span>{{ $modality }}</span>
+                            @forelse ($modalities as $modality)
+                                <label class="flex min-h-20 items-start gap-3 rounded-md border border-zinc-200 px-4 py-3 text-sm transition has-checked:border-emerald-700 has-checked:bg-emerald-50">
+                                    <input type="radio" name="race_modality_id" value="{{ $modality->id }}" @checked((int) old('race_modality_id') === $modality->id) class="mt-1 size-4 accent-emerald-800" required>
+                                    <span class="grid gap-1">
+                                        <span class="font-bold">{{ $modality->displayName() }}</span>
+                                        <span class="text-zinc-600">
+                                            {{ $modality->price === null ? 'Valor a definir' : 'R$ '.number_format((float) $modality->price, 2, ',', '.') }}
+                                        </span>
+                                    </span>
                                 </label>
-                            @endforeach
+                            @empty
+                                <div class="rounded-md border border-amber-200 bg-amber-50 p-4 text-sm font-semibold text-amber-950 md:col-span-2">
+                                    Nenhuma modalidade ativa no momento.
+                                </div>
+                            @endforelse
                         </div>
-                        @error('modality')
+                        @error('race_modality_id')
                             <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
                         @enderror
                     </fieldset>
@@ -154,7 +156,7 @@
                             <p class="mt-1 text-sm leading-6 text-zinc-600">O envio definitivo e o pagamento serao ativados apos a escolha do gateway.</p>
                         </div>
 
-                        <button type="submit" class="rounded-md bg-emerald-800 px-5 py-3 text-sm font-black text-white transition hover:bg-emerald-900">
+                        <button type="submit" @disabled($modalities->isEmpty()) class="rounded-md bg-emerald-800 px-5 py-3 text-sm font-black text-white transition hover:bg-emerald-900 disabled:cursor-not-allowed disabled:bg-zinc-400">
                             Enviar inscricao
                         </button>
                     </div>

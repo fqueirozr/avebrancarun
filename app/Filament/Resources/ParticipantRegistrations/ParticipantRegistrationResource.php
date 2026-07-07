@@ -4,6 +4,7 @@ namespace App\Filament\Resources\ParticipantRegistrations;
 
 use App\Filament\Resources\ParticipantRegistrations\Pages\EditParticipantRegistration;
 use App\Filament\Resources\ParticipantRegistrations\Pages\ListParticipantRegistrations;
+use App\Filament\Resources\ParticipantRegistrations\Pages\PrintParticipantRegistrations;
 use App\Filament\Resources\ParticipantRegistrations\Schemas\ParticipantRegistrationForm;
 use App\Filament\Resources\ParticipantRegistrations\Tables\ParticipantRegistrationsTable;
 use App\Models\ParticipantRegistration;
@@ -48,6 +49,7 @@ class ParticipantRegistrationResource extends Resource
     {
         return [
             'index' => ListParticipantRegistrations::route('/'),
+            'print' => PrintParticipantRegistrations::route('/print'),
             'edit' => EditParticipantRegistration::route('/{record}/edit'),
         ];
     }

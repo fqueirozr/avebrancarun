@@ -7,3 +7,65 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
+
+@layer components {
+    .event-rich-content {
+        @apply text-sm/6 font-semibold text-zinc-800;
+    }
+
+    .event-rich-content :where(p, ul, ol, blockquote) {
+        @apply my-0;
+    }
+
+    .event-rich-content :where(p, ul, ol, blockquote) + :where(p, ul, ol, blockquote, h2, h3) {
+        @apply mt-2;
+    }
+
+    .event-rich-content :where(h2, h3) {
+        @apply my-0 font-black text-zinc-950;
+    }
+
+    .event-rich-content h2 {
+        @apply text-base/6;
+    }
+
+    .event-rich-content h3 {
+        @apply text-sm/6;
+    }
+
+    .event-rich-content :where(strong, b) {
+        @apply font-black text-zinc-950;
+    }
+
+    .event-rich-content :where(em, i) {
+        @apply italic;
+    }
+
+    .event-rich-content :where(u) {
+        @apply underline underline-offset-2;
+    }
+
+    .event-rich-content :where(s, del) {
+        @apply line-through decoration-zinc-500;
+    }
+
+    .event-rich-content a {
+        @apply font-bold text-emerald-800 underline underline-offset-2 transition hover:text-emerald-950;
+    }
+
+    .event-rich-content ul {
+        @apply list-disc pl-5;
+    }
+
+    .event-rich-content ol {
+        @apply list-decimal pl-5;
+    }
+
+    .event-rich-content li + li {
+        @apply mt-1;
+    }
+
+    .event-rich-content blockquote {
+        @apply border-l-4 border-emerald-700/30 pl-4 font-bold text-zinc-700;
+    }
+}

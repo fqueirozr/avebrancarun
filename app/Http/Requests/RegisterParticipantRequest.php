@@ -29,18 +29,7 @@ class RegisterParticipantRequest extends FormRequest
             'guardian_name' => ['nullable', 'string', 'max:255'],
             'phone' => ['required', 'string', 'max:30'],
             'email' => ['required', 'email', 'max:255'],
-            'modality' => [
-                'required',
-                'string',
-                Rule::in([
-                    'Infantil 6-7 anos - 100 m',
-                    'Infantil 8-9 anos - 200 m',
-                    'Infantil 10-11 anos - 300 m',
-                    'Infantil 12-13 anos - 400 m',
-                    'Adulto a partir de 14 anos - 3 km',
-                    'Adulto a partir de 16 anos - 6 km',
-                ]),
-            ],
+            'race_modality_id' => ['required', Rule::exists('race_modalities', 'id')->where('is_active', true)],
             'notes' => ['nullable', 'string', 'max:1000'],
         ];
     }

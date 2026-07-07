@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\ParticipantRegistrations\Schemas;
 
+use App\Models\ParticipantRegistration;
+use App\Models\RaceModality;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -34,24 +36,15 @@ class ParticipantRegistrationForm
                     ->email()
                     ->required()
                     ->maxLength(255),
-                Select::make('modality')
+                Select::make('race_modality_id')
                     ->label('Modalidade')
-                    ->options([
-                        'Infantil 6-7 anos - 100 m' => 'Infantil 6-7 anos - 100 m',
-                        'Infantil 8-9 anos - 200 m' => 'Infantil 8-9 anos - 200 m',
-                        'Infantil 10-11 anos - 300 m' => 'Infantil 10-11 anos - 300 m',
-                        'Infantil 12-13 anos - 400 m' => 'Infantil 12-13 anos - 400 m',
-                        'Adulto a partir de 14 anos - 3 km' => 'Adulto a partir de 14 anos - 3 km',
-                        'Adulto a partir de 16 anos - 6 km' => 'Adulto a partir de 16 anos - 6 km',
-                    ])
+                    ->options(fn (): array => RaceModality::options())
+                    ->searchable()
+                    ->preload()
                     ->required(),
                 Select::make('payment_status')
                     ->label('Status do pagamento')
-                    ->options([
-                        'pending' => 'Pendente',
-                        'paid' => 'Pago',
-                        'cancelled' => 'Cancelado',
-                    ])
+                    ->options(ParticipantRegistration::paymentStatusOptions())
                     ->required(),
                 Textarea::make('notes')
                     ->label('Observacoes')

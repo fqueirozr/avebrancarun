@@ -3,20 +3,26 @@
 
 Ola {{ $registration->athlete_name }},
 
-Recebemos a sua inscricao para a Corrida Ave Branca. Confira abaixo os dados registados:
+A sua inscricao para a **Corrida Ave Branca** ja esta em analise pela organizacao. Confira os dados registrados abaixo.
 
 <x-mail::panel>
-**Atleta:** {{ $registration->athlete_name }}<br>
-**Data de nascimento:** {{ $registration->birth_date->format('d/m/Y') }}<br>
-**Responsavel:** {{ $registration->guardian_name ?: 'Nao informado' }}<br>
-**Telefone:** {{ $registration->phone }}<br>
-**Email:** {{ $registration->email }}<br>
-**Modalidade:** {{ $registration->modality }}<br>
-**Observacoes:** {{ $registration->notes ?: 'Nao informado' }}<br>
-**Estado do pagamento:** Pendente
+**Status da inscricao:** Recebida<br>
+**Status do pagamento:** Pendente
 </x-mail::panel>
 
-A confirmacao final sera feita apos a definicao do pagamento.
+<x-mail::table>
+| Dado | Informacao |
+| :--- | :--- |
+| Atleta | {{ $registration->athlete_name }} |
+| Data de nascimento | {{ $registration->birth_date->format('d/m/Y') }} |
+| Responsavel | {{ $registration->guardian_name ?: 'Nao informado' }} |
+| Telefone | {{ $registration->phone }} |
+| Email | {{ $registration->email }} |
+| Modalidade | {{ $registration->modality }} |
+| Observacoes | {{ $registration->notes ?: 'Nao informado' }} |
+</x-mail::table>
+
+A confirmacao final sera enviada assim que o pagamento for definido. Guarde este e-mail para consultar os dados da sua inscricao.
 
 Obrigado,<br>
 {{ config('app.name') }}

@@ -1,0 +1,73 @@
+<?php
+
+namespace App\Filament\Resources\RaceModalities\Tables;
+
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables\Table;
+use Illuminate\Support\Number;
+
+class RaceModalitiesTable
+{
+    public static function configure(Table $table): Table
+    {
+        return $table
+            ->columns([
+                TextColumn::make('sort_order')
+                    ->label('Ordem')
+                    ->sortable(),
+                TextColumn::make('name')
+                    ->label('Nome')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('type')
+                    ->label('Tipo')
+                    ->badge()
+                    ->sortable(),
+                TextColumn::make('age_range')
+                    ->label('Faixa etaria')
+                    ->searchable()
+                    ->toggleable(),
+                TextColumn::make('distance')
+                    ->label('Distancia')
+                    ->searchable(),
+                TextColumn::make('price')
+                    ->label('Valor')
+                    ->formatStateUsing(fn (?string $state): string => $state === null ? 'A definir' : Number::currency((float) $state, 'BRL', 'pt_BR'))
+                    ->sortable(),
+                TextColumn::make('max_participants')
+                    ->label('Limite')
+                    ->placeholder('Sem limite')
+                    ->sortable()
+                    ->toggleable(),
+                IconColumn::make('is_active')
+                    ->label('Ativa')
+                    ->boolean()
+                    ->sortable(),
+            ])
+            ->filters([
+                SelectFilter::make('type')
+                    ->label('Tipo')
+                    ->options([
+                        'Infantil' => 'Infantil',
+                        'Adulto' => 'Adulto',
+                    ]),
+                TernaryFilter::make('is_active')
+                    ->label('Ativa'),
+            ])
+            ->defaultSort('sort_order')
+            ->recordActions([
+                EditAction::make(),
+            ])
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                ]),
+            ]);
+    }
+}
