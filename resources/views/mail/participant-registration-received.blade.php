@@ -15,7 +15,9 @@ A sua inscricao para a **Corrida Ave Branca** ja esta em analise pela organizaca
 | :--- | :--- |
 | Atleta | {{ $registration->athlete_name }} |
 | Data de nascimento | {{ $registration->birth_date->format('d/m/Y') }} |
+| CPF do participante | {{ $registration->participant_cpf }} |
 | Responsavel | {{ $registration->guardian_name ?: 'Nao informado' }} |
+| CPF do responsavel | {{ $registration->guardian_cpf ?: 'Nao informado' }} |
 | Telefone | {{ $registration->phone }} |
 | Email | {{ $registration->email }} |
 | Pagador | {{ $registration->billing_name ?: 'Nao informado' }} |

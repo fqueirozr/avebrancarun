@@ -28,8 +28,10 @@ class RegisterParticipantRequest extends FormRequest
         return [
             'athlete_name' => ['required', 'string', 'max:255'],
             'birth_date' => ['required', 'date', 'before:today'],
+            'participant_cpf' => ['required', 'string', 'regex:/^\d{11}$/'],
             'guardian_name' => ['nullable', 'string', 'max:255'],
-            'phone' => ['required', 'string', 'max:30'],
+            'guardian_cpf' => ['nullable', 'string', 'regex:/^\d{11}$/'],
+            'phone' => ['required', 'string', 'regex:/^\d{10,11}$/'],
             'email' => ['required', 'email', 'max:255'],
             'billing_document' => ['nullable', 'string', 'regex:/^\d{11}(\d{3})?$/'],
             'billing_name' => ['nullable', 'string', 'max:255'],
@@ -50,6 +52,14 @@ class RegisterParticipantRequest extends FormRequest
         return [
             function (Validator $validator): void {
                 $raceModality = RaceModality::query()->find($this->input('race_modality_id'));
+
+                if (filled($this->input('participant_cpf')) && ! $this->hasValidCpf((string) $this->input('participant_cpf'))) {
+                    $validator->errors()->add('participant_cpf', 'Informe um CPF valido para o participante.');
+                }
+
+                if (filled($this->input('guardian_cpf')) && ! $this->hasValidCpf((string) $this->input('guardian_cpf'))) {
+                    $validator->errors()->add('guardian_cpf', 'Informe um CPF valido para o responsavel.');
+                }
 
                 if (! $this->requiresCheckoutData($raceModality)) {
                     return;
@@ -77,15 +87,15 @@ class RegisterParticipantRequest extends FormRequest
      */
     protected function prepareForValidation(): void
     {
-        if ($this->has('billing_document')) {
-            $this->merge([
-                'billing_document' => preg_replace('/\D+/', '', (string) $this->input('billing_document')),
-            ]);
-        }
+        foreach (['participant_cpf', 'guardian_cpf', 'phone', 'billing_document', 'billing_postal_code'] as $field) {
+            if (! $this->has($field)) {
+                continue;
+            }
 
-        if ($this->has('billing_postal_code')) {
+            $digits = preg_replace('/\D+/', '', (string) $this->input($field));
+
             $this->merge([
-                'billing_postal_code' => preg_replace('/\D+/', '', (string) $this->input('billing_postal_code')),
+                $field => $digits === '' && $field !== 'participant_cpf' && $field !== 'phone' ? null : $digits,
             ]);
         }
     }
@@ -121,6 +131,10 @@ class RegisterParticipantRequest extends FormRequest
 
     private function hasValidCpf(string $cpf): bool
     {
+        if (strlen($cpf) !== 11) {
+            return false;
+        }
+
         if (preg_match('/^(\d)\1{10}$/', $cpf)) {
             return false;
         }
@@ -144,6 +158,10 @@ class RegisterParticipantRequest extends FormRequest
 
     private function hasValidCnpj(string $cnpj): bool
     {
+        if (strlen($cnpj) !== 14) {
+            return false;
+        }
+
         if (preg_match('/^(\d)\1{13}$/', $cnpj)) {
             return false;
         }

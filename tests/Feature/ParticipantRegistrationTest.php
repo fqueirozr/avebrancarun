@@ -37,8 +37,10 @@ test('a participant can submit a registration', function () {
     $this->post(route('registration.store'), [
         'athlete_name' => $registration->athlete_name,
         'birth_date' => $registration->birth_date->format('Y-m-d'),
+        'participant_cpf' => '529.982.247-25',
         'guardian_name' => $registration->guardian_name,
-        'phone' => $registration->phone,
+        'guardian_cpf' => '153.509.460-56',
+        'phone' => '(11) 99999-9999',
         'email' => $registration->email,
         'billing_document' => $registration->billing_document,
         'race_modality_id' => $raceModality->id,
@@ -50,6 +52,9 @@ test('a participant can submit a registration', function () {
     $this->assertDatabaseHas(ParticipantRegistration::class, [
         'athlete_name' => 'Maria Silva',
         'email' => 'maria@example.com',
+        'participant_cpf' => '52998224725',
+        'guardian_cpf' => '15350946056',
+        'phone' => '11999999999',
         'billing_document' => $registration->billing_document,
         'race_modality_id' => $raceModality->id,
         'modality' => 'Adulto a partir de 16 anos - 6 km',
@@ -99,7 +104,9 @@ test('a participant is redirected to checkout when payment gateway is configured
     $this->post(route('registration.store'), [
         'athlete_name' => $registration->athlete_name,
         'birth_date' => $registration->birth_date->format('Y-m-d'),
+        'participant_cpf' => $registration->participant_cpf,
         'guardian_name' => $registration->guardian_name,
+        'guardian_cpf' => $registration->guardian_cpf,
         'phone' => $registration->phone,
         'email' => $registration->email,
         'billing_document' => '529.982.247-25',
@@ -159,7 +166,9 @@ test('paid registration requires a billing document for checkout', function () {
     $this->post(route('registration.store'), [
         'athlete_name' => $registration->athlete_name,
         'birth_date' => $registration->birth_date->format('Y-m-d'),
+        'participant_cpf' => $registration->participant_cpf,
         'guardian_name' => $registration->guardian_name,
+        'guardian_cpf' => $registration->guardian_cpf,
         'phone' => $registration->phone,
         'email' => $registration->email,
         'billing_name' => 'Maria Silva',
@@ -185,7 +194,9 @@ test('paid registration requires billing address data for checkout', function ()
     $this->post(route('registration.store'), [
         'athlete_name' => $registration->athlete_name,
         'birth_date' => $registration->birth_date->format('Y-m-d'),
+        'participant_cpf' => $registration->participant_cpf,
         'guardian_name' => $registration->guardian_name,
+        'guardian_cpf' => $registration->guardian_cpf,
         'phone' => $registration->phone,
         'email' => $registration->email,
         'billing_document' => '52998224725',
@@ -214,7 +225,9 @@ test('paid registration rejects an invalid billing document before checkout', fu
     $this->post(route('registration.store'), [
         'athlete_name' => $registration->athlete_name,
         'birth_date' => $registration->birth_date->format('Y-m-d'),
+        'participant_cpf' => $registration->participant_cpf,
         'guardian_name' => $registration->guardian_name,
+        'guardian_cpf' => $registration->guardian_cpf,
         'phone' => $registration->phone,
         'email' => $registration->email,
         'billing_document' => '37829155412',
@@ -261,7 +274,9 @@ test('checkout gateway failure returns the participant to the form with the gate
     $this->post(route('registration.store'), [
         'athlete_name' => $registration->athlete_name,
         'birth_date' => $registration->birth_date->format('Y-m-d'),
+        'participant_cpf' => $registration->participant_cpf,
         'guardian_name' => $registration->guardian_name,
+        'guardian_cpf' => $registration->guardian_cpf,
         'phone' => $registration->phone,
         'email' => $registration->email,
         'billing_document' => '52998224725',
@@ -283,6 +298,7 @@ test('registration submission validates required fields', function () {
         ->assertSessionHasErrors([
             'athlete_name',
             'birth_date',
+            'participant_cpf',
             'phone',
             'email',
             'race_modality_id',
@@ -299,13 +315,37 @@ test('registration submission rejects inactive modalities', function () {
     $this->post(route('registration.store'), [
         'athlete_name' => $registration->athlete_name,
         'birth_date' => $registration->birth_date->format('Y-m-d'),
+        'participant_cpf' => $registration->participant_cpf,
         'guardian_name' => $registration->guardian_name,
+        'guardian_cpf' => $registration->guardian_cpf,
         'phone' => $registration->phone,
         'email' => $registration->email,
         'race_modality_id' => $raceModality->id,
         'notes' => $registration->notes,
     ])
         ->assertSessionHasErrors('race_modality_id');
+});
+
+test('registration submission rejects invalid participant and guardian cpf and phone', function () {
+    $raceModality = RaceModality::factory()->create();
+    $registration = ParticipantRegistration::factory()->make();
+
+    $this->post(route('registration.store'), [
+        'athlete_name' => $registration->athlete_name,
+        'birth_date' => $registration->birth_date->format('Y-m-d'),
+        'participant_cpf' => '111.111.111-11',
+        'guardian_name' => 'Joao Silva',
+        'guardian_cpf' => '222.222.222-22',
+        'phone' => '12345',
+        'email' => $registration->email,
+        'race_modality_id' => $raceModality->id,
+        'notes' => $registration->notes,
+    ])
+        ->assertSessionHasErrors([
+            'participant_cpf',
+            'guardian_cpf',
+            'phone',
+        ]);
 });
 
 test('registration update email shows cancelled status', function () {

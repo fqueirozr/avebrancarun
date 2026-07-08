@@ -32,6 +32,14 @@ class ParticipantRegistrationsTable
                     ->searchable()
                     ->sortable()
                     ->wrap(),
+                TextColumn::make('participant_cpf')
+                    ->label('CPF participante')
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('guardian_cpf')
+                    ->label('CPF responsavel')
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('phone')
                     ->label('Telefone')
                     ->searchable(),

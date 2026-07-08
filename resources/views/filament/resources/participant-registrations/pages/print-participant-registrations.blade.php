@@ -171,6 +171,7 @@
                     <tr>
                         <th>Atleta</th>
                         <th>Nascimento</th>
+                        <th>CPF participante</th>
                         <th>Responsavel</th>
                         <th>Telefone</th>
                         <th>E-mail</th>
@@ -184,6 +185,7 @@
                         <tr>
                             <td>{{ $registration->athlete_name }}</td>
                             <td>{{ $registration->birth_date?->format('d/m/Y') }}</td>
+                            <td>{{ $registration->participant_cpf }}</td>
                             <td>{{ $registration->guardian_name ?: '-' }}</td>
                             <td>{{ $registration->phone }}</td>
                             <td>{{ $registration->email }}</td>

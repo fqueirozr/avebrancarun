@@ -80,113 +80,132 @@
                 <form action="{{ route('registration.store') }}" method="POST" class="mt-7 grid grid-cols-1 gap-5">
                     @csrf
 
-                    <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
-                        <label class="grid gap-2">
-                            <span class="text-sm font-bold text-zinc-800">Nome do atleta</span>
-                            <input type="text" name="athlete_name" value="{{ old('athlete_name') }}" class="rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-emerald-700 focus:ring-3 focus:ring-emerald-100" placeholder="Nome completo" required>
-                            @error('athlete_name')
-                                <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
-                            @enderror
-                        </label>
+                    <fieldset class="grid min-w-0 gap-5 border-b border-zinc-200 pb-6">
+                        <legend class="mb-4 text-base font-black text-zinc-950">Participante</legend>
 
-                        <label class="grid gap-2">
-                            <span class="text-sm font-bold text-zinc-800">Data de nascimento</span>
-                            <input type="date" name="birth_date" value="{{ old('birth_date') }}" class="rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-emerald-700 focus:ring-3 focus:ring-emerald-100" required>
-                            @error('birth_date')
-                                <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
-                            @enderror
-                        </label>
-                    </div>
+                        <div class="grid min-w-0 grid-cols-1 gap-5 md:grid-cols-2">
+                            <label class="grid min-w-0 gap-2">
+                                <span class="text-sm font-bold leading-5 text-zinc-800">Nome do atleta</span>
+                                <input type="text" name="athlete_name" value="{{ old('athlete_name') }}" class="min-w-0 rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-emerald-700 focus:ring-3 focus:ring-emerald-100" placeholder="Nome completo" required>
+                                @error('athlete_name')
+                                    <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
+                                @enderror
+                            </label>
 
-                    <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
-                        <label class="grid gap-2">
-                            <span class="text-sm font-bold text-zinc-800">Responsavel</span>
-                            <input type="text" name="guardian_name" value="{{ old('guardian_name') }}" class="rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-emerald-700 focus:ring-3 focus:ring-emerald-100" placeholder="Obrigatorio para menores">
-                            @error('guardian_name')
-                                <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
-                            @enderror
-                        </label>
+                            <label class="grid min-w-0 gap-2">
+                                <span class="text-sm font-bold leading-5 text-zinc-800">CPF do participante</span>
+                                <input type="text" name="participant_cpf" value="{{ old('participant_cpf') }}" inputmode="numeric" data-mask="cpf" class="min-w-0 rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-emerald-700 focus:ring-3 focus:ring-emerald-100" placeholder="000.000.000-00" required>
+                                @error('participant_cpf')
+                                    <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
+                                @enderror
+                            </label>
 
-                        <label class="grid gap-2">
-                            <span class="text-sm font-bold text-zinc-800">Telefone</span>
-                            <input type="tel" name="phone" value="{{ old('phone') }}" class="rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-emerald-700 focus:ring-3 focus:ring-emerald-100" placeholder="(00) 00000-0000" required>
-                            @error('phone')
-                                <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
-                            @enderror
-                        </label>
-                    </div>
+                            <label class="grid min-w-0 gap-2">
+                                <span class="text-sm font-bold leading-5 text-zinc-800">Data de nascimento</span>
+                                <input type="date" name="birth_date" value="{{ old('birth_date') }}" class="min-w-0 rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-emerald-700 focus:ring-3 focus:ring-emerald-100" required>
+                                @error('birth_date')
+                                    <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
+                                @enderror
+                            </label>
 
-                    <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
-                        <label class="grid gap-2">
-                            <span class="text-sm font-bold text-zinc-800">E-mail</span>
-                            <input type="email" name="email" value="{{ old('email') }}" class="rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-emerald-700 focus:ring-3 focus:ring-emerald-100" placeholder="email@exemplo.com" required>
-                            @error('email')
-                                <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
-                            @enderror
-                        </label>
+                            <label class="grid min-w-0 gap-2">
+                                <span class="text-sm font-bold leading-5 text-zinc-800">Telefone</span>
+                                <input type="tel" name="phone" value="{{ old('phone') }}" inputmode="tel" data-mask="phone" class="min-w-0 rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-emerald-700 focus:ring-3 focus:ring-emerald-100" placeholder="(00) 00000-0000" required>
+                                @error('phone')
+                                    <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
+                                @enderror
+                            </label>
 
-                        <label class="grid gap-2">
-                            <span class="text-sm font-bold text-zinc-800">CPF/CNPJ do pagador</span>
-                            <input type="text" name="billing_document" value="{{ old('billing_document') }}" inputmode="numeric" class="rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-emerald-700 focus:ring-3 focus:ring-emerald-100" placeholder="Somente numeros">
-                            @error('billing_document')
-                                <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
-                            @enderror
-                        </label>
-                    </div>
-
-                    <div class="grid gap-5 rounded-md border border-zinc-200 bg-zinc-50 p-4">
-                        <div>
-                            <p class="text-sm font-black text-zinc-900">Dados do pagador</p>
-                            <p class="mt-1 text-sm leading-6 text-zinc-600">Necessario para abrir o checkout nas modalidades com valor.</p>
+                            <label class="grid min-w-0 gap-2 md:col-span-2">
+                                <span class="text-sm font-bold leading-5 text-zinc-800">E-mail</span>
+                                <input type="email" name="email" value="{{ old('email') }}" class="min-w-0 rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-emerald-700 focus:ring-3 focus:ring-emerald-100" placeholder="email@exemplo.com" required>
+                                @error('email')
+                                    <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
+                                @enderror
+                            </label>
                         </div>
+                    </fieldset>
 
-                        <label class="grid gap-2">
-                            <span class="text-sm font-bold text-zinc-800">Nome completo do pagador</span>
-                            <input type="text" name="billing_name" value="{{ old('billing_name') }}" class="rounded-md border border-zinc-300 bg-white px-4 py-3 text-base outline-none transition focus:border-emerald-700 focus:ring-3 focus:ring-emerald-100" placeholder="Nome completo">
-                            @error('billing_name')
-                                <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
-                            @enderror
-                        </label>
+                    <fieldset class="grid min-w-0 gap-5 border-b border-zinc-200 pb-6">
+                        <legend class="mb-4 text-base font-black text-zinc-950">Responsavel</legend>
 
-                        <div class="grid grid-cols-1 gap-5 md:grid-cols-[1fr_9rem]">
-                            <label class="grid gap-2">
-                                <span class="text-sm font-bold text-zinc-800">Endereco</span>
-                                <input type="text" name="billing_address" value="{{ old('billing_address') }}" class="rounded-md border border-zinc-300 bg-white px-4 py-3 text-base outline-none transition focus:border-emerald-700 focus:ring-3 focus:ring-emerald-100" placeholder="Rua, avenida ou travessa">
+                        <div class="grid min-w-0 grid-cols-1 gap-5 md:grid-cols-2">
+                            <label class="grid min-w-0 gap-2">
+                                <span class="text-sm font-bold leading-5 text-zinc-800">Nome do responsavel</span>
+                                <input type="text" name="guardian_name" value="{{ old('guardian_name') }}" class="min-w-0 rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-emerald-700 focus:ring-3 focus:ring-emerald-100" placeholder="Obrigatorio para menores">
+                                @error('guardian_name')
+                                    <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
+                                @enderror
+                            </label>
+
+                            <label class="grid min-w-0 gap-2">
+                                <span class="text-sm font-bold leading-5 text-zinc-800">CPF do responsavel</span>
+                                <input type="text" name="guardian_cpf" value="{{ old('guardian_cpf') }}" inputmode="numeric" data-mask="cpf" class="min-w-0 rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-emerald-700 focus:ring-3 focus:ring-emerald-100" placeholder="000.000.000-00">
+                                @error('guardian_cpf')
+                                    <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
+                                @enderror
+                            </label>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="grid min-w-0 gap-5 border-b border-zinc-200 pb-6">
+                        <legend class="mb-4 text-base font-black text-zinc-950">Pagador</legend>
+
+                        <div class="grid min-w-0 grid-cols-1 gap-5 md:grid-cols-2">
+                            <label class="grid min-w-0 gap-2">
+                                <span class="text-sm font-bold leading-5 text-zinc-800">Nome completo do pagador</span>
+                                <input type="text" name="billing_name" value="{{ old('billing_name') }}" class="min-w-0 rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-emerald-700 focus:ring-3 focus:ring-emerald-100" placeholder="Nome completo">
+                                @error('billing_name')
+                                    <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
+                                @enderror
+                            </label>
+
+                            <label class="grid min-w-0 gap-2">
+                                <span class="text-sm font-bold leading-5 text-zinc-800">CPF/CNPJ do pagador</span>
+                                <input type="text" name="billing_document" value="{{ old('billing_document') }}" inputmode="numeric" data-mask="cpfCnpj" class="min-w-0 rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-emerald-700 focus:ring-3 focus:ring-emerald-100" placeholder="000.000.000-00">
+                                @error('billing_document')
+                                    <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
+                                @enderror
+                            </label>
+
+                            <label class="grid min-w-0 gap-2 md:col-span-2 lg:col-span-1">
+                                <span class="text-sm font-bold leading-5 text-zinc-800">Endereco</span>
+                                <input type="text" name="billing_address" value="{{ old('billing_address') }}" class="min-w-0 rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-emerald-700 focus:ring-3 focus:ring-emerald-100" placeholder="Rua, avenida ou travessa">
                                 @error('billing_address')
                                     <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
                                 @enderror
                             </label>
 
-                            <label class="grid gap-2">
-                                <span class="text-sm font-bold text-zinc-800">Numero</span>
-                                <input type="text" name="billing_address_number" value="{{ old('billing_address_number') }}" class="rounded-md border border-zinc-300 bg-white px-4 py-3 text-base outline-none transition focus:border-emerald-700 focus:ring-3 focus:ring-emerald-100" placeholder="123">
-                                @error('billing_address_number')
-                                    <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
-                                @enderror
-                            </label>
-                        </div>
+                            <div class="grid min-w-0 grid-cols-1 gap-5 sm:grid-cols-[minmax(0,1fr)_8rem]">
+                                <label class="grid min-w-0 gap-2">
+                                    <span class="text-sm font-bold leading-5 text-zinc-800">Bairro</span>
+                                    <input type="text" name="billing_province" value="{{ old('billing_province') }}" class="min-w-0 rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-emerald-700 focus:ring-3 focus:ring-emerald-100" placeholder="Bairro">
+                                    @error('billing_province')
+                                        <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
+                                    @enderror
+                                </label>
 
-                        <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
-                            <label class="grid gap-2">
-                                <span class="text-sm font-bold text-zinc-800">Bairro</span>
-                                <input type="text" name="billing_province" value="{{ old('billing_province') }}" class="rounded-md border border-zinc-300 bg-white px-4 py-3 text-base outline-none transition focus:border-emerald-700 focus:ring-3 focus:ring-emerald-100" placeholder="Bairro">
-                                @error('billing_province')
-                                    <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
-                                @enderror
-                            </label>
+                                <label class="grid min-w-0 gap-2">
+                                    <span class="text-sm font-bold leading-5 text-zinc-800">Numero</span>
+                                    <input type="text" name="billing_address_number" value="{{ old('billing_address_number') }}" class="min-w-0 rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-emerald-700 focus:ring-3 focus:ring-emerald-100" placeholder="123">
+                                    @error('billing_address_number')
+                                        <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
+                                    @enderror
+                                </label>
+                            </div>
 
-                            <label class="grid gap-2">
-                                <span class="text-sm font-bold text-zinc-800">CEP</span>
-                                <input type="text" name="billing_postal_code" value="{{ old('billing_postal_code') }}" inputmode="numeric" class="rounded-md border border-zinc-300 bg-white px-4 py-3 text-base outline-none transition focus:border-emerald-700 focus:ring-3 focus:ring-emerald-100" placeholder="Somente numeros">
+                            <label class="grid min-w-0 gap-2">
+                                <span class="text-sm font-bold leading-5 text-zinc-800">CEP</span>
+                                <input type="text" name="billing_postal_code" value="{{ old('billing_postal_code') }}" inputmode="numeric" class="min-w-0 rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-emerald-700 focus:ring-3 focus:ring-emerald-100" placeholder="Somente numeros">
                                 @error('billing_postal_code')
                                     <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
                                 @enderror
                             </label>
                         </div>
-                    </div>
+                    </fieldset>
 
-                    <fieldset class="grid gap-3">
-                        <legend class="text-sm font-bold text-zinc-800">Modalidade</legend>
+                    <fieldset class="grid min-w-0 gap-3 border-b border-zinc-200 pb-6">
+                        <legend class="mb-4 text-base font-black text-zinc-950">Modalidade</legend>
                         <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
                             @forelse ($modalities as $modality)
                                 <label class="flex min-h-20 items-start gap-3 rounded-md border border-zinc-200 px-4 py-3 text-sm transition has-checked:border-emerald-700 has-checked:bg-emerald-50">
@@ -209,13 +228,17 @@
                         @enderror
                     </fieldset>
 
-                    <label class="grid gap-2">
-                        <span class="text-sm font-bold text-zinc-800">Observacoes</span>
-                        <textarea name="notes" rows="4" class="rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-emerald-700 focus:ring-3 focus:ring-emerald-100" placeholder="Equipe, restricao medica ou detalhe importante">{{ old('notes') }}</textarea>
-                        @error('notes')
-                            <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
-                        @enderror
-                    </label>
+                    <fieldset class="grid min-w-0 gap-5">
+                        <legend class="mb-4 text-base font-black text-zinc-950">Observacoes</legend>
+
+                        <label class="grid min-w-0 gap-2">
+                            <span class="text-sm font-bold leading-5 text-zinc-800">Detalhes adicionais</span>
+                            <textarea name="notes" rows="4" class="min-w-0 rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-emerald-700 focus:ring-3 focus:ring-emerald-100" placeholder="Equipe, restricao medica ou detalhe importante">{{ old('notes') }}</textarea>
+                            @error('notes')
+                                <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
+                            @enderror
+                        </label>
+                    </fieldset>
 
                     <div class="grid gap-3 rounded-md bg-zinc-50 p-5 sm:grid-cols-[1fr_auto] sm:items-center">
                         <div>

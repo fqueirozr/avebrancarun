@@ -11,7 +11,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 #[Fillable([
     'athlete_name',
     'birth_date',
+    'participant_cpf',
     'guardian_name',
+    'guardian_cpf',
     'phone',
     'email',
     'billing_document',
