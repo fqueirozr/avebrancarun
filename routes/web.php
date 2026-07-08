@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AsaasWebhookController;
+use App\Http\Controllers\ContactMessageController;
 use App\Http\Controllers\ParticipantRegistrationController;
 use App\Models\EventSetting;
 use App\Models\RaceModality;
@@ -27,6 +28,7 @@ Route::get('/inscricao', function () {
     ]);
 })->name('registration');
 Route::post('/inscricao', [ParticipantRegistrationController::class, 'store'])->name('registration.store');
+Route::post('/contato', [ContactMessageController::class, 'store'])->name('contact.store');
 Route::get('/inscricao/{registration}/pagamento/sucesso', [ParticipantRegistrationController::class, 'paymentSuccess'])
     ->middleware('signed')
     ->name('registration.payment.success');

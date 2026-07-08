@@ -20,6 +20,9 @@ class EventSettingFactory extends Factory
         return [
             'event_date' => fake()->date('d/m/Y'),
             'event_location' => fake()->city(),
+            'contact_email' => fake()->safeEmail(),
+            'contact_phone' => fake()->numerify('###########'),
+            'contact_whatsapp' => fake()->numerify('###########'),
             'kit_information' => fake()->sentence(),
             'regulation' => fake()->paragraphs(3, true),
         ];

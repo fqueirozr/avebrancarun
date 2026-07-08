@@ -20,6 +20,21 @@ class EventSettingForm
                     ->label('Local')
                     ->placeholder('A confirmar')
                     ->maxLength(255),
+                TextInput::make('contact_email')
+                    ->label('E-mail de contato')
+                    ->placeholder('contato@evento.com.br')
+                    ->email()
+                    ->maxLength(255),
+                TextInput::make('contact_phone')
+                    ->label('Telefone do evento')
+                    ->placeholder('(00) 0000-0000')
+                    ->tel()
+                    ->maxLength(255),
+                TextInput::make('contact_whatsapp')
+                    ->label('WhatsApp do evento')
+                    ->placeholder('(00) 00000-0000')
+                    ->tel()
+                    ->maxLength(255),
                 RichEditor::make('kit_information')
                     ->label('Kit atleta')
                     ->placeholder('Informe os itens do kit ou orientações de retirada')

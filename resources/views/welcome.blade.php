@@ -28,7 +28,7 @@
                 <div class="hidden items-center gap-7 text-sm font-semibold text-white/90 md:flex">
                     <a href="#modalidades" class="hover:text-white">Modalidades</a>
                     <a href="#programacao" class="hover:text-white">Programação</a>
-                    <a href="#informacoes" class="hover:text-white">Informações</a>
+                    <a href="#contato" class="hover:text-white">Contato</a>
                 </div>
 
                 <a href="{{ route('registration') }}" class="rounded-md bg-white px-4 py-2 text-sm font-bold text-emerald-900 shadow-sm transition hover:bg-lime-100">
@@ -149,26 +149,101 @@
                 </div>
             </section>
 
-            <section id="informacoes" class="mx-auto max-w-7xl px-5 py-16 sm:px-8">
-                <div class="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_0.85fr] lg:items-center">
-                    <div>
-                        <p class="text-sm font-bold uppercase tracking-normal text-emerald-700">Inscrições</p>
-                        <h2 class="mt-3 text-3xl font-black leading-tight sm:text-4xl">Fluxo pronto para evoluir para pagamento online</h2>
-                        <p class="mt-4 text-base leading-7 text-zinc-700">
-                            Enquanto o meio de pagamento ideal está em análise, a página de inscrição organiza os dados do atleta e destaca que a confirmação será finalizada após a definição do gateway.
-                        </p>
+            <section id="contato" class="mx-auto max-w-7xl px-5 py-16 sm:px-8">
+                <div class="grid grid-cols-1 gap-8 lg:grid-cols-[0.85fr_1.15fr] lg:items-start">
+                    <div class="rounded-md bg-emerald-950 p-6 text-white shadow-xl shadow-emerald-950/15">
+                        <p class="text-sm font-semibold text-lime-200">Contato</p>
+                        <h2 class="mt-3 text-3xl font-black leading-tight">Fale com a organização</h2>
+                        <div class="mt-6 grid gap-4 text-sm leading-6 text-white/82">
+                            @if ($eventSetting->contact_email)
+                                <p>
+                                    <span class="block font-bold text-white">E-mail</span>
+                                    <a href="mailto:{{ $eventSetting->contact_email }}" class="hover:text-lime-200">{{ $eventSetting->contact_email }}</a>
+                                </p>
+                            @endif
+
+                            @if ($eventSetting->contact_phone)
+                                <p>
+                                    <span class="block font-bold text-white">Telefone</span>
+                                    {{ $eventSetting->contact_phone }}
+                                </p>
+                            @endif
+
+                            @if ($eventSetting->contact_whatsapp)
+                                <p>
+                                    <span class="block font-bold text-white">WhatsApp</span>
+                                    {{ $eventSetting->contact_whatsapp }}
+                                </p>
+                            @endif
+
+                            @unless ($eventSetting->contact_email || $eventSetting->contact_phone || $eventSetting->contact_whatsapp)
+                                <p>Envie sua mensagem pelo formulário. A organização responderá pelo e-mail informado.</p>
+                            @endunless
+                        </div>
                     </div>
 
-                    <div class="rounded-md bg-emerald-950 p-6 text-white shadow-xl shadow-emerald-950/15">
-                        <p class="text-sm font-semibold text-lime-200">Próxima etapa</p>
-                        <p class="mt-3 text-2xl font-black">Integrar pagamento</p>
-                        <p class="mt-3 text-sm leading-6 text-white/78">
-                            O formulário pode ser ligado a Pix, cartão ou plataforma externa quando o cliente escolher o provedor.
-                        </p>
-                        <a href="{{ route('registration') }}" class="mt-6 inline-flex rounded-md bg-lime-300 px-5 py-3 text-sm font-black text-emerald-950 transition hover:bg-lime-200">
-                            Abrir inscrição
-                        </a>
-                    </div>
+                    <form action="{{ route('contact.store') }}" method="POST" class="grid gap-5 rounded-md border border-zinc-200 bg-white p-5 shadow-sm shadow-emerald-950/5 sm:p-7">
+                        @csrf
+
+                        <div>
+                            <p class="text-sm font-bold uppercase tracking-normal text-emerald-700">Mensagem</p>
+                            <h3 class="mt-2 text-2xl font-black leading-tight">Envie sua dúvida</h3>
+                        </div>
+
+                        @if (session('contact_status'))
+                            <div class="rounded-md border border-emerald-200 bg-emerald-50 p-4 text-sm font-bold text-emerald-950">
+                                {{ session('contact_status') }}
+                            </div>
+                        @endif
+
+                        <div class="grid min-w-0 grid-cols-1 gap-5 md:grid-cols-2">
+                            <label class="grid min-w-0 gap-2">
+                                <span class="text-sm font-bold leading-5 text-zinc-800">Nome</span>
+                                <input type="text" name="name" value="{{ old('name') }}" class="min-w-0 rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-emerald-700 focus:ring-3 focus:ring-emerald-100" placeholder="Seu nome" required>
+                                @error('name')
+                                    <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
+                                @enderror
+                            </label>
+
+                            <label class="grid min-w-0 gap-2">
+                                <span class="text-sm font-bold leading-5 text-zinc-800">E-mail</span>
+                                <input type="email" name="email" value="{{ old('email') }}" class="min-w-0 rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-emerald-700 focus:ring-3 focus:ring-emerald-100" placeholder="email@exemplo.com" required>
+                                @error('email')
+                                    <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
+                                @enderror
+                            </label>
+
+                            <label class="grid min-w-0 gap-2">
+                                <span class="text-sm font-bold leading-5 text-zinc-800">Telefone</span>
+                                <input type="tel" name="phone" value="{{ old('phone') }}" inputmode="tel" data-mask="phone" class="min-w-0 rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-emerald-700 focus:ring-3 focus:ring-emerald-100" placeholder="(00) 00000-0000">
+                                @error('phone')
+                                    <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
+                                @enderror
+                            </label>
+
+                            <label class="grid min-w-0 gap-2">
+                                <span class="text-sm font-bold leading-5 text-zinc-800">Assunto</span>
+                                <input type="text" name="subject" value="{{ old('subject') }}" class="min-w-0 rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-emerald-700 focus:ring-3 focus:ring-emerald-100" placeholder="Sobre o que quer falar?">
+                                @error('subject')
+                                    <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
+                                @enderror
+                            </label>
+                        </div>
+
+                        <label class="grid min-w-0 gap-2">
+                            <span class="text-sm font-bold leading-5 text-zinc-800">Mensagem</span>
+                            <textarea name="message" rows="5" class="min-w-0 rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-emerald-700 focus:ring-3 focus:ring-emerald-100" placeholder="Escreva sua dúvida ou solicitação" required>{{ old('message') }}</textarea>
+                            @error('message')
+                                <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
+                            @enderror
+                        </label>
+
+                        <div class="flex justify-end">
+                            <button type="submit" class="rounded-md bg-emerald-800 px-5 py-3 text-sm font-black text-white transition hover:bg-emerald-900">
+                                Enviar mensagem
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </section>
         </main>

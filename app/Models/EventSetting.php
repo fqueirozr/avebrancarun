@@ -10,6 +10,9 @@ use Illuminate\Database\Eloquent\Model;
 #[Fillable([
     'event_date',
     'event_location',
+    'contact_email',
+    'contact_phone',
+    'contact_whatsapp',
     'kit_information',
     'regulation',
 ])]
