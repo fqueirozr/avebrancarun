@@ -47,6 +47,17 @@ class ParticipantRegistrationsTable
                     ->label('E-mail')
                     ->searchable()
                     ->toggleable(),
+                TextColumn::make('emergency_contact_name')
+                    ->label('Contato emerg.')
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('privacy_policy_version')
+                    ->label('Política')
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('privacy_policy_accepted_at')
+                    ->label('Aceite privacidade')
+                    ->dateTime('d/m/Y H:i')
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('payment_status')
                     ->label('Pagamento')
                     ->badge()

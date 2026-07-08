@@ -45,6 +45,10 @@ test('a participant can submit a registration', function () {
         'billing_document' => $registration->billing_document,
         'race_modality_id' => $raceModality->id,
         'notes' => $registration->notes,
+        'emergency_contact_name' => 'Ana Silva',
+        'emergency_contact_phone' => '(11) 98888-7777',
+        'health_notes' => 'Alergia a amendoim.',
+        'promotional_opt_in' => '1',
         'accepted_regulation' => '1',
         'accepted_privacy_policy' => '1',
         'accepted_fitness_declaration' => '1',
@@ -61,8 +65,20 @@ test('a participant can submit a registration', function () {
         'billing_document' => $registration->billing_document,
         'race_modality_id' => $raceModality->id,
         'modality' => 'Adulto a partir de 16 anos - 6 km',
+        'notes' => $registration->notes,
+        'emergency_contact_name' => 'Ana Silva',
+        'emergency_contact_phone' => '11988887777',
+        'promotional_opt_in' => true,
+        'privacy_policy_version' => ParticipantRegistration::PrivacyPolicyVersion,
         'payment_status' => 'pending',
     ]);
+
+    $storedRegistration = ParticipantRegistration::query()->where('email', 'maria@example.com')->firstOrFail();
+
+    expect($storedRegistration->health_notes)->toBe('Alergia a amendoim.')
+        ->and($storedRegistration->privacy_policy_accepted_at)->not->toBeNull()
+        ->and($storedRegistration->privacy_policy_acceptance_ip)->not->toBeNull()
+        ->and($storedRegistration->privacy_policy_acceptance_user_agent)->not->toBeNull();
 
     Mail::assertSent(ParticipantRegistrationReceived::class, function (ParticipantRegistrationReceived $mail) {
         return $mail->hasTo('maria@example.com')
@@ -95,6 +111,36 @@ test('registration submission requires mandatory declarations', function () {
             'accepted_regulation',
             'accepted_privacy_policy',
             'accepted_fitness_declaration',
+        ]);
+
+    expect(ParticipantRegistration::query()->count())->toBe(0);
+});
+
+test('minor participant registration requires guardian data', function () {
+    $raceModality = RaceModality::factory()->create([
+        'price' => null,
+    ]);
+
+    $registration = ParticipantRegistration::factory()->make([
+        'birth_date' => now()->subYears(12)->format('Y-m-d'),
+        'race_modality_id' => $raceModality->id,
+    ]);
+
+    $this->post(route('registration.store'), [
+        'athlete_name' => $registration->athlete_name,
+        'birth_date' => $registration->birth_date->format('Y-m-d'),
+        'participant_cpf' => '529.982.247-25',
+        'phone' => '(11) 99999-9999',
+        'email' => $registration->email,
+        'race_modality_id' => $raceModality->id,
+        'notes' => $registration->notes,
+        'accepted_regulation' => '1',
+        'accepted_privacy_policy' => '1',
+        'accepted_fitness_declaration' => '1',
+    ])
+        ->assertSessionHasErrors([
+            'guardian_name',
+            'guardian_cpf',
         ]);
 
     expect(ParticipantRegistration::query()->count())->toBe(0);

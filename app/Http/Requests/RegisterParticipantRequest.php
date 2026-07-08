@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use App\Models\RaceModality;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Carbon;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
 
@@ -41,6 +42,10 @@ class RegisterParticipantRequest extends FormRequest
             'billing_postal_code' => ['nullable', 'string', 'regex:/^\d{8}$/'],
             'race_modality_id' => ['required', Rule::exists('race_modalities', 'id')->where('is_active', true)],
             'notes' => ['nullable', 'string', 'max:1000'],
+            'emergency_contact_name' => ['nullable', 'string', 'max:255'],
+            'emergency_contact_phone' => ['nullable', 'string', 'regex:/^\d{10,11}$/'],
+            'health_notes' => ['nullable', 'string', 'max:1000'],
+            'promotional_opt_in' => ['nullable', 'boolean'],
             'accepted_regulation' => ['accepted'],
             'accepted_privacy_policy' => ['accepted'],
             'accepted_fitness_declaration' => ['accepted'],
@@ -86,6 +91,10 @@ class RegisterParticipantRequest extends FormRequest
             'billing_postal_code' => 'o CEP do pagador',
             'race_modality_id' => 'a modalidade',
             'notes' => 'as observações',
+            'emergency_contact_name' => 'o nome do contato de emergência',
+            'emergency_contact_phone' => 'o telefone do contato de emergência',
+            'health_notes' => 'as informações de saúde e emergência',
+            'promotional_opt_in' => 'a autorização de comunicações promocionais',
             'accepted_regulation' => 'o Regulamento',
             'accepted_privacy_policy' => 'a Política de Privacidade',
             'accepted_fitness_declaration' => 'a declaração de aptidão para participar da prova',
@@ -107,6 +116,16 @@ class RegisterParticipantRequest extends FormRequest
 
                 if (filled($this->input('guardian_cpf')) && ! $this->hasValidCpf((string) $this->input('guardian_cpf'))) {
                     $validator->errors()->add('guardian_cpf', 'Informe um CPF válido para o responsável.');
+                }
+
+                if ($this->isMinorParticipant()) {
+                    if (blank($this->input('guardian_name'))) {
+                        $validator->errors()->add('guardian_name', 'Informe o nome do responsável para participantes menores de idade.');
+                    }
+
+                    if (blank($this->input('guardian_cpf'))) {
+                        $validator->errors()->add('guardian_cpf', 'Informe o CPF do responsável para participantes menores de idade.');
+                    }
                 }
 
                 if (! $this->requiresCheckoutData($raceModality)) {
@@ -135,7 +154,7 @@ class RegisterParticipantRequest extends FormRequest
      */
     protected function prepareForValidation(): void
     {
-        foreach (['participant_cpf', 'guardian_cpf', 'phone', 'billing_document', 'billing_postal_code'] as $field) {
+        foreach (['participant_cpf', 'guardian_cpf', 'phone', 'emergency_contact_phone', 'billing_document', 'billing_postal_code'] as $field) {
             if (! $this->has($field)) {
                 continue;
             }
@@ -151,6 +170,23 @@ class RegisterParticipantRequest extends FormRequest
     private function requiresCheckoutData(?RaceModality $raceModality): bool
     {
         return $raceModality !== null && $raceModality->price !== null && (float) $raceModality->price > 0;
+    }
+
+    private function isMinorParticipant(): bool
+    {
+        if (blank($this->input('birth_date'))) {
+            return false;
+        }
+
+        $birthDateValue = (string) $this->input('birth_date');
+
+        if (strtotime($birthDateValue) === false) {
+            return false;
+        }
+
+        $birthDate = Carbon::parse($birthDateValue);
+
+        return $birthDate->isAfter(today()->subYears(18));
     }
 
     /**

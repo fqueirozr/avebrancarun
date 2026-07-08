@@ -32,6 +32,11 @@ class ParticipantRegistrationController extends Controller
 
         $registration = ParticipantRegistration::create([
             ...$validated,
+            'promotional_opt_in' => (bool) ($validated['promotional_opt_in'] ?? false),
+            'privacy_policy_accepted_at' => now(),
+            'privacy_policy_version' => ParticipantRegistration::PrivacyPolicyVersion,
+            'privacy_policy_acceptance_ip' => $request->ip(),
+            'privacy_policy_acceptance_user_agent' => $request->userAgent(),
             'modality' => $raceModality->displayName(),
         ]);
 

@@ -232,9 +232,36 @@
                         <legend class="mb-4 text-base font-black text-zinc-950">Observações</legend>
 
                         <label class="grid min-w-0 gap-2">
-                            <span class="text-sm font-bold leading-5 text-zinc-800">Detalhes adicionais</span>
-                            <textarea name="notes" rows="4" class="min-w-0 rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-emerald-700 focus:ring-3 focus:ring-emerald-100" placeholder="Equipe, restrição médica ou detalhe importante">{{ old('notes') }}</textarea>
+                            <span class="text-sm font-bold leading-5 text-zinc-800">Detalhes gerais</span>
+                            <textarea name="notes" rows="3" class="min-w-0 rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-emerald-700 focus:ring-3 focus:ring-emerald-100" placeholder="Equipe, preferências operacionais ou detalhe não sensível">{{ old('notes') }}</textarea>
                             @error('notes')
+                                <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
+                            @enderror
+                        </label>
+
+                        <div class="grid min-w-0 grid-cols-1 gap-5 md:grid-cols-2">
+                            <label class="grid min-w-0 gap-2">
+                                <span class="text-sm font-bold leading-5 text-zinc-800">Contato de emergência</span>
+                                <input type="text" name="emergency_contact_name" value="{{ old('emergency_contact_name') }}" class="min-w-0 rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-emerald-700 focus:ring-3 focus:ring-emerald-100" placeholder="Nome da pessoa">
+                                @error('emergency_contact_name')
+                                    <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
+                                @enderror
+                            </label>
+
+                            <label class="grid min-w-0 gap-2">
+                                <span class="text-sm font-bold leading-5 text-zinc-800">Telefone de emergência</span>
+                                <input type="tel" name="emergency_contact_phone" value="{{ old('emergency_contact_phone') }}" inputmode="tel" data-mask="phone" class="min-w-0 rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-emerald-700 focus:ring-3 focus:ring-emerald-100" placeholder="(00) 00000-0000">
+                                @error('emergency_contact_phone')
+                                    <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
+                                @enderror
+                            </label>
+                        </div>
+
+                        <label class="grid min-w-0 gap-2">
+                            <span class="text-sm font-bold leading-5 text-zinc-800">Saúde e suporte emergencial</span>
+                            <textarea name="health_notes" rows="4" class="min-w-0 rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-emerald-700 focus:ring-3 focus:ring-emerald-100" placeholder="Alergias, restrições médicas, medicamentos ou condição relevante para atendimento durante o evento">{{ old('health_notes') }}</textarea>
+                            <span class="text-xs font-semibold leading-5 text-zinc-500">Use este campo apenas para informações necessárias à segurança do participante no evento.</span>
+                            @error('health_notes')
                                 <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
                             @enderror
                         </label>
@@ -274,6 +301,14 @@
                             <span>Declaro estar apto a participar da prova.</span>
                         </label>
                         @error('accepted_fitness_declaration')
+                            <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
+                        @enderror
+
+                        <label class="flex items-start gap-3 rounded-md border border-zinc-200 bg-white px-4 py-3 text-sm font-semibold text-zinc-800 transition has-checked:border-emerald-700 has-checked:bg-emerald-50">
+                            <input type="checkbox" name="promotional_opt_in" value="1" @checked(old('promotional_opt_in')) class="mt-1 size-4 accent-emerald-800">
+                            <span>Autorizo receber comunicações promocionais sobre futuras corridas e ações do organizador. Posso solicitar o descadastramento a qualquer momento.</span>
+                        </label>
+                        @error('promotional_opt_in')
                             <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
                         @enderror
                     </fieldset>
@@ -321,9 +356,37 @@
             </div>
             <div class="max-h-[70vh] overflow-y-auto bg-[#f4fbff] p-4 sm:p-6">
                 <div class="event-rich-content event-rich-content--modal rounded-md border border-race-cyan/15 bg-white p-5 shadow-sm shadow-cyan-950/5 sm:p-6">
-                    <p>Os dados informados neste formulário serão usados pela organização da Corrida Ave Branca para processar a inscrição, identificar o participante, entrar em contato sobre o evento e viabilizar o pagamento quando aplicável.</p>
-                    <p>As informações poderão ser compartilhadas apenas com serviços necessários à realização da prova, como plataformas de pagamento, cronometragem, comunicação e suporte operacional.</p>
-                    <p>Ao continuar, você declara ciência desse tratamento de dados para fins de inscrição e organização do evento.</p>
+                    <p><strong>Versão {{ \App\Models\ParticipantRegistration::PrivacyPolicyVersion }}.</strong> Esta Política de Privacidade descreve como a organização da Corrida Ave Branca trata dados pessoais no fluxo de inscrição, pagamento e operação do evento.</p>
+
+                    <h3>1. Dados coletados</h3>
+                    <p>Coletamos dados de identificação e contato do participante, como nome, data de nascimento, CPF, telefone, e-mail, modalidade escolhida e dados do responsável legal quando o participante for menor de idade. Quando houver pagamento, coletamos os dados do pagador necessários ao checkout, como nome, CPF ou CNPJ, endereço, número, bairro e CEP.</p>
+                    <p>Campos de observações gerais devem ser usados para informações operacionais não sensíveis. Informações de saúde, alergias, medicamentos, restrições médicas, contato de emergência e dados semelhantes devem ser informados apenas nos campos próprios de saúde e emergência.</p>
+
+                    <h3>2. Finalidades e bases de tratamento</h3>
+                    <p>Usamos os dados para criar e administrar a inscrição, identificar participantes, confirmar idade e autorização de menores, viabilizar pagamento, emitir comunicações essenciais sobre o evento, prestar suporte, organizar kits, apuração, segurança, atendimento emergencial, prevenção a fraudes, cumprimento de obrigações legais e defesa de direitos.</p>
+                    <p>Dados de saúde e emergência são usados somente para segurança do participante e eventual suporte emergencial durante o evento.</p>
+
+                    <h3>3. Pagamentos</h3>
+                    <p>O checkout pode ser processado pela Asaas. Enviamos ao processador apenas os dados necessários para criar e reconciliar cobranças. Esta aplicação não armazena cartão completo, chave Pix, boleto integral ou outro instrumento financeiro completo.</p>
+
+                    <h3>4. Compartilhamento</h3>
+                    <p>Podemos compartilhar dados, no limite necessário, com organizadores, prestadores de tecnologia e suporte, processadores de pagamento, equipe de cronometragem e resultados, logística de kit, comunicação operacional, equipes médicas ou emergenciais, seguradoras quando aplicável, autoridades públicas quando exigido e parceiros necessários à execução do evento. Não vendemos dados pessoais.</p>
+
+                    <h3>5. Resultados, imagens e divulgação pública</h3>
+                    <p>Resultados, fotos e vídeos do evento podem divulgar dados compatíveis com a natureza pública da prova, como nome do participante, número de peito, categoria, equipe, tempo, classificação, fotos e vídeos captados durante o evento.</p>
+
+                    <h3>6. Comunicações promocionais</h3>
+                    <p>Mensagens essenciais sobre inscrição, pagamento, segurança, suporte e alterações do evento não dependem de opt-in promocional. Comunicações promocionais sobre futuras corridas ou ações do organizador só serão enviadas quando você autorizar no formulário, e o descadastramento pode ser solicitado pelo canal indicado nesta política.</p>
+
+                    <h3>7. Retenção, exclusão e anonimização</h3>
+                    <p>Os dados serão mantidos pelo tempo necessário para inscrição, pagamento, suporte, obrigações legais, fiscais, regulatórias e contratuais, prevenção a fraudes, defesa de direitos e histórico do evento. Após esse período, os dados poderão ser excluídos, anonimizados ou mantidos apenas quando houver base legal para retenção.</p>
+
+                    <h3>8. Direitos LGPD</h3>
+                    <p>Você pode solicitar confirmação de tratamento, acesso, correção, anonimização, bloqueio ou eliminação quando aplicável, portabilidade quando cabível, informações sobre compartilhamento, revogação de consentimento e revisão de decisões automatizadas caso venham a ser adotadas.</p>
+                    <p>Para exercer direitos, pedir exclusão/anonimização após o prazo necessário ou solicitar opt-out promocional, entre em contato pelo e-mail oficial da organização informado nos canais do evento. Para segurança, poderemos pedir dados mínimos para confirmar a identidade do solicitante antes de atender o pedido.</p>
+
+                    <h3>9. Segurança</h3>
+                    <p>Adotamos controles para reduzir acesso indevido e exposição desnecessária, incluindo validação dos formulários, proteção CSRF, acesso administrativo restrito e tratamento separado de informações de saúde e emergência.</p>
                 </div>
             </div>
         </dialog>

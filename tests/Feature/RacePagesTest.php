@@ -65,5 +65,9 @@ test('registration page is available', function () {
         ->assertSee('data-modal-open="registration-privacy-policy-modal"', false)
         ->assertSeeText('Regulamento oficial da prova')
         ->assertSeeText('Política de Privacidade')
+        ->assertSeeText('Direitos LGPD')
+        ->assertSeeText('Retenção, exclusão e anonimização')
+        ->assertSeeText('Comunicações promocionais')
+        ->assertSeeText('Saúde e suporte emergencial')
         ->assertSeeText('Enviar inscrição');
 });

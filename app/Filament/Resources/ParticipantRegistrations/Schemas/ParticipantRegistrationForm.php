@@ -8,6 +8,7 @@ use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Schema;
 
 class ParticipantRegistrationForm
@@ -98,6 +99,28 @@ class ParticipantRegistrationForm
                     ->label('Observações')
                     ->columnSpanFull()
                     ->maxLength(1000),
+                TextInput::make('emergency_contact_name')
+                    ->label('Contato de emergência')
+                    ->maxLength(255),
+                TextInput::make('emergency_contact_phone')
+                    ->label('Telefone de emergência')
+                    ->tel()
+                    ->minLength(10)
+                    ->maxLength(11),
+                Textarea::make('health_notes')
+                    ->label('Saúde e emergência')
+                    ->columnSpanFull()
+                    ->maxLength(1000),
+                Toggle::make('promotional_opt_in')
+                    ->label('Aceitou comunicações promocionais'),
+                TextInput::make('privacy_policy_version')
+                    ->label('Versão da política aceita')
+                    ->disabled()
+                    ->dehydrated(false),
+                TextInput::make('privacy_policy_accepted_at')
+                    ->label('Aceite da política em')
+                    ->disabled()
+                    ->dehydrated(false),
             ]);
     }
 }

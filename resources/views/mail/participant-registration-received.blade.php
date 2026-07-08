@@ -24,6 +24,11 @@ A sua inscrição para a **Corrida Ave Branca** já está em análise pela organ
 | CPF/CNPJ do pagador | {{ $registration->billing_document ?: 'Não informado' }} |
 | Modalidade | {{ $registration->modality }} |
 | Observações | {{ $registration->notes ?: 'Não informado' }} |
+| Contato de emergência | {{ $registration->emergency_contact_name ?: 'Não informado' }} |
+| Telefone de emergência | {{ $registration->emergency_contact_phone ?: 'Não informado' }} |
+| Saúde e emergência | {{ $registration->health_notes ?: 'Não informado' }} |
+| Comunicações promocionais | {{ $registration->promotional_opt_in ? 'Autorizadas' : 'Não autorizadas' }} |
+| Política de Privacidade aceita | {{ $registration->privacy_policy_version }} em {{ $registration->privacy_policy_accepted_at?->format('d/m/Y H:i') }} |
 </x-mail::table>
 
 A confirmação final será enviada assim que o pagamento for definido. Guarde este e-mail para consultar os dados da sua inscrição.

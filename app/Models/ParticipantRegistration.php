@@ -25,6 +25,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'race_modality_id',
     'modality',
     'notes',
+    'emergency_contact_name',
+    'emergency_contact_phone',
+    'health_notes',
+    'promotional_opt_in',
+    'privacy_policy_accepted_at',
+    'privacy_policy_version',
+    'privacy_policy_acceptance_ip',
+    'privacy_policy_acceptance_user_agent',
     'payment_status',
     'payment_gateway',
     'payment_gateway_reference',
@@ -34,6 +42,8 @@ class ParticipantRegistration extends Model
 {
     /** @use HasFactory<ParticipantRegistrationFactory> */
     use HasFactory;
+
+    public const PrivacyPolicyVersion = '2026-07-08';
 
     /**
      * @return BelongsTo<RaceModality, $this>
@@ -69,6 +79,9 @@ class ParticipantRegistration extends Model
     {
         return [
             'birth_date' => 'date',
+            'health_notes' => 'encrypted',
+            'promotional_opt_in' => 'boolean',
+            'privacy_policy_accepted_at' => 'datetime',
         ];
     }
 }
