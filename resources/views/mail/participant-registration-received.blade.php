@@ -18,6 +18,8 @@ A sua inscricao para a **Corrida Ave Branca** ja esta em analise pela organizaca
 | Responsavel | {{ $registration->guardian_name ?: 'Nao informado' }} |
 | Telefone | {{ $registration->phone }} |
 | Email | {{ $registration->email }} |
+| Pagador | {{ $registration->billing_name ?: 'Nao informado' }} |
+| CPF/CNPJ do pagador | {{ $registration->billing_document ?: 'Nao informado' }} |
 | Modalidade | {{ $registration->modality }} |
 | Observacoes | {{ $registration->notes ?: 'Nao informado' }} |
 </x-mail::table>

@@ -24,6 +24,12 @@ class ParticipantRegistrationFactory extends Factory
             'guardian_name' => fake()->optional()->name(),
             'phone' => fake()->phoneNumber(),
             'email' => fake()->safeEmail(),
+            'billing_document' => fake()->numerify('###########'),
+            'billing_name' => fake()->name(),
+            'billing_address' => fake()->streetName(),
+            'billing_address_number' => fake()->buildingNumber(),
+            'billing_province' => fake()->city(),
+            'billing_postal_code' => fake()->numerify('########'),
             'race_modality_id' => fn (): int => RaceModality::query()->value('id') ?? RaceModality::factory()->create()->id,
             'modality' => fn (array $attributes): string => RaceModality::query()
                 ->find($attributes['race_modality_id'])

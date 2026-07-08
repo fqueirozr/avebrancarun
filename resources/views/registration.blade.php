@@ -43,7 +43,7 @@
                         <p class="text-sm font-semibold text-lime-200">Inscricao da corrida</p>
                         <h1 class="mt-3 text-3xl font-black leading-tight">Corrida Ave Branca</h1>
                         <p class="mt-4 text-sm leading-6 text-white/78">
-                            Preencha os dados do atleta e escolha a modalidade. A confirmacao de pagamento sera liberada apos a definicao do meio de pagamento.
+                            Preencha os dados do atleta, escolha a modalidade e siga para o checkout seguro quando o pagamento estiver ativo.
                         </p>
                     </div>
                 </div>
@@ -51,7 +51,7 @@
                 <div class="mt-5 rounded-md border border-amber-200 bg-amber-50 p-5 text-amber-950">
                     <p class="font-black">Pagamento em analise</p>
                     <p class="mt-2 text-sm leading-6">
-                        Esta etapa esta preparada para integracao com Pix, cartao ou plataforma externa assim que o provedor for escolhido.
+                        O checkout pode ser pago por Pix ou cartao quando a configuracao do gateway estiver ativa.
                     </p>
                 </div>
             </aside>
@@ -70,6 +70,12 @@
                         {{ session('status') }}
                     </div>
                 @endif
+
+                @error('checkout')
+                    <div class="mt-6 rounded-md border border-red-200 bg-red-50 p-4 text-sm font-bold text-red-900">
+                        {{ $message }}
+                    </div>
+                @enderror
 
                 <form action="{{ route('registration.store') }}" method="POST" class="mt-7 grid grid-cols-1 gap-5">
                     @csrf
@@ -110,13 +116,74 @@
                         </label>
                     </div>
 
-                    <label class="grid gap-2">
-                        <span class="text-sm font-bold text-zinc-800">E-mail</span>
-                        <input type="email" name="email" value="{{ old('email') }}" class="rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-emerald-700 focus:ring-3 focus:ring-emerald-100" placeholder="email@exemplo.com" required>
-                        @error('email')
-                            <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
-                        @enderror
-                    </label>
+                    <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+                        <label class="grid gap-2">
+                            <span class="text-sm font-bold text-zinc-800">E-mail</span>
+                            <input type="email" name="email" value="{{ old('email') }}" class="rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-emerald-700 focus:ring-3 focus:ring-emerald-100" placeholder="email@exemplo.com" required>
+                            @error('email')
+                                <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
+                            @enderror
+                        </label>
+
+                        <label class="grid gap-2">
+                            <span class="text-sm font-bold text-zinc-800">CPF/CNPJ do pagador</span>
+                            <input type="text" name="billing_document" value="{{ old('billing_document') }}" inputmode="numeric" class="rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-emerald-700 focus:ring-3 focus:ring-emerald-100" placeholder="Somente numeros">
+                            @error('billing_document')
+                                <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
+                            @enderror
+                        </label>
+                    </div>
+
+                    <div class="grid gap-5 rounded-md border border-zinc-200 bg-zinc-50 p-4">
+                        <div>
+                            <p class="text-sm font-black text-zinc-900">Dados do pagador</p>
+                            <p class="mt-1 text-sm leading-6 text-zinc-600">Necessario para abrir o checkout nas modalidades com valor.</p>
+                        </div>
+
+                        <label class="grid gap-2">
+                            <span class="text-sm font-bold text-zinc-800">Nome completo do pagador</span>
+                            <input type="text" name="billing_name" value="{{ old('billing_name') }}" class="rounded-md border border-zinc-300 bg-white px-4 py-3 text-base outline-none transition focus:border-emerald-700 focus:ring-3 focus:ring-emerald-100" placeholder="Nome completo">
+                            @error('billing_name')
+                                <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
+                            @enderror
+                        </label>
+
+                        <div class="grid grid-cols-1 gap-5 md:grid-cols-[1fr_9rem]">
+                            <label class="grid gap-2">
+                                <span class="text-sm font-bold text-zinc-800">Endereco</span>
+                                <input type="text" name="billing_address" value="{{ old('billing_address') }}" class="rounded-md border border-zinc-300 bg-white px-4 py-3 text-base outline-none transition focus:border-emerald-700 focus:ring-3 focus:ring-emerald-100" placeholder="Rua, avenida ou travessa">
+                                @error('billing_address')
+                                    <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
+                                @enderror
+                            </label>
+
+                            <label class="grid gap-2">
+                                <span class="text-sm font-bold text-zinc-800">Numero</span>
+                                <input type="text" name="billing_address_number" value="{{ old('billing_address_number') }}" class="rounded-md border border-zinc-300 bg-white px-4 py-3 text-base outline-none transition focus:border-emerald-700 focus:ring-3 focus:ring-emerald-100" placeholder="123">
+                                @error('billing_address_number')
+                                    <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
+                                @enderror
+                            </label>
+                        </div>
+
+                        <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+                            <label class="grid gap-2">
+                                <span class="text-sm font-bold text-zinc-800">Bairro</span>
+                                <input type="text" name="billing_province" value="{{ old('billing_province') }}" class="rounded-md border border-zinc-300 bg-white px-4 py-3 text-base outline-none transition focus:border-emerald-700 focus:ring-3 focus:ring-emerald-100" placeholder="Bairro">
+                                @error('billing_province')
+                                    <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
+                                @enderror
+                            </label>
+
+                            <label class="grid gap-2">
+                                <span class="text-sm font-bold text-zinc-800">CEP</span>
+                                <input type="text" name="billing_postal_code" value="{{ old('billing_postal_code') }}" inputmode="numeric" class="rounded-md border border-zinc-300 bg-white px-4 py-3 text-base outline-none transition focus:border-emerald-700 focus:ring-3 focus:ring-emerald-100" placeholder="Somente numeros">
+                                @error('billing_postal_code')
+                                    <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
+                                @enderror
+                            </label>
+                        </div>
+                    </div>
 
                     <fieldset class="grid gap-3">
                         <legend class="text-sm font-bold text-zinc-800">Modalidade</legend>
@@ -153,7 +220,7 @@
                     <div class="grid gap-3 rounded-md bg-zinc-50 p-5 sm:grid-cols-[1fr_auto] sm:items-center">
                         <div>
                             <p class="font-black">Confirmacao pendente</p>
-                            <p class="mt-1 text-sm leading-6 text-zinc-600">O envio definitivo e o pagamento serao ativados apos a escolha do gateway.</p>
+                            <p class="mt-1 text-sm leading-6 text-zinc-600">A inscricao sera registrada e, se houver valor configurado, voce seguira para o pagamento.</p>
                         </div>
 
                         <button type="submit" @disabled($modalities->isEmpty()) class="rounded-md bg-emerald-800 px-5 py-3 text-sm font-black text-white transition hover:bg-emerald-900 disabled:cursor-not-allowed disabled:bg-zinc-400">

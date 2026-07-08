@@ -21,6 +21,7 @@ class ParticipantRegistrationsTable
     public static function configure(Table $table): Table
     {
         return $table
+            ->poll('10s')
             ->columns([
                 TextColumn::make('athlete_name')
                     ->label('Atleta')
@@ -47,6 +48,14 @@ class ParticipantRegistrationsTable
                         'cancelled' => 'danger',
                         default => 'warning',
                     }),
+                TextColumn::make('payment_gateway')
+                    ->label('Gateway')
+                    ->placeholder('Manual')
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('payment_gateway_reference')
+                    ->label('Ref. gateway')
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('created_at')
                     ->label('Inscrito em')
                     ->dateTime('d/m/Y H:i')

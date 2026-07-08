@@ -36,6 +36,28 @@ class ParticipantRegistrationForm
                     ->email()
                     ->required()
                     ->maxLength(255),
+                TextInput::make('billing_document')
+                    ->label('CPF/CNPJ do pagador')
+                    ->numeric()
+                    ->minLength(11)
+                    ->maxLength(14),
+                TextInput::make('billing_name')
+                    ->label('Nome do pagador')
+                    ->maxLength(255),
+                TextInput::make('billing_address')
+                    ->label('Endereco do pagador')
+                    ->maxLength(255),
+                TextInput::make('billing_address_number')
+                    ->label('Numero')
+                    ->maxLength(20),
+                TextInput::make('billing_province')
+                    ->label('Bairro')
+                    ->maxLength(255),
+                TextInput::make('billing_postal_code')
+                    ->label('CEP')
+                    ->numeric()
+                    ->minLength(8)
+                    ->maxLength(8),
                 Select::make('race_modality_id')
                     ->label('Modalidade')
                     ->options(fn (): array => RaceModality::options())
@@ -46,6 +68,20 @@ class ParticipantRegistrationForm
                     ->label('Status do pagamento')
                     ->options(ParticipantRegistration::paymentStatusOptions())
                     ->required(),
+                TextInput::make('payment_gateway')
+                    ->label('Gateway')
+                    ->disabled()
+                    ->dehydrated(false),
+                TextInput::make('payment_gateway_reference')
+                    ->label('Referencia do gateway')
+                    ->disabled()
+                    ->dehydrated(false),
+                TextInput::make('payment_checkout_url')
+                    ->label('Link do checkout')
+                    ->url()
+                    ->columnSpanFull()
+                    ->disabled()
+                    ->dehydrated(false),
                 Textarea::make('notes')
                     ->label('Observacoes')
                     ->columnSpanFull()

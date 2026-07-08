@@ -14,10 +14,19 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'guardian_name',
     'phone',
     'email',
+    'billing_document',
+    'billing_name',
+    'billing_address',
+    'billing_address_number',
+    'billing_province',
+    'billing_postal_code',
     'race_modality_id',
     'modality',
     'notes',
     'payment_status',
+    'payment_gateway',
+    'payment_gateway_reference',
+    'payment_checkout_url',
 ])]
 class ParticipantRegistration extends Model
 {

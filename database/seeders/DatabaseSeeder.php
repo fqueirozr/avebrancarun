@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(EventSettingSeeder::class);
         $this->call(RaceModalitySeeder::class);
+        $this->call(PaymentGatewaySettingSeeder::class);
 
         User::factory(10)->create();
 

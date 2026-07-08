@@ -4,10 +4,15 @@ use App\Filament\Resources\ParticipantRegistrations\ParticipantRegistrationResou
 use App\Mail\ParticipantRegistrationReceived;
 use App\Mail\ParticipantRegistrationUpdated;
 use App\Models\ParticipantRegistration;
+use App\Models\PaymentGatewaySetting;
 use App\Models\RaceModality;
 use App\Models\User;
+use App\Payments\CheckoutRequest;
+use App\Payments\CheckoutResponse;
+use App\Payments\PaymentGateway;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\URL;
 
 uses(RefreshDatabase::class);
 
@@ -19,6 +24,7 @@ test('a participant can submit a registration', function () {
         'type' => 'Adulto',
         'age_range' => 'A partir de 16 anos',
         'distance' => '6 km',
+        'price' => null,
     ]);
 
     $registration = ParticipantRegistration::factory()->make([
@@ -34,6 +40,7 @@ test('a participant can submit a registration', function () {
         'guardian_name' => $registration->guardian_name,
         'phone' => $registration->phone,
         'email' => $registration->email,
+        'billing_document' => $registration->billing_document,
         'race_modality_id' => $raceModality->id,
         'notes' => $registration->notes,
     ])
@@ -43,6 +50,7 @@ test('a participant can submit a registration', function () {
     $this->assertDatabaseHas(ParticipantRegistration::class, [
         'athlete_name' => 'Maria Silva',
         'email' => 'maria@example.com',
+        'billing_document' => $registration->billing_document,
         'race_modality_id' => $raceModality->id,
         'modality' => 'Adulto a partir de 16 anos - 6 km',
         'payment_status' => 'pending',
@@ -53,6 +61,221 @@ test('a participant can submit a registration', function () {
             && $mail->registration->athlete_name === 'Maria Silva'
             && $mail->registration->modality === 'Adulto a partir de 16 anos - 6 km';
     });
+});
+
+test('a participant is redirected to checkout when payment gateway is configured', function () {
+    Mail::fake();
+
+    PaymentGatewaySetting::query()->create([
+        'gateway' => 'asaas',
+        'is_enabled' => true,
+        'environment' => 'sandbox',
+        'api_key' => 'test-key',
+        'checkout_minutes_to_expire' => 60,
+        'billing_types' => ['PIX', 'CREDIT_CARD'],
+        'charge_types' => ['DETACHED'],
+    ]);
+
+    $raceModality = RaceModality::factory()->create([
+        'price' => 25,
+    ]);
+
+    $this->app->bind(PaymentGateway::class, fn (): PaymentGateway => new class implements PaymentGateway
+    {
+        public function createCheckout(CheckoutRequest $request): CheckoutResponse
+        {
+            return new CheckoutResponse(
+                gateway: 'fake',
+                reference: 'checkout_123',
+                checkoutUrl: 'https://checkout.example/checkout_123',
+            );
+        }
+    });
+
+    $registration = ParticipantRegistration::factory()->make([
+        'race_modality_id' => $raceModality->id,
+    ]);
+
+    $this->post(route('registration.store'), [
+        'athlete_name' => $registration->athlete_name,
+        'birth_date' => $registration->birth_date->format('Y-m-d'),
+        'guardian_name' => $registration->guardian_name,
+        'phone' => $registration->phone,
+        'email' => $registration->email,
+        'billing_document' => '529.982.247-25',
+        'billing_name' => 'Maria Silva',
+        'billing_address' => 'Rua das Flores',
+        'billing_address_number' => '123',
+        'billing_province' => 'Centro',
+        'billing_postal_code' => '70000-000',
+        'race_modality_id' => $raceModality->id,
+        'notes' => $registration->notes,
+    ])
+        ->assertRedirect('https://checkout.example/checkout_123');
+
+    $this->assertDatabaseHas(ParticipantRegistration::class, [
+        'email' => $registration->email,
+        'payment_gateway' => 'fake',
+        'payment_gateway_reference' => 'checkout_123',
+        'payment_checkout_url' => 'https://checkout.example/checkout_123',
+    ]);
+});
+
+test('checkout success return marks the registration as paid', function () {
+    Mail::fake();
+
+    $registration = ParticipantRegistration::factory()->create([
+        'email' => 'maria@example.com',
+        'payment_status' => 'pending',
+        'payment_gateway' => 'asaas',
+        'payment_gateway_reference' => 'checkout_123',
+    ]);
+
+    $this->get(URL::temporarySignedRoute(
+        'registration.payment.success',
+        now()->addMinutes(30),
+        ['registration' => $registration]
+    ))
+        ->assertRedirectToRoute('registration')
+        ->assertSessionHas('status');
+
+    expect($registration->refresh()->payment_status)->toBe('paid');
+
+    Mail::assertSent(ParticipantRegistrationUpdated::class, function (ParticipantRegistrationUpdated $mail): bool {
+        return $mail->hasTo('maria@example.com')
+            && $mail->registration->payment_status === 'paid';
+    });
+});
+
+test('paid registration requires a billing document for checkout', function () {
+    $raceModality = RaceModality::factory()->create([
+        'price' => 25,
+    ]);
+
+    $registration = ParticipantRegistration::factory()->make([
+        'race_modality_id' => $raceModality->id,
+    ]);
+
+    $this->post(route('registration.store'), [
+        'athlete_name' => $registration->athlete_name,
+        'birth_date' => $registration->birth_date->format('Y-m-d'),
+        'guardian_name' => $registration->guardian_name,
+        'phone' => $registration->phone,
+        'email' => $registration->email,
+        'billing_name' => 'Maria Silva',
+        'billing_address' => 'Rua das Flores',
+        'billing_address_number' => '123',
+        'billing_province' => 'Centro',
+        'billing_postal_code' => '70000000',
+        'race_modality_id' => $raceModality->id,
+        'notes' => $registration->notes,
+    ])
+        ->assertSessionHasErrors('billing_document');
+});
+
+test('paid registration requires billing address data for checkout', function () {
+    $raceModality = RaceModality::factory()->create([
+        'price' => 25,
+    ]);
+
+    $registration = ParticipantRegistration::factory()->make([
+        'race_modality_id' => $raceModality->id,
+    ]);
+
+    $this->post(route('registration.store'), [
+        'athlete_name' => $registration->athlete_name,
+        'birth_date' => $registration->birth_date->format('Y-m-d'),
+        'guardian_name' => $registration->guardian_name,
+        'phone' => $registration->phone,
+        'email' => $registration->email,
+        'billing_document' => '52998224725',
+        'billing_name' => 'Teste',
+        'race_modality_id' => $raceModality->id,
+        'notes' => $registration->notes,
+    ])
+        ->assertSessionHasErrors([
+            'billing_name',
+            'billing_address',
+            'billing_address_number',
+            'billing_province',
+            'billing_postal_code',
+        ]);
+});
+
+test('paid registration rejects an invalid billing document before checkout', function () {
+    $raceModality = RaceModality::factory()->create([
+        'price' => 25,
+    ]);
+
+    $registration = ParticipantRegistration::factory()->make([
+        'race_modality_id' => $raceModality->id,
+    ]);
+
+    $this->post(route('registration.store'), [
+        'athlete_name' => $registration->athlete_name,
+        'birth_date' => $registration->birth_date->format('Y-m-d'),
+        'guardian_name' => $registration->guardian_name,
+        'phone' => $registration->phone,
+        'email' => $registration->email,
+        'billing_document' => '37829155412',
+        'billing_name' => 'Lucas Gabriel da Silva',
+        'billing_address' => 'Rua 20',
+        'billing_address_number' => '8',
+        'billing_province' => 'Centro',
+        'billing_postal_code' => '72900000',
+        'race_modality_id' => $raceModality->id,
+        'notes' => $registration->notes,
+    ])
+        ->assertSessionHasErrors('billing_document');
+});
+
+test('checkout gateway failure returns the participant to the form with the gateway message', function () {
+    Mail::fake();
+
+    PaymentGatewaySetting::query()->create([
+        'gateway' => 'asaas',
+        'is_enabled' => true,
+        'environment' => 'sandbox',
+        'api_key' => 'test-key',
+        'checkout_minutes_to_expire' => 60,
+        'billing_types' => ['PIX', 'CREDIT_CARD'],
+        'charge_types' => ['DETACHED'],
+    ]);
+
+    $raceModality = RaceModality::factory()->create([
+        'price' => 25,
+    ]);
+
+    $this->app->bind(PaymentGateway::class, fn (): PaymentGateway => new class implements PaymentGateway
+    {
+        public function createCheckout(CheckoutRequest $request): CheckoutResponse
+        {
+            throw new RuntimeException('Gateway indisponivel.');
+        }
+    });
+
+    $registration = ParticipantRegistration::factory()->make([
+        'race_modality_id' => $raceModality->id,
+    ]);
+
+    $this->post(route('registration.store'), [
+        'athlete_name' => $registration->athlete_name,
+        'birth_date' => $registration->birth_date->format('Y-m-d'),
+        'guardian_name' => $registration->guardian_name,
+        'phone' => $registration->phone,
+        'email' => $registration->email,
+        'billing_document' => '52998224725',
+        'billing_name' => 'Maria Silva',
+        'billing_address' => 'Rua das Flores',
+        'billing_address_number' => '123',
+        'billing_province' => 'Centro',
+        'billing_postal_code' => '70000000',
+        'race_modality_id' => $raceModality->id,
+        'notes' => $registration->notes,
+    ])
+        ->assertSessionHasErrors('checkout');
+
+    Mail::assertNothingSent();
 });
 
 test('registration submission validates required fields', function () {
