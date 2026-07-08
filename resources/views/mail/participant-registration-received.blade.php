@@ -3,7 +3,7 @@
 
 Olá {{ $registration->athlete_name }},
 
-A sua inscrição para a **Corrida Ave Branca** já está em análise pela organização. Confira os dados registrados abaixo.
+A sua inscrição para a **Ave Branca Run** já está em análise pela organização. Confira os dados registrados abaixo.
 
 <x-mail::panel>
 **Status da inscrição:** Recebida<br>

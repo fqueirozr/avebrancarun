@@ -125,3 +125,45 @@ test('asaas checkout gateway retries with credit card when pix key is missing', 
         return $request['billingTypes'] === ['CREDIT_CARD'];
     });
 });
+
+test('asaas checkout gateway applies the legal senior discount for participants older than 65', function () {
+    Http::fake([
+        'api-sandbox.asaas.com/v3/checkouts' => Http::response([
+            'id' => 'checkout_senior_123',
+            'link' => 'https://sandbox.asaas.com/checkoutSession/show/checkout_senior_123',
+            'status' => 'ACTIVE',
+        ]),
+    ]);
+
+    $settings = PaymentGatewaySetting::query()->create([
+        'gateway' => 'asaas',
+        'is_enabled' => true,
+        'environment' => 'sandbox',
+        'api_key' => 'test-key',
+        'checkout_minutes_to_expire' => 60,
+        'billing_types' => ['PIX', 'CREDIT_CARD'],
+        'charge_types' => ['DETACHED'],
+    ]);
+
+    $raceModality = RaceModality::factory()->create([
+        'price' => 80,
+    ]);
+
+    $registration = ParticipantRegistration::factory()->create([
+        'birth_date' => today()->subYears(66)->subDay()->format('Y-m-d'),
+        'race_modality_id' => $raceModality->id,
+    ]);
+
+    (new AsaasCheckoutGateway)->createCheckout(new CheckoutRequest(
+        registration: $registration,
+        raceModality: $raceModality,
+        successUrl: 'https://example.com/success',
+        cancelUrl: 'https://example.com/cancel',
+        expiredUrl: 'https://example.com/expired',
+    ), $settings);
+
+    Http::assertSent(function ($request): bool {
+        return $request->url() === 'https://api-sandbox.asaas.com/v3/checkouts'
+            && $request['items'][0]['value'] === 40.0;
+    });
+});

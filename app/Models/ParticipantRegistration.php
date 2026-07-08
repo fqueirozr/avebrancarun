@@ -45,6 +45,10 @@ class ParticipantRegistration extends Model
 
     public const PrivacyPolicyVersion = '2026-07-08';
 
+    public const SeniorLegalDiscountMinimumAge = 65;
+
+    public const SeniorLegalDiscountRate = 0.5;
+
     /**
      * @return BelongsTo<RaceModality, $this>
      */
@@ -68,6 +72,26 @@ class ParticipantRegistration extends Model
     public function paymentStatusLabel(): string
     {
         return self::paymentStatusOptions()[$this->payment_status] ?? 'Pendente';
+    }
+
+    public function isEligibleForSeniorLegalDiscount(): bool
+    {
+        if ($this->birth_date === null) {
+            return false;
+        }
+
+        return $this->birth_date->age > self::SeniorLegalDiscountMinimumAge;
+    }
+
+    public function priceFor(RaceModality $raceModality): float
+    {
+        $price = (float) $raceModality->price;
+
+        if (! $this->isEligibleForSeniorLegalDiscount()) {
+            return $price;
+        }
+
+        return round($price * self::SeniorLegalDiscountRate, 2);
     }
 
     /**

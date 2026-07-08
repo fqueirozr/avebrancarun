@@ -28,8 +28,8 @@ class ParticipantRegistrationUpdated extends Mailable
     {
         return new Envelope(
             subject: $this->registration->payment_status === 'cancelled'
-                ? 'Inscrição cancelada - Corrida Ave Branca'
-                : 'Atualização da inscrição - Corrida Ave Branca',
+                ? 'Inscrição cancelada - Ave Branca Run'
+                : 'Atualização da inscrição - Ave Branca Run',
         );
     }
 

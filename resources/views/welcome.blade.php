@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="description" content="Corrida de rua do Clube de Desbravadores Ave Branca, com modalidades infantis e percursos adultos de 3 km e 6 km.">
 
-        <title>Corrida Ave Branca</title>
+        <title>Ave Branca Run</title>
 
         <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="any">
         <link rel="apple-touch-icon" href="{{ asset('images/ave-branca-logo.png') }}">
@@ -22,7 +22,7 @@
                         alt="Logo do Clube de Desbravadores Ave Branca"
                         class="size-14 rounded-full border-2 border-white/80 bg-white object-cover shadow-sm"
                     >
-                    <span class="text-sm font-semibold uppercase tracking-normal">Clube Ave Branca</span>
+                    <span class="text-sm font-semibold uppercase tracking-normal">Ave Branca Run</span>
                 </a>
 
                 <div class="hidden items-center gap-7 text-sm font-semibold text-white/90 md:flex">
@@ -39,7 +39,7 @@
 
         <main>
             <section class="relative overflow-hidden bg-race-night text-white">
-                <h1 class="sr-only">Corrida Ave Branca Run</h1>
+                <h1 class="sr-only">Ave Branca Run</h1>
                 <img
                     src="{{ asset('images/ave-branca-run-2026-hero-new.png') }}"
                     alt="Arte da 2ª edição Ave Branca Run com data, horário, local e distâncias da corrida"
@@ -71,7 +71,8 @@
                 </div>
                 <div class="rounded-md border border-race-cyan/20 bg-white p-5 shadow-sm shadow-cyan-950/10">
                     <p class="text-sm font-semibold text-race-blue">Pagamento</p>
-                    <p class="mt-2 text-2xl font-black">Em análise</p>
+                    <p class="mt-2 text-2xl font-black">Crédito/PIX</p>
+                    <p class="mt-2 text-sm leading-6 text-zinc-600">Checkout ASAAS Gestão Financeira Instituição de Pagamento S.A.</p>
                 </div>
             </section>
 
@@ -383,8 +384,8 @@
 
         <footer class="border-t border-race-cyan/15 bg-white">
             <div class="mx-auto flex max-w-7xl flex-col gap-3 px-5 py-8 text-sm text-zinc-600 sm:px-8 md:flex-row md:items-center md:justify-between">
-                <p class="font-semibold text-zinc-800">Clube de Desbravadores Ave Branca</p>
-                <p>Corrida de rua com inscrições, modalidades e pagamento em preparação.</p>
+                <p class="font-semibold text-zinc-800">Ave Branca Run</p>
+                <p>Corrida de rua com inscrições, modalidades e pagamento por Crédito/PIX via ASAAS Gestão Financeira Instituição de Pagamento S.A.</p>
             </div>
         </footer>
 

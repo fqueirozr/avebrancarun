@@ -3,7 +3,7 @@
 
 Olá {{ $registration->athlete_name }},
 
-A sua inscrição para a **Corrida Ave Branca** recebeu uma nova atualização da organização.
+A sua inscrição para a **Ave Branca Run** recebeu uma nova atualização da organização.
 
 <x-mail::panel>
 **Status do pagamento:** {{ $registration->paymentStatusLabel() }}<br>

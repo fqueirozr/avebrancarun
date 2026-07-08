@@ -1,7 +1,7 @@
 <x-mail::message>
 # Nova mensagem de contato
 
-Uma nova mensagem foi enviada pelo site da **Corrida Ave Branca**.
+Uma nova mensagem foi enviada pelo site da **Ave Branca Run**.
 
 <x-mail::table>
 | Dado | InformaÃ§Ã£o |

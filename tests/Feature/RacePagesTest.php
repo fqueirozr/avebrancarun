@@ -26,7 +26,7 @@ test('race landing page is available', function () {
 
     $this->get('/')
         ->assertSuccessful()
-        ->assertSeeText('Corrida Ave Branca')
+        ->assertSeeText('Ave Branca Run')
         ->assertSeeText('12/10/2026')
         ->assertSeeText('Parque Municipal')
         ->assertSeeText('Camiseta, número de peito e medalha')
@@ -69,5 +69,6 @@ test('registration page is available', function () {
         ->assertSeeText('Retenção, exclusão e anonimização')
         ->assertSeeText('Comunicações promocionais')
         ->assertSeeText('Saúde e suporte emergencial')
+        ->assertSeeText('desconto legal de 50%')
         ->assertSeeText('Enviar inscrição');
 });

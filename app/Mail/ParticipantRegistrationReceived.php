@@ -27,7 +27,7 @@ class ParticipantRegistrationReceived extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Inscrição recebida - Corrida Ave Branca',
+            subject: 'Inscrição recebida - Ave Branca Run',
         );
     }
 

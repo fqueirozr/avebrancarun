@@ -28,7 +28,7 @@ class ContactMessageReceived extends Mailable
     {
         return new Envelope(
             replyTo: [$this->contactMessage->email],
-            subject: 'Nova mensagem de contato - Corrida Ave Branca',
+            subject: 'Nova mensagem de contato - Ave Branca Run',
         );
     }
 

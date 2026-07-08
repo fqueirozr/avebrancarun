@@ -3,9 +3,9 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="description" content="Página de inscrição da Corrida Ave Branca.">
+        <meta name="description" content="Página de inscrição da Ave Branca Run.">
 
-        <title>Inscrição | Corrida Ave Branca</title>
+        <title>Inscrição | Ave Branca Run</title>
 
         <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="any">
         <link rel="apple-touch-icon" href="{{ asset('images/ave-branca-logo.png') }}">
@@ -22,7 +22,7 @@
                         alt="Logo do Clube de Desbravadores Ave Branca"
                         class="size-14 rounded-full border border-emerald-900/10 bg-white object-cover shadow-sm"
                     >
-                    <span class="text-sm font-semibold uppercase tracking-normal text-race-ink">Clube Ave Branca</span>
+                    <span class="text-sm font-semibold uppercase tracking-normal text-race-ink">Ave Branca Run</span>
                 </a>
 
                 <a href="{{ route('home') }}" class="rounded-md border border-zinc-200 px-4 py-2 text-sm font-bold text-zinc-800 transition hover:bg-zinc-50">
@@ -41,17 +41,17 @@
                     >
                     <div class="p-6">
                         <p class="text-sm font-semibold text-race-cyan">Inscrição da corrida</p>
-                        <h1 class="mt-3 text-3xl font-black leading-tight">Corrida Ave Branca</h1>
+                        <h1 class="mt-3 text-3xl font-black leading-tight">Ave Branca Run</h1>
                         <p class="mt-4 text-sm leading-6 text-white/78">
-                            Preencha os dados do atleta, escolha a modalidade e siga para o checkout seguro quando o pagamento estiver ativo.
+                            Preencha os dados do atleta, escolha a modalidade e siga para o checkout seguro com pagamento por Crédito/PIX.
                         </p>
                     </div>
                 </div>
 
                 <div class="mt-5 rounded-md border border-amber-200 bg-amber-50 p-5 text-amber-950">
-                    <p class="font-black">Pagamento em análise</p>
+                    <p class="font-black">Pagamento por Crédito/PIX</p>
                     <p class="mt-2 text-sm leading-6">
-                        O checkout pode ser pago por Pix ou cartão quando a configuração do gateway estiver ativa.
+                        O pagamento é processado pela ASAAS Gestão Financeira Instituição de Pagamento S.A.
                     </p>
                 </div>
             </aside>
@@ -103,6 +103,7 @@
                             <label class="grid min-w-0 gap-2">
                                 <span class="text-sm font-bold leading-5 text-zinc-800">Data de nascimento</span>
                                 <input type="date" name="birth_date" value="{{ old('birth_date') }}" class="min-w-0 rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-emerald-700 focus:ring-3 focus:ring-emerald-100" required>
+                                <span class="text-xs font-semibold leading-5 text-emerald-700">Participantes com mais de {{ \App\Models\ParticipantRegistration::SeniorLegalDiscountMinimumAge }} anos recebem desconto legal de {{ number_format(\App\Models\ParticipantRegistration::SeniorLegalDiscountRate * 100, 0, ',', '.') }}% no checkout.</span>
                                 @error('birth_date')
                                     <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
                                 @enderror
@@ -206,6 +207,9 @@
 
                     <fieldset class="grid min-w-0 gap-3 border-b border-zinc-200 pb-6">
                         <legend class="mb-4 text-base font-black text-zinc-950">Modalidade</legend>
+                        <div class="rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold leading-6 text-emerald-950">
+                            O desconto legal de {{ number_format(\App\Models\ParticipantRegistration::SeniorLegalDiscountRate * 100, 0, ',', '.') }}% para participantes com mais de {{ \App\Models\ParticipantRegistration::SeniorLegalDiscountMinimumAge }} anos é calculado automaticamente pela data de nascimento informada.
+                        </div>
                         <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
                             @forelse ($modalities as $modality)
                                 <label class="flex min-h-20 items-start gap-3 rounded-md border border-zinc-200 px-4 py-3 text-sm transition has-checked:border-emerald-700 has-checked:bg-emerald-50">
@@ -356,7 +360,7 @@
             </div>
             <div class="max-h-[70vh] overflow-y-auto bg-[#f4fbff] p-4 sm:p-6">
                 <div class="event-rich-content event-rich-content--modal rounded-md border border-race-cyan/15 bg-white p-5 shadow-sm shadow-cyan-950/5 sm:p-6">
-                    <p><strong>Versão {{ \App\Models\ParticipantRegistration::PrivacyPolicyVersion }}.</strong> Esta Política de Privacidade descreve como a organização da Corrida Ave Branca trata dados pessoais no fluxo de inscrição, pagamento e operação do evento.</p>
+                    <p><strong>Versão {{ \App\Models\ParticipantRegistration::PrivacyPolicyVersion }}.</strong> Esta Política de Privacidade descreve como a organização da Ave Branca Run trata dados pessoais no fluxo de inscrição, pagamento e operação do evento.</p>
 
                     <h3>1. Dados coletados</h3>
                     <p>Coletamos dados de identificação e contato do participante, como nome, data de nascimento, CPF, telefone, e-mail, modalidade escolhida e dados do responsável legal quando o participante for menor de idade. Quando houver pagamento, coletamos os dados do pagador necessários ao checkout, como nome, CPF ou CNPJ, endereço, número, bairro e CEP.</p>
@@ -367,7 +371,7 @@
                     <p>Dados de saúde e emergência são usados somente para segurança do participante e eventual suporte emergencial durante o evento.</p>
 
                     <h3>3. Pagamentos</h3>
-                    <p>O checkout pode ser processado pela Asaas. Enviamos ao processador apenas os dados necessários para criar e reconciliar cobranças. Esta aplicação não armazena cartão completo, chave Pix, boleto integral ou outro instrumento financeiro completo.</p>
+                    <p>O checkout de Crédito/PIX é processado pela ASAAS Gestão Financeira Instituição de Pagamento S.A. Enviamos ao processador apenas os dados necessários para criar e reconciliar cobranças. Esta aplicação não armazena cartão completo, chave Pix, boleto integral ou outro instrumento financeiro completo.</p>
 
                     <h3>4. Compartilhamento</h3>
                     <p>Podemos compartilhar dados, no limite necessário, com organizadores, prestadores de tecnologia e suporte, processadores de pagamento, equipe de cronometragem e resultados, logística de kit, comunicação operacional, equipes médicas ou emergenciais, seguradoras quando aplicável, autoridades públicas quando exigido e parceiros necessários à execução do evento. Não vendemos dados pessoais.</p>
