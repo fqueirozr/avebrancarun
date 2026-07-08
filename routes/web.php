@@ -20,6 +20,7 @@ Route::get('/', function () {
 
 Route::get('/inscricao', function () {
     return view('registration', [
+        'eventSetting' => EventSetting::current(),
         'modalities' => RaceModality::query()
             ->where('is_active', true)
             ->orderBy('sort_order')

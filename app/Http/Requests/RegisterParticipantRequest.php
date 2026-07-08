@@ -41,6 +41,9 @@ class RegisterParticipantRequest extends FormRequest
             'billing_postal_code' => ['nullable', 'string', 'regex:/^\d{8}$/'],
             'race_modality_id' => ['required', Rule::exists('race_modalities', 'id')->where('is_active', true)],
             'notes' => ['nullable', 'string', 'max:1000'],
+            'accepted_regulation' => ['accepted'],
+            'accepted_privacy_policy' => ['accepted'],
+            'accepted_fitness_declaration' => ['accepted'],
         ];
     }
 
@@ -58,6 +61,7 @@ class RegisterParticipantRequest extends FormRequest
             'email.email' => 'Informe um e-mail válido.',
             'regex' => 'Informe um valor válido para :attribute.',
             'race_modality_id.exists' => 'Escolha uma modalidade ativa.',
+            'accepted' => 'Você precisa aceitar :attribute.',
         ];
     }
 
@@ -82,6 +86,9 @@ class RegisterParticipantRequest extends FormRequest
             'billing_postal_code' => 'o CEP do pagador',
             'race_modality_id' => 'a modalidade',
             'notes' => 'as observações',
+            'accepted_regulation' => 'o Regulamento',
+            'accepted_privacy_policy' => 'a Política de Privacidade',
+            'accepted_fitness_declaration' => 'a declaração de aptidão para participar da prova',
         ];
     }
 

@@ -24,6 +24,11 @@ class ParticipantRegistrationController extends Controller
     {
         $validated = $request->validated();
         $raceModality = RaceModality::query()->findOrFail($validated['race_modality_id']);
+        unset(
+            $validated['accepted_regulation'],
+            $validated['accepted_privacy_policy'],
+            $validated['accepted_fitness_declaration'],
+        );
 
         $registration = ParticipantRegistration::create([
             ...$validated,

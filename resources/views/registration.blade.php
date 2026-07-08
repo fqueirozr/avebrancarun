@@ -35,9 +35,9 @@
             <aside class="lg:sticky lg:top-8 lg:self-start">
                 <div class="overflow-hidden rounded-md bg-race-night text-white shadow-xl shadow-cyan-950/20">
                     <img
-                        src="{{ asset('images/ave-branca-run-2026-hero.jpeg') }}"
+                        src="{{ asset('images/ave-branca-run-2026-hero-new.png') }}"
                         alt="Arte da Ave Branca Run com informações da corrida"
-                        class="h-56 w-full object-cover object-center"
+                        class="h-auto w-full bg-race-night object-contain"
                     >
                     <div class="p-6">
                         <p class="text-sm font-semibold text-race-cyan">Inscrição da corrida</p>
@@ -240,6 +240,44 @@
                         </label>
                     </fieldset>
 
+                    <fieldset class="grid min-w-0 gap-4 border-t border-zinc-200 pt-6">
+                        <legend class="mb-1 text-base font-black text-zinc-950">Declarações obrigatórias</legend>
+
+                        <div class="flex items-start gap-3 rounded-md border border-zinc-200 bg-white px-4 py-3 text-sm font-semibold text-zinc-800 transition has-checked:border-emerald-700 has-checked:bg-emerald-50">
+                            <input id="accepted_regulation" type="checkbox" name="accepted_regulation" value="1" @checked(old('accepted_regulation')) class="mt-1 size-4 accent-emerald-800" required>
+                            <p>
+                                <label for="accepted_regulation">Declaro que li e aceito o </label>
+                                <button type="button" data-modal-open="registration-regulation-modal" class="font-black text-race-blue underline decoration-race-blue/35 underline-offset-3 transition hover:text-race-ink">
+                                    Regulamento
+                                </button>.
+                            </p>
+                        </div>
+                        @error('accepted_regulation')
+                            <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
+                        @enderror
+
+                        <div class="flex items-start gap-3 rounded-md border border-zinc-200 bg-white px-4 py-3 text-sm font-semibold text-zinc-800 transition has-checked:border-emerald-700 has-checked:bg-emerald-50">
+                            <input id="accepted_privacy_policy" type="checkbox" name="accepted_privacy_policy" value="1" @checked(old('accepted_privacy_policy')) class="mt-1 size-4 accent-emerald-800" required>
+                            <p>
+                                <label for="accepted_privacy_policy">Li e concordo com a </label>
+                                <button type="button" data-modal-open="registration-privacy-policy-modal" class="font-black text-race-blue underline decoration-race-blue/35 underline-offset-3 transition hover:text-race-ink">
+                                    Política de Privacidade
+                                </button>.
+                            </p>
+                        </div>
+                        @error('accepted_privacy_policy')
+                            <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
+                        @enderror
+
+                        <label class="flex items-start gap-3 rounded-md border border-zinc-200 bg-white px-4 py-3 text-sm font-semibold text-zinc-800 transition has-checked:border-emerald-700 has-checked:bg-emerald-50">
+                            <input type="checkbox" name="accepted_fitness_declaration" value="1" @checked(old('accepted_fitness_declaration')) class="mt-1 size-4 accent-emerald-800" required>
+                            <span>Declaro estar apto a participar da prova.</span>
+                        </label>
+                        @error('accepted_fitness_declaration')
+                            <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
+                        @enderror
+                    </fieldset>
+
                     <div class="grid gap-3 rounded-md bg-zinc-50 p-5 sm:grid-cols-[1fr_auto] sm:items-center">
                         <div>
                             <p class="font-black">Confirmação pendente</p>
@@ -253,5 +291,41 @@
                 </form>
             </section>
         </main>
+
+        <dialog id="registration-regulation-modal" class="m-auto w-[min(44rem,calc(100vw-2rem))] rounded-md border border-race-cyan/15 bg-white p-0 text-zinc-950 shadow-2xl shadow-cyan-950/30 backdrop:bg-race-night/80">
+            <div class="flex items-start justify-between gap-5 border-b border-race-cyan/20 bg-race-night p-5 text-white sm:p-6">
+                <div>
+                    <p class="text-sm font-bold uppercase tracking-normal text-race-cyan">Regulamento</p>
+                    <h2 class="mt-1 text-2xl font-black leading-tight">Regras da corrida</h2>
+                </div>
+                <button type="button" data-modal-close class="rounded-md border border-white/20 bg-white/10 px-3 py-2 text-sm font-black text-white transition hover:bg-white/20" aria-label="Fechar modal">
+                    Fechar
+                </button>
+            </div>
+            <div class="max-h-[70vh] overflow-y-auto bg-[#f4fbff] p-4 sm:p-6">
+                <div class="event-rich-content event-rich-content--modal rounded-md border border-race-cyan/15 bg-white p-5 shadow-sm shadow-cyan-950/5 sm:p-6">
+                    {{ \Filament\Forms\Components\RichEditor\RichContentRenderer::make($eventSetting->regulation ?: 'Em revisão') }}
+                </div>
+            </div>
+        </dialog>
+
+        <dialog id="registration-privacy-policy-modal" class="m-auto w-[min(44rem,calc(100vw-2rem))] rounded-md border border-race-cyan/15 bg-white p-0 text-zinc-950 shadow-2xl shadow-cyan-950/30 backdrop:bg-race-night/80">
+            <div class="flex items-start justify-between gap-5 border-b border-race-cyan/20 bg-race-night p-5 text-white sm:p-6">
+                <div>
+                    <p class="text-sm font-bold uppercase tracking-normal text-race-cyan">Privacidade</p>
+                    <h2 class="mt-1 text-2xl font-black leading-tight">Política de Privacidade</h2>
+                </div>
+                <button type="button" data-modal-close class="rounded-md border border-white/20 bg-white/10 px-3 py-2 text-sm font-black text-white transition hover:bg-white/20" aria-label="Fechar modal">
+                    Fechar
+                </button>
+            </div>
+            <div class="max-h-[70vh] overflow-y-auto bg-[#f4fbff] p-4 sm:p-6">
+                <div class="event-rich-content event-rich-content--modal rounded-md border border-race-cyan/15 bg-white p-5 shadow-sm shadow-cyan-950/5 sm:p-6">
+                    <p>Os dados informados neste formulário serão usados pela organização da Corrida Ave Branca para processar a inscrição, identificar o participante, entrar em contato sobre o evento e viabilizar o pagamento quando aplicável.</p>
+                    <p>As informações poderão ser compartilhadas apenas com serviços necessários à realização da prova, como plataformas de pagamento, cronometragem, comunicação e suporte operacional.</p>
+                    <p>Ao continuar, você declara ciência desse tratamento de dados para fins de inscrição e organização do evento.</p>
+                </div>
+            </div>
+        </dialog>
     </body>
 </html>

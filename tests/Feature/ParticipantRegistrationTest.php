@@ -45,6 +45,9 @@ test('a participant can submit a registration', function () {
         'billing_document' => $registration->billing_document,
         'race_modality_id' => $raceModality->id,
         'notes' => $registration->notes,
+        'accepted_regulation' => '1',
+        'accepted_privacy_policy' => '1',
+        'accepted_fitness_declaration' => '1',
     ])
         ->assertRedirectToRoute('registration')
         ->assertSessionHas('status');
@@ -66,6 +69,35 @@ test('a participant can submit a registration', function () {
             && $mail->registration->athlete_name === 'Maria Silva'
             && $mail->registration->modality === 'Adulto a partir de 16 anos - 6 km';
     });
+});
+
+test('registration submission requires mandatory declarations', function () {
+    $raceModality = RaceModality::factory()->create([
+        'price' => null,
+    ]);
+
+    $registration = ParticipantRegistration::factory()->make([
+        'race_modality_id' => $raceModality->id,
+    ]);
+
+    $this->post(route('registration.store'), [
+        'athlete_name' => $registration->athlete_name,
+        'birth_date' => $registration->birth_date->format('Y-m-d'),
+        'participant_cpf' => '529.982.247-25',
+        'guardian_name' => $registration->guardian_name,
+        'guardian_cpf' => '153.509.460-56',
+        'phone' => '(11) 99999-9999',
+        'email' => $registration->email,
+        'race_modality_id' => $raceModality->id,
+        'notes' => $registration->notes,
+    ])
+        ->assertSessionHasErrors([
+            'accepted_regulation',
+            'accepted_privacy_policy',
+            'accepted_fitness_declaration',
+        ]);
+
+    expect(ParticipantRegistration::query()->count())->toBe(0);
 });
 
 test('a participant is redirected to checkout when payment gateway is configured', function () {
@@ -117,6 +149,9 @@ test('a participant is redirected to checkout when payment gateway is configured
         'billing_postal_code' => '70000-000',
         'race_modality_id' => $raceModality->id,
         'notes' => $registration->notes,
+        'accepted_regulation' => '1',
+        'accepted_privacy_policy' => '1',
+        'accepted_fitness_declaration' => '1',
     ])
         ->assertRedirect('https://checkout.example/checkout_123');
 
@@ -178,6 +213,9 @@ test('paid registration requires a billing document for checkout', function () {
         'billing_postal_code' => '70000000',
         'race_modality_id' => $raceModality->id,
         'notes' => $registration->notes,
+        'accepted_regulation' => '1',
+        'accepted_privacy_policy' => '1',
+        'accepted_fitness_declaration' => '1',
     ])
         ->assertSessionHasErrors('billing_document');
 });
@@ -287,6 +325,9 @@ test('checkout gateway failure returns the participant to the form with the gate
         'billing_postal_code' => '70000000',
         'race_modality_id' => $raceModality->id,
         'notes' => $registration->notes,
+        'accepted_regulation' => '1',
+        'accepted_privacy_policy' => '1',
+        'accepted_fitness_declaration' => '1',
     ])
         ->assertSessionHasErrors('checkout');
 

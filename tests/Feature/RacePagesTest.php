@@ -45,6 +45,10 @@ test('race landing page is available', function () {
 });
 
 test('registration page is available', function () {
+    EventSetting::factory()->create([
+        'regulation' => '<p>Regulamento oficial da prova</p>',
+    ]);
+
     RaceModality::factory()->create([
         'name' => 'Adulto a partir de 16 anos',
         'type' => 'Adulto',
@@ -57,5 +61,9 @@ test('registration page is available', function () {
         ->assertSuccessful()
         ->assertSeeText('Dados para inscrição')
         ->assertSeeText('Adulto a partir de 16 anos - 6 km')
+        ->assertSee('data-modal-open="registration-regulation-modal"', false)
+        ->assertSee('data-modal-open="registration-privacy-policy-modal"', false)
+        ->assertSeeText('Regulamento oficial da prova')
+        ->assertSeeText('Política de Privacidade')
         ->assertSeeText('Enviar inscrição');
 });

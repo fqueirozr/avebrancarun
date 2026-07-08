@@ -41,7 +41,7 @@
             <section class="relative overflow-hidden bg-race-night text-white">
                 <h1 class="sr-only">Corrida Ave Branca Run</h1>
                 <img
-                    src="{{ asset('images/ave-branca-run-2026-hero.jpeg') }}"
+                    src="{{ asset('images/ave-branca-run-2026-hero-new.png') }}"
                     alt="Arte da 2ª edição Ave Branca Run com data, horário, local e distâncias da corrida"
                     class="h-[min(100svh,900px)] min-h-[620px] w-full object-cover object-center"
                 >
