@@ -13,8 +13,8 @@
         @fonts
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="bg-[#f8faf5] text-zinc-950 antialiased">
-        <header class="border-b border-emerald-900/10 bg-white">
+    <body class="bg-[#f4fbff] text-zinc-950 antialiased">
+        <header class="border-b border-sky-900/10 bg-white">
             <nav class="mx-auto flex max-w-7xl items-center justify-between px-5 py-5 sm:px-8" aria-label="Navegação principal">
                 <a href="{{ route('home') }}" class="flex items-center gap-3">
                     <img
@@ -22,7 +22,7 @@
                         alt="Logo do Clube de Desbravadores Ave Branca"
                         class="size-14 rounded-full border border-emerald-900/10 bg-white object-cover shadow-sm"
                     >
-                    <span class="text-sm font-semibold uppercase tracking-normal text-emerald-950">Clube Ave Branca</span>
+                    <span class="text-sm font-semibold uppercase tracking-normal text-race-ink">Clube Ave Branca</span>
                 </a>
 
                 <a href="{{ route('home') }}" class="rounded-md border border-zinc-200 px-4 py-2 text-sm font-bold text-zinc-800 transition hover:bg-zinc-50">
@@ -33,14 +33,14 @@
 
         <main class="mx-auto grid max-w-7xl grid-cols-1 gap-8 px-5 py-10 sm:px-8 lg:grid-cols-[0.75fr_1.25fr] lg:py-14">
             <aside class="lg:sticky lg:top-8 lg:self-start">
-                <div class="overflow-hidden rounded-md bg-emerald-950 text-white shadow-xl shadow-emerald-950/15">
+                <div class="overflow-hidden rounded-md bg-race-night text-white shadow-xl shadow-cyan-950/20">
                     <img
-                        src="{{ asset('images/ave-branca-corrida-hero.png') }}"
-                        alt="Participantes em uma corrida de rua"
-                        class="h-56 w-full object-cover"
+                        src="{{ asset('images/ave-branca-run-2026-hero.jpeg') }}"
+                        alt="Arte da Ave Branca Run com informações da corrida"
+                        class="h-56 w-full object-cover object-center"
                     >
                     <div class="p-6">
-                        <p class="text-sm font-semibold text-lime-200">Inscrição da corrida</p>
+                        <p class="text-sm font-semibold text-race-cyan">Inscrição da corrida</p>
                         <h1 class="mt-3 text-3xl font-black leading-tight">Corrida Ave Branca</h1>
                         <p class="mt-4 text-sm leading-6 text-white/78">
                             Preencha os dados do atleta, escolha a modalidade e siga para o checkout seguro quando o pagamento estiver ativo.
@@ -246,7 +246,7 @@
                             <p class="mt-1 text-sm leading-6 text-zinc-600">A inscrição será registrada e, se houver valor configurado, você seguirá para o pagamento.</p>
                         </div>
 
-                        <button type="submit" @disabled($modalities->isEmpty()) class="rounded-md bg-emerald-800 px-5 py-3 text-sm font-black text-white transition hover:bg-emerald-900 disabled:cursor-not-allowed disabled:bg-zinc-400">
+                        <button type="submit" @disabled($modalities->isEmpty()) class="rounded-md bg-race-blue px-5 py-3 text-sm font-black text-white transition hover:bg-race-ink disabled:cursor-not-allowed disabled:bg-zinc-400">
                             Enviar inscrição
                         </button>
                     </div>

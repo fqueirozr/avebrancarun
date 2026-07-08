@@ -13,7 +13,7 @@
         @fonts
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="bg-[#f7faf2] text-zinc-950 antialiased">
+    <body class="bg-[#f4fbff] text-zinc-950 antialiased">
         <header class="absolute inset-x-0 top-0 z-20">
             <nav class="mx-auto flex max-w-7xl items-center justify-between px-5 py-5 sm:px-8" aria-label="Navegação principal">
                 <a href="{{ route('home') }}" class="flex items-center gap-3 text-white">
@@ -31,63 +31,54 @@
                     <a href="#contato" class="hover:text-white">Contato</a>
                 </div>
 
-                <a href="{{ route('registration') }}" class="rounded-md bg-white px-4 py-2 text-sm font-bold text-emerald-900 shadow-sm transition hover:bg-lime-100">
+                <a href="{{ route('registration') }}" class="rounded-md bg-race-cyan px-4 py-2 text-sm font-bold text-race-night shadow-sm shadow-cyan-950/20 transition hover:bg-race-ice">
                     Inscrever-se
                 </a>
             </nav>
         </header>
 
         <main>
-            <section class="relative min-h-[720px] overflow-hidden bg-zinc-950 text-white">
+            <section class="relative overflow-hidden bg-race-night text-white">
+                <h1 class="sr-only">Corrida Ave Branca Run</h1>
                 <img
-                    src="{{ asset('images/ave-branca-corrida-hero.png') }}"
-                    alt="Corredores participando de uma corrida de rua ao nascer do sol"
-                    class="absolute inset-0 h-full w-full object-cover"
+                    src="{{ asset('images/ave-branca-run-2026-hero.jpeg') }}"
+                    alt="Arte da 2ª edição Ave Branca Run com data, horário, local e distâncias da corrida"
+                    class="h-[min(100svh,900px)] min-h-[620px] w-full object-cover object-center"
                 >
-                <div class="absolute inset-0 bg-linear-to-r from-emerald-950/96 via-emerald-950/70 to-zinc-950/18"></div>
-                <div class="absolute inset-x-0 bottom-0 h-36 bg-linear-to-t from-[#f7faf2] to-transparent"></div>
+                <div class="absolute inset-x-0 top-0 h-32 bg-linear-to-b from-race-night/85 to-transparent"></div>
+                <div class="absolute inset-x-0 bottom-0 h-44 bg-linear-to-t from-race-night via-race-night/68 to-transparent"></div>
 
-                <div class="relative z-10 mx-auto flex min-h-[720px] max-w-7xl items-end px-5 pb-24 pt-36 sm:px-8 lg:pb-28">
-                    <div class="max-w-3xl">
-                        <p class="mb-5 inline-flex rounded-md border border-white/25 bg-white/12 px-3 py-1 text-sm font-semibold text-lime-100 shadow-sm backdrop-blur">
-                            Corrida de rua para toda a família
-                        </p>
-                        <h1 class="text-5xl font-black leading-tight text-white sm:text-6xl lg:text-7xl">
-                            Corrida Ave Branca
-                        </h1>
-                        <p class="mt-6 max-w-2xl text-lg leading-8 text-white/86 sm:text-xl">
-                            Um evento do Clube de Desbravadores Ave Branca com provas infantis por faixa etária e percursos adultos de 3 km e 6 km.
-                        </p>
-                        <div class="mt-8 flex flex-col gap-3 sm:flex-row">
-                            <a href="{{ route('registration') }}" class="rounded-md bg-lime-300 px-6 py-3 text-center text-base font-black text-emerald-950 shadow-lg shadow-lime-950/20 transition hover:-translate-y-0.5 hover:bg-lime-200">
-                                Fazer inscrição
-                            </a>
-                            <a href="#modalidades" class="rounded-md border border-white/30 bg-white/10 px-6 py-3 text-center text-base font-bold text-white backdrop-blur transition hover:-translate-y-0.5 hover:bg-white/18">
-                                Ver modalidades
-                            </a>
-                        </div>
+                <div class="absolute inset-x-0 bottom-0 z-10">
+                    <div class="mx-auto flex max-w-7xl flex-col items-center justify-center gap-3 px-5 pb-8 sm:flex-row sm:px-8 lg:pb-10">
+                        <a href="{{ route('registration') }}" class="w-full rounded-md bg-race-cyan px-6 py-3 text-center text-base font-black text-race-night shadow-lg shadow-cyan-950/30 transition hover:-translate-y-0.5 hover:bg-race-ice sm:w-auto">
+                            Fazer inscrição
+                        </a>
+                        <a href="#modalidades" class="w-full rounded-md border border-race-cyan/45 bg-race-night/45 px-6 py-3 text-center text-base font-bold text-race-ice backdrop-blur transition hover:-translate-y-0.5 hover:bg-white/12 sm:w-auto">
+                            Ver modalidades
+                        </a>
                     </div>
                 </div>
             </section>
 
             <section class="mx-auto grid max-w-7xl grid-cols-1 gap-4 px-5 py-10 sm:px-8 md:grid-cols-3">
-                <div class="rounded-md border border-emerald-900/10 bg-white p-5 shadow-sm shadow-emerald-950/5">
-                    <p class="text-sm font-semibold text-emerald-800">Público</p>
+                <div class="rounded-md border border-race-cyan/20 bg-white p-5 shadow-sm shadow-cyan-950/10">
+                    <p class="text-sm font-semibold text-race-blue">Público</p>
                     <p class="mt-2 text-2xl font-black">Infantil e adulto</p>
                 </div>
-                <div class="rounded-md border border-emerald-900/10 bg-white p-5 shadow-sm shadow-emerald-950/5">
-                    <p class="text-sm font-semibold text-emerald-800">Percursos</p>
+                <div class="rounded-md border border-race-cyan/20 bg-white p-5 shadow-sm shadow-cyan-950/10">
+                    <p class="text-sm font-semibold text-race-blue">Percursos</p>
                     <p class="mt-2 text-2xl font-black">{{ $modalities->pluck('distance')->filter()->unique()->values()->implode(' / ') ?: 'Em breve' }}</p>
                 </div>
-                <div class="rounded-md border border-emerald-900/10 bg-white p-5 shadow-sm shadow-emerald-950/5">
-                    <p class="text-sm font-semibold text-emerald-800">Pagamento</p>
+                <div class="rounded-md border border-race-cyan/20 bg-white p-5 shadow-sm shadow-cyan-950/10">
+                    <p class="text-sm font-semibold text-race-blue">Pagamento</p>
                     <p class="mt-2 text-2xl font-black">Em análise</p>
                 </div>
             </section>
 
-            <section id="modalidades" class="mx-auto max-w-7xl px-5 py-14 sm:px-8">
+            <section id="modalidades" class="bg-[#f4fbff]">
+                <div class="mx-auto max-w-7xl px-5 py-14 sm:px-8">
                 <div class="max-w-2xl">
-                    <p class="text-sm font-bold uppercase tracking-normal text-emerald-700">Modalidades</p>
+                    <p class="text-sm font-bold uppercase tracking-normal text-race-blue">Modalidades</p>
                     <h2 class="mt-3 text-3xl font-black leading-tight sm:text-4xl">Categorias por idade e distância</h2>
                     <p class="mt-4 text-base leading-7 text-zinc-700">
                         As provas infantis são organizadas por faixa etária. A partir dos 14 anos, o atleta já pode participar da corrida adulta de 3 km; a partir dos 16 anos, da corrida adulta de 6 km.
@@ -96,9 +87,9 @@
 
                 <div class="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     @forelse ($modalities as $modality)
-                        <article class="rounded-md border border-zinc-200 bg-white p-6 shadow-sm shadow-emerald-950/5 transition hover:-translate-y-1 hover:border-emerald-200 hover:shadow-lg hover:shadow-emerald-950/10">
+                        <article class="rounded-md border border-race-cyan/15 bg-white p-6 shadow-sm shadow-cyan-950/5 transition hover:-translate-y-1 hover:border-race-cyan/45 hover:shadow-lg hover:shadow-cyan-950/10">
                             <div class="flex items-center justify-between gap-4">
-                                <span class="rounded-md bg-emerald-100 px-3 py-1 text-sm font-bold text-emerald-800">{{ $modality->type }}</span>
+                                <span class="rounded-md bg-sky-100 px-3 py-1 text-sm font-bold text-race-blue">{{ $modality->type }}</span>
                                 <span class="text-sm font-semibold text-zinc-500">{{ $modality->age_range }}</span>
                             </div>
                             <p class="mt-6 text-5xl font-black text-zinc-950">{{ $modality->distance }}</p>
@@ -106,7 +97,7 @@
                                 {{ $modality->price === null ? 'Valor a definir' : 'R$ '.number_format((float) $modality->price, 2, ',', '.') }}
                             </p>
                             @if ($modality->google_maps_embed_url)
-                                <a href="#percurso-{{ $modality->id }}" class="mt-5 inline-flex rounded-md bg-emerald-800 px-4 py-2 text-sm font-black text-white transition hover:bg-emerald-900">
+                                <a href="#percurso-{{ $modality->id }}" class="mt-5 inline-flex rounded-md bg-race-blue px-4 py-2 text-sm font-black text-white transition hover:bg-race-ink">
                                     Ver percurso
                                 </a>
                             @endif
@@ -117,11 +108,12 @@
                         </div>
                     @endforelse
                 </div>
+                </div>
             </section>
 
             <section id="programacao" class="bg-white py-16">
                 <div class="mx-auto max-w-7xl px-5 sm:px-8">
-                    <p class="text-sm font-bold uppercase tracking-normal text-emerald-700">Evento</p>
+                    <p class="text-sm font-bold uppercase tracking-normal text-race-blue">Evento</p>
                     <h2 class="mt-3 text-4xl font-black leading-tight sm:text-5xl">Informações da prova</h2>
 
                     @php
@@ -142,17 +134,17 @@
                                 ['titulo' => 'Cronometragem', 'valor' => $eventSetting->timing_information ?: 'As informações de apuração e resultados serão divulgadas nos canais oficiais do evento.', 'modal' => null],
                                 ['titulo' => 'Inscrições especiais', 'valor' => $eventSetting->special_registrations_information ?: 'Entre em contato com a organização para necessidades específicas ou orientações adicionais.', 'modal' => null],
                             ] as $item)
-                                <details class="group rounded-md border border-emerald-900/10 bg-[#f7faf2] shadow-sm shadow-emerald-950/5 transition open:border-emerald-700/30 open:bg-white">
+                                <details class="group rounded-md border border-race-cyan/15 bg-[#f4fbff] shadow-sm shadow-cyan-950/5 transition open:border-race-cyan/45 open:bg-white">
                                     <summary class="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-5 text-base font-black text-zinc-950 marker:hidden">
                                         <span>{{ $item['titulo'] }}</span>
-                                        <span class="grid size-6 shrink-0 place-items-center rounded-full bg-emerald-800 text-sm leading-none text-white transition group-open:rotate-45 group-open:bg-lime-300 group-open:text-emerald-950">+</span>
+                                        <span class="grid size-6 shrink-0 place-items-center rounded-full bg-race-blue text-sm leading-none text-white transition group-open:rotate-45 group-open:bg-race-cyan group-open:text-race-night">+</span>
                                     </summary>
-                                    <div class="border-t border-emerald-900/10 px-5 pb-5 pt-4">
+                                    <div class="border-t border-race-cyan/15 px-5 pb-5 pt-4">
                                         <div class="event-rich-content">
                                             {{ \Filament\Forms\Components\RichEditor\RichContentRenderer::make($item['valor']) }}
                                         </div>
                                         @if ($item['modal'] !== null)
-                                            <button type="button" data-modal-open="{{ $item['modal'] }}" class="mt-4 inline-flex rounded-md bg-emerald-800 px-4 py-2 text-sm font-black text-white transition hover:bg-emerald-900">
+                                            <button type="button" data-modal-open="{{ $item['modal'] }}" class="mt-4 inline-flex rounded-md bg-race-blue px-4 py-2 text-sm font-black text-white transition hover:bg-race-ink">
                                                 {{ $item['botao'] }}
                                             </button>
                                         @endif
@@ -160,20 +152,20 @@
                                 </details>
                             @endforeach
 
-                            <button type="button" data-modal-open="regulation-modal" class="flex items-center justify-between gap-4 rounded-md border border-emerald-900/10 bg-[#f7faf2] px-5 py-5 text-left text-base font-black text-zinc-950 shadow-sm shadow-emerald-950/5 transition hover:border-emerald-700/30 hover:bg-white">
+                            <button type="button" data-modal-open="regulation-modal" class="flex items-center justify-between gap-4 rounded-md border border-race-cyan/15 bg-[#f4fbff] px-5 py-5 text-left text-base font-black text-zinc-950 shadow-sm shadow-cyan-950/5 transition hover:border-race-cyan/45 hover:bg-white">
                                 <span>Regulamento</span>
-                                <span class="text-2xl leading-none text-emerald-800" aria-hidden="true">↗</span>
+                                <span class="text-2xl leading-none text-race-blue" aria-hidden="true">↗</span>
                             </button>
                         </div>
 
-                        <aside id="percursos" class="rounded-md border border-emerald-900/10 bg-emerald-950 p-4 text-white shadow-xl shadow-emerald-950/15 sm:p-5">
+                        <aside id="percursos" class="rounded-md border border-race-cyan/20 bg-race-night p-4 text-white shadow-xl shadow-cyan-950/20 sm:p-5">
                             <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                                 <div>
-                                    <p class="text-sm font-bold text-lime-200">Percursos</p>
+                                    <p class="text-sm font-bold text-race-cyan">Percursos</p>
                                     <p class="mt-1 text-xs font-semibold text-white/70">Modalidades ativas do evento</p>
                                 </div>
 
-                                <p class="text-sm font-bold text-lime-100">
+                                <p class="text-sm font-bold text-race-ice">
                                     {{ $modalities->count() > 0 ? $modalities->count().' modalidades' : 'Em breve' }}
                                 </p>
                             </div>
@@ -185,7 +177,7 @@
                                             <button
                                                 type="button"
                                                 id="percurso-tab-{{ $modality->id }}"
-                                                class="shrink-0 rounded-md px-4 py-2 text-left text-sm font-black text-white/75 transition hover:bg-white/10 hover:text-white aria-selected:bg-lime-300 aria-selected:text-emerald-950"
+                                                class="shrink-0 rounded-md px-4 py-2 text-left text-sm font-black text-white/75 transition hover:bg-white/10 hover:text-white aria-selected:bg-race-cyan aria-selected:text-race-night"
                                                 role="tab"
                                                 aria-selected="{{ $loop->first ? 'true' : 'false' }}"
                                                 aria-controls="percurso-{{ $modality->id }}"
@@ -210,7 +202,7 @@
                                                 <div class="mb-3 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
                                                     <div>
                                                         <p class="text-base font-black text-white">{{ $modality->name }}</p>
-                                                        <p class="text-sm font-semibold text-lime-100">{{ $modality->distance ?: 'Distância a definir' }}</p>
+                                                        <p class="text-sm font-semibold text-race-ice">{{ $modality->distance ?: 'Distância a definir' }}</p>
                                                     </div>
                                                     <p class="text-xs font-bold uppercase tracking-normal text-white/55">{{ $modality->age_range ?: 'Todas as idades' }}</p>
                                                 </div>
@@ -219,7 +211,7 @@
                                                     <iframe
                                                         src="{{ $modality->google_maps_embed_url }}"
                                                         title="Mapa do percurso {{ $modality->displayName() }}"
-                                                        class="aspect-[4/3] w-full rounded-md border-0 bg-emerald-900"
+                                                        class="aspect-[4/3] w-full rounded-md border-0 bg-race-ink"
                                                         loading="lazy"
                                                         allowfullscreen
                                                         referrerpolicy="no-referrer-when-downgrade"
@@ -227,20 +219,20 @@
                                                 @elseif ($courseImageUrl)
                                                     <img src="{{ $courseImageUrl }}" alt="Imagem do percurso da prova" class="aspect-[4/3] w-full rounded-md object-cover">
                                                 @else
-                                                    <div class="grid aspect-[4/3] place-items-center rounded-md bg-emerald-900 px-6 text-center">
+                                                    <div class="grid aspect-[4/3] place-items-center rounded-md bg-race-ink px-6 text-center">
                                                         <p class="text-2xl font-black leading-tight text-white">Em breve</p>
                                                     </div>
                                                 @endif
                                             </div>
 
-                                            <div class="event-rich-content text-sm leading-6 text-lime-100 [&_*]:text-lime-100">
+                                            <div class="event-rich-content text-sm leading-6 text-race-ice [&_*]:text-race-ice">
                                                 {{ \Filament\Forms\Components\RichEditor\RichContentRenderer::make($modality->description ?: $eventSetting->course_information ?: 'Logo o percurso estará disponível para você se preparar.') }}
                                             </div>
                                         </div>
                                     @endforeach
                                 </div>
                             @else
-                                <div class="mt-5 rounded-md border border-lime-300/50 bg-lime-300/10 p-4 text-sm font-bold text-lime-100">
+                                <div class="mt-5 rounded-md border border-race-cyan/40 bg-race-cyan/10 p-4 text-sm font-bold text-race-ice">
                                     Logo o percurso estará disponível para você se preparar.
                                 </div>
                             @endif
@@ -251,9 +243,9 @@
                                         <summary class="flex cursor-pointer list-none items-center justify-between gap-4 px-4 py-3 marker:hidden">
                                             <span>
                                                 <span class="block text-sm font-black text-white">{{ $modality->name }}</span>
-                                                <span class="mt-1 block text-xs font-semibold text-lime-100">{{ $modality->distance ?: 'Distância a definir' }}</span>
+                                                <span class="mt-1 block text-xs font-semibold text-race-ice">{{ $modality->distance ?: 'Distância a definir' }}</span>
                                             </span>
-                                            <span class="grid size-6 shrink-0 place-items-center rounded-full bg-lime-300 text-sm leading-none text-emerald-950 transition group-open:rotate-45">+</span>
+                                            <span class="grid size-6 shrink-0 place-items-center rounded-full bg-race-cyan text-sm leading-none text-race-night transition group-open:rotate-45">+</span>
                                         </summary>
 
                                         <div class="grid gap-3 border-t border-white/10 p-3">
@@ -261,7 +253,7 @@
                                                 <iframe
                                                     src="{{ $modality->google_maps_embed_url }}"
                                                     title="Mapa do percurso {{ $modality->displayName() }}"
-                                                    class="aspect-[4/3] w-full rounded-md border-0 bg-emerald-900"
+                                                    class="aspect-[4/3] w-full rounded-md border-0 bg-race-ink"
                                                     loading="lazy"
                                                     allowfullscreen
                                                     referrerpolicy="no-referrer-when-downgrade"
@@ -269,18 +261,18 @@
                                             @elseif ($courseImageUrl)
                                                 <img src="{{ $courseImageUrl }}" alt="Imagem do percurso da prova" class="aspect-[4/3] w-full rounded-md object-cover">
                                             @else
-                                                <div class="grid aspect-[4/3] place-items-center rounded-md bg-emerald-900 px-6 text-center">
+                                                <div class="grid aspect-[4/3] place-items-center rounded-md bg-race-ink px-6 text-center">
                                                     <p class="text-2xl font-black leading-tight text-white">Em breve</p>
                                                 </div>
                                             @endif
 
-                                            <div class="event-rich-content text-sm leading-6 text-lime-100 [&_*]:text-lime-100">
+                                            <div class="event-rich-content text-sm leading-6 text-race-ice [&_*]:text-race-ice">
                                                 {{ \Filament\Forms\Components\RichEditor\RichContentRenderer::make($modality->description ?: $eventSetting->course_information ?: 'Logo o percurso estará disponível para você se preparar.') }}
                                             </div>
                                         </div>
                                     </details>
                                 @else
-                                    <div class="rounded-md border border-lime-300/50 bg-lime-300/10 p-4 text-sm font-bold text-lime-100">
+                                    <div class="rounded-md border border-race-cyan/40 bg-race-cyan/10 p-4 text-sm font-bold text-race-ice">
                                         Logo o percurso estará disponível para você se preparar.
                                     </div>
                                 @endif
@@ -292,14 +284,14 @@
 
             <section id="contato" class="mx-auto max-w-7xl px-5 py-16 sm:px-8">
                 <div class="grid grid-cols-1 gap-8 lg:grid-cols-[0.85fr_1.15fr] lg:items-start">
-                    <div class="rounded-md bg-emerald-950 p-6 text-white shadow-xl shadow-emerald-950/15">
-                        <p class="text-sm font-semibold text-lime-200">Contato</p>
+                    <div class="rounded-md bg-race-night p-6 text-white shadow-xl shadow-cyan-950/20">
+                        <p class="text-sm font-semibold text-race-cyan">Contato</p>
                         <h2 class="mt-3 text-3xl font-black leading-tight">Fale com a organização</h2>
                         <div class="mt-6 grid gap-4 text-sm leading-6 text-white/82">
                             @if ($eventSetting->contact_email)
                                 <p>
                                     <span class="block font-bold text-white">E-mail</span>
-                                    <a href="mailto:{{ $eventSetting->contact_email }}" class="hover:text-lime-200">{{ $eventSetting->contact_email }}</a>
+                                    <a href="mailto:{{ $eventSetting->contact_email }}" class="hover:text-race-cyan">{{ $eventSetting->contact_email }}</a>
                                 </p>
                             @endif
 
@@ -323,16 +315,16 @@
                         </div>
                     </div>
 
-                    <form action="{{ route('contact.store') }}" method="POST" class="grid gap-5 rounded-md border border-zinc-200 bg-white p-5 shadow-sm shadow-emerald-950/5 sm:p-7">
+                    <form action="{{ route('contact.store') }}" method="POST" class="grid gap-5 rounded-md border border-race-cyan/15 bg-white p-5 shadow-sm shadow-cyan-950/5 sm:p-7">
                         @csrf
 
                         <div>
-                            <p class="text-sm font-bold uppercase tracking-normal text-emerald-700">Mensagem</p>
+                            <p class="text-sm font-bold uppercase tracking-normal text-race-blue">Mensagem</p>
                             <h3 class="mt-2 text-2xl font-black leading-tight">Envie sua dúvida</h3>
                         </div>
 
                         @if (session('contact_status'))
-                            <div class="rounded-md border border-emerald-200 bg-emerald-50 p-4 text-sm font-bold text-emerald-950">
+                            <div class="rounded-md border border-race-cyan/30 bg-sky-50 p-4 text-sm font-bold text-race-ink">
                                 {{ session('contact_status') }}
                             </div>
                         @endif
@@ -340,7 +332,7 @@
                         <div class="grid min-w-0 grid-cols-1 gap-5 md:grid-cols-2">
                             <label class="grid min-w-0 gap-2">
                                 <span class="text-sm font-bold leading-5 text-zinc-800">Nome</span>
-                                <input type="text" name="name" value="{{ old('name') }}" class="min-w-0 rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-emerald-700 focus:ring-3 focus:ring-emerald-100" placeholder="Seu nome" required>
+                                <input type="text" name="name" value="{{ old('name') }}" class="min-w-0 rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-race-blue focus:ring-3 focus:ring-sky-100" placeholder="Seu nome" required>
                                 @error('name')
                                     <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
                                 @enderror
@@ -348,7 +340,7 @@
 
                             <label class="grid min-w-0 gap-2">
                                 <span class="text-sm font-bold leading-5 text-zinc-800">E-mail</span>
-                                <input type="email" name="email" value="{{ old('email') }}" class="min-w-0 rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-emerald-700 focus:ring-3 focus:ring-emerald-100" placeholder="email@exemplo.com" required>
+                                <input type="email" name="email" value="{{ old('email') }}" class="min-w-0 rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-race-blue focus:ring-3 focus:ring-sky-100" placeholder="email@exemplo.com" required>
                                 @error('email')
                                     <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
                                 @enderror
@@ -356,7 +348,7 @@
 
                             <label class="grid min-w-0 gap-2">
                                 <span class="text-sm font-bold leading-5 text-zinc-800">Telefone</span>
-                                <input type="tel" name="phone" value="{{ old('phone') }}" inputmode="tel" data-mask="phone" class="min-w-0 rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-emerald-700 focus:ring-3 focus:ring-emerald-100" placeholder="(00) 00000-0000">
+                                <input type="tel" name="phone" value="{{ old('phone') }}" inputmode="tel" data-mask="phone" class="min-w-0 rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-race-blue focus:ring-3 focus:ring-sky-100" placeholder="(00) 00000-0000">
                                 @error('phone')
                                     <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
                                 @enderror
@@ -364,7 +356,7 @@
 
                             <label class="grid min-w-0 gap-2">
                                 <span class="text-sm font-bold leading-5 text-zinc-800">Assunto</span>
-                                <input type="text" name="subject" value="{{ old('subject') }}" class="min-w-0 rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-emerald-700 focus:ring-3 focus:ring-emerald-100" placeholder="Sobre o que quer falar?">
+                                <input type="text" name="subject" value="{{ old('subject') }}" class="min-w-0 rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-race-blue focus:ring-3 focus:ring-sky-100" placeholder="Sobre o que quer falar?">
                                 @error('subject')
                                     <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
                                 @enderror
@@ -373,14 +365,14 @@
 
                         <label class="grid min-w-0 gap-2">
                             <span class="text-sm font-bold leading-5 text-zinc-800">Mensagem</span>
-                            <textarea name="message" rows="5" class="min-w-0 rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-emerald-700 focus:ring-3 focus:ring-emerald-100" placeholder="Escreva sua dúvida ou solicitação" required>{{ old('message') }}</textarea>
+                            <textarea name="message" rows="5" class="min-w-0 rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-race-blue focus:ring-3 focus:ring-sky-100" placeholder="Escreva sua dúvida ou solicitação" required>{{ old('message') }}</textarea>
                             @error('message')
                                 <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
                             @enderror
                         </label>
 
                         <div class="flex justify-end">
-                            <button type="submit" class="rounded-md bg-emerald-800 px-5 py-3 text-sm font-black text-white transition hover:bg-emerald-900">
+                            <button type="submit" class="rounded-md bg-race-blue px-5 py-3 text-sm font-black text-white transition hover:bg-race-ink">
                                 Enviar mensagem
                             </button>
                         </div>
@@ -389,42 +381,42 @@
             </section>
         </main>
 
-        <footer class="border-t border-emerald-900/10 bg-white">
+        <footer class="border-t border-race-cyan/15 bg-white">
             <div class="mx-auto flex max-w-7xl flex-col gap-3 px-5 py-8 text-sm text-zinc-600 sm:px-8 md:flex-row md:items-center md:justify-between">
                 <p class="font-semibold text-zinc-800">Clube de Desbravadores Ave Branca</p>
                 <p>Corrida de rua com inscrições, modalidades e pagamento em preparação.</p>
             </div>
         </footer>
 
-        <dialog id="kit-modal" class="m-auto w-[min(44rem,calc(100vw-2rem))] rounded-md border border-emerald-900/10 bg-white p-0 text-zinc-950 shadow-2xl shadow-emerald-950/30 backdrop:bg-emerald-950/75">
-            <div class="flex items-start justify-between gap-5 border-b border-emerald-900/10 bg-emerald-950 p-5 text-white sm:p-6">
+        <dialog id="kit-modal" class="m-auto w-[min(44rem,calc(100vw-2rem))] rounded-md border border-race-cyan/15 bg-white p-0 text-zinc-950 shadow-2xl shadow-cyan-950/30 backdrop:bg-race-night/80">
+            <div class="flex items-start justify-between gap-5 border-b border-race-cyan/20 bg-race-night p-5 text-white sm:p-6">
                 <div>
-                    <p class="text-sm font-bold uppercase tracking-normal text-lime-200">Kit atleta</p>
+                    <p class="text-sm font-bold uppercase tracking-normal text-race-cyan">Kit atleta</p>
                     <h2 class="mt-1 text-2xl font-black leading-tight">Informações do kit</h2>
                 </div>
                 <button type="button" data-modal-close class="rounded-md border border-white/20 bg-white/10 px-3 py-2 text-sm font-black text-white transition hover:bg-white/20" aria-label="Fechar modal">
                     Fechar
                 </button>
             </div>
-            <div class="max-h-[70vh] overflow-y-auto bg-[#f7faf2] p-4 sm:p-6">
-                <div class="event-rich-content event-rich-content--modal rounded-md border border-emerald-900/10 bg-white p-5 shadow-sm shadow-emerald-950/5 sm:p-6">
+            <div class="max-h-[70vh] overflow-y-auto bg-[#f4fbff] p-4 sm:p-6">
+                <div class="event-rich-content event-rich-content--modal rounded-md border border-race-cyan/15 bg-white p-5 shadow-sm shadow-cyan-950/5 sm:p-6">
                     {{ \Filament\Forms\Components\RichEditor\RichContentRenderer::make($eventSetting->kit_information ?: 'Em definição') }}
                 </div>
             </div>
         </dialog>
 
-        <dialog id="regulation-modal" class="m-auto w-[min(44rem,calc(100vw-2rem))] rounded-md border border-emerald-900/10 bg-white p-0 text-zinc-950 shadow-2xl shadow-emerald-950/30 backdrop:bg-emerald-950/75">
-            <div class="flex items-start justify-between gap-5 border-b border-emerald-900/10 bg-emerald-950 p-5 text-white sm:p-6">
+        <dialog id="regulation-modal" class="m-auto w-[min(44rem,calc(100vw-2rem))] rounded-md border border-race-cyan/15 bg-white p-0 text-zinc-950 shadow-2xl shadow-cyan-950/30 backdrop:bg-race-night/80">
+            <div class="flex items-start justify-between gap-5 border-b border-race-cyan/20 bg-race-night p-5 text-white sm:p-6">
                 <div>
-                    <p class="text-sm font-bold uppercase tracking-normal text-lime-200">Regulamento</p>
+                    <p class="text-sm font-bold uppercase tracking-normal text-race-cyan">Regulamento</p>
                     <h2 class="mt-1 text-2xl font-black leading-tight">Regras da corrida</h2>
                 </div>
                 <button type="button" data-modal-close class="rounded-md border border-white/20 bg-white/10 px-3 py-2 text-sm font-black text-white transition hover:bg-white/20" aria-label="Fechar modal">
                     Fechar
                 </button>
             </div>
-            <div class="max-h-[70vh] overflow-y-auto bg-[#f7faf2] p-4 sm:p-6">
-                <div class="event-rich-content event-rich-content--modal rounded-md border border-emerald-900/10 bg-white p-5 shadow-sm shadow-emerald-950/5 sm:p-6">
+            <div class="max-h-[70vh] overflow-y-auto bg-[#f4fbff] p-4 sm:p-6">
+                <div class="event-rich-content event-rich-content--modal rounded-md border border-race-cyan/15 bg-white p-5 shadow-sm shadow-cyan-950/5 sm:p-6">
                     {{ \Filament\Forms\Components\RichEditor\RichContentRenderer::make($eventSetting->regulation ?: 'Em revisão') }}
                 </div>
             </div>
