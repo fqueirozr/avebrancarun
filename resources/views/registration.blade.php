@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="pt-BR">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="description" content="Pagina de inscricao da Corrida Ave Branca.">
+        <meta name="description" content="Página de inscrição da Corrida Ave Branca.">
 
-        <title>Inscricao | Corrida Ave Branca</title>
+        <title>Inscrição | Corrida Ave Branca</title>
 
         <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="any">
         <link rel="apple-touch-icon" href="{{ asset('images/ave-branca-logo.png') }}">
@@ -15,7 +15,7 @@
     </head>
     <body class="bg-[#f8faf5] text-zinc-950 antialiased">
         <header class="border-b border-emerald-900/10 bg-white">
-            <nav class="mx-auto flex max-w-7xl items-center justify-between px-5 py-5 sm:px-8" aria-label="Navegacao principal">
+            <nav class="mx-auto flex max-w-7xl items-center justify-between px-5 py-5 sm:px-8" aria-label="Navegação principal">
                 <a href="{{ route('home') }}" class="flex items-center gap-3">
                     <img
                         src="{{ asset('images/ave-branca-logo.png') }}"
@@ -40,7 +40,7 @@
                         class="h-56 w-full object-cover"
                     >
                     <div class="p-6">
-                        <p class="text-sm font-semibold text-lime-200">Inscricao da corrida</p>
+                        <p class="text-sm font-semibold text-lime-200">Inscrição da corrida</p>
                         <h1 class="mt-3 text-3xl font-black leading-tight">Corrida Ave Branca</h1>
                         <p class="mt-4 text-sm leading-6 text-white/78">
                             Preencha os dados do atleta, escolha a modalidade e siga para o checkout seguro quando o pagamento estiver ativo.
@@ -49,19 +49,19 @@
                 </div>
 
                 <div class="mt-5 rounded-md border border-amber-200 bg-amber-50 p-5 text-amber-950">
-                    <p class="font-black">Pagamento em analise</p>
+                    <p class="font-black">Pagamento em análise</p>
                     <p class="mt-2 text-sm leading-6">
-                        O checkout pode ser pago por Pix ou cartao quando a configuracao do gateway estiver ativa.
+                        O checkout pode ser pago por Pix ou cartão quando a configuração do gateway estiver ativa.
                     </p>
                 </div>
             </aside>
 
             <section class="rounded-md border border-zinc-200 bg-white p-5 shadow-sm sm:p-7">
                 <div class="border-b border-zinc-200 pb-6">
-                    <p class="text-sm font-bold uppercase tracking-normal text-emerald-700">Formulario</p>
-                    <h2 class="mt-2 text-3xl font-black leading-tight">Dados para inscricao</h2>
+                    <p class="text-sm font-bold uppercase tracking-normal text-emerald-700">Formulário</p>
+                    <h2 class="mt-2 text-3xl font-black leading-tight">Dados para inscrição</h2>
                     <p class="mt-3 text-sm leading-6 text-zinc-600">
-                        Os campos abaixo ja organizam as informacoes essenciais para a etapa de inscricao.
+                        Os campos abaixo já organizam as informações essenciais para a etapa de inscrição.
                     </p>
                 </div>
 
@@ -127,19 +127,19 @@
                     </fieldset>
 
                     <fieldset class="grid min-w-0 gap-5 border-b border-zinc-200 pb-6">
-                        <legend class="mb-4 text-base font-black text-zinc-950">Responsavel</legend>
+                        <legend class="mb-4 text-base font-black text-zinc-950">Responsável</legend>
 
                         <div class="grid min-w-0 grid-cols-1 gap-5 md:grid-cols-2">
                             <label class="grid min-w-0 gap-2">
-                                <span class="text-sm font-bold leading-5 text-zinc-800">Nome do responsavel</span>
-                                <input type="text" name="guardian_name" value="{{ old('guardian_name') }}" class="min-w-0 rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-emerald-700 focus:ring-3 focus:ring-emerald-100" placeholder="Obrigatorio para menores">
+                                <span class="text-sm font-bold leading-5 text-zinc-800">Nome do responsável</span>
+                                <input type="text" name="guardian_name" value="{{ old('guardian_name') }}" class="min-w-0 rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-emerald-700 focus:ring-3 focus:ring-emerald-100" placeholder="Obrigatório para menores">
                                 @error('guardian_name')
                                     <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
                                 @enderror
                             </label>
 
                             <label class="grid min-w-0 gap-2">
-                                <span class="text-sm font-bold leading-5 text-zinc-800">CPF do responsavel</span>
+                                <span class="text-sm font-bold leading-5 text-zinc-800">CPF do responsável</span>
                                 <input type="text" name="guardian_cpf" value="{{ old('guardian_cpf') }}" inputmode="numeric" data-mask="cpf" class="min-w-0 rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-emerald-700 focus:ring-3 focus:ring-emerald-100" placeholder="000.000.000-00">
                                 @error('guardian_cpf')
                                     <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
@@ -169,7 +169,7 @@
                             </label>
 
                             <label class="grid min-w-0 gap-2 md:col-span-2 lg:col-span-1">
-                                <span class="text-sm font-bold leading-5 text-zinc-800">Endereco</span>
+                                <span class="text-sm font-bold leading-5 text-zinc-800">Endereço</span>
                                 <input type="text" name="billing_address" value="{{ old('billing_address') }}" class="min-w-0 rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-emerald-700 focus:ring-3 focus:ring-emerald-100" placeholder="Rua, avenida ou travessa">
                                 @error('billing_address')
                                     <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
@@ -186,7 +186,7 @@
                                 </label>
 
                                 <label class="grid min-w-0 gap-2">
-                                    <span class="text-sm font-bold leading-5 text-zinc-800">Numero</span>
+                                    <span class="text-sm font-bold leading-5 text-zinc-800">Número</span>
                                     <input type="text" name="billing_address_number" value="{{ old('billing_address_number') }}" class="min-w-0 rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-emerald-700 focus:ring-3 focus:ring-emerald-100" placeholder="123">
                                     @error('billing_address_number')
                                         <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
@@ -196,7 +196,7 @@
 
                             <label class="grid min-w-0 gap-2">
                                 <span class="text-sm font-bold leading-5 text-zinc-800">CEP</span>
-                                <input type="text" name="billing_postal_code" value="{{ old('billing_postal_code') }}" inputmode="numeric" class="min-w-0 rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-emerald-700 focus:ring-3 focus:ring-emerald-100" placeholder="Somente numeros">
+                                <input type="text" name="billing_postal_code" value="{{ old('billing_postal_code') }}" inputmode="numeric" class="min-w-0 rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-emerald-700 focus:ring-3 focus:ring-emerald-100" placeholder="Somente números">
                                 @error('billing_postal_code')
                                     <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
                                 @enderror
@@ -229,11 +229,11 @@
                     </fieldset>
 
                     <fieldset class="grid min-w-0 gap-5">
-                        <legend class="mb-4 text-base font-black text-zinc-950">Observacoes</legend>
+                        <legend class="mb-4 text-base font-black text-zinc-950">Observações</legend>
 
                         <label class="grid min-w-0 gap-2">
                             <span class="text-sm font-bold leading-5 text-zinc-800">Detalhes adicionais</span>
-                            <textarea name="notes" rows="4" class="min-w-0 rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-emerald-700 focus:ring-3 focus:ring-emerald-100" placeholder="Equipe, restricao medica ou detalhe importante">{{ old('notes') }}</textarea>
+                            <textarea name="notes" rows="4" class="min-w-0 rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-emerald-700 focus:ring-3 focus:ring-emerald-100" placeholder="Equipe, restrição médica ou detalhe importante">{{ old('notes') }}</textarea>
                             @error('notes')
                                 <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
                             @enderror
@@ -242,12 +242,12 @@
 
                     <div class="grid gap-3 rounded-md bg-zinc-50 p-5 sm:grid-cols-[1fr_auto] sm:items-center">
                         <div>
-                            <p class="font-black">Confirmacao pendente</p>
-                            <p class="mt-1 text-sm leading-6 text-zinc-600">A inscricao sera registrada e, se houver valor configurado, voce seguira para o pagamento.</p>
+                            <p class="font-black">Confirmação pendente</p>
+                            <p class="mt-1 text-sm leading-6 text-zinc-600">A inscrição será registrada e, se houver valor configurado, você seguirá para o pagamento.</p>
                         </div>
 
                         <button type="submit" @disabled($modalities->isEmpty()) class="rounded-md bg-emerald-800 px-5 py-3 text-sm font-black text-white transition hover:bg-emerald-900 disabled:cursor-not-allowed disabled:bg-zinc-400">
-                            Enviar inscricao
+                            Enviar inscrição
                         </button>
                     </div>
                 </form>

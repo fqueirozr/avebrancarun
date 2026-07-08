@@ -68,4 +68,40 @@
     .event-rich-content blockquote {
         @apply border-l-4 border-emerald-700/30 pl-4 font-bold text-zinc-700;
     }
+
+    .event-rich-content--modal {
+        @apply text-base/7 font-medium text-zinc-700;
+    }
+
+    .event-rich-content--modal :where(p, ul, ol, blockquote) + :where(p, ul, ol, blockquote, h2, h3) {
+        @apply mt-5;
+    }
+
+    .event-rich-content--modal :where(h2, h3) {
+        @apply text-zinc-950;
+    }
+
+    .event-rich-content--modal h2 {
+        @apply border-b border-emerald-900/10 pb-2 text-2xl/8;
+    }
+
+    .event-rich-content--modal h3 {
+        @apply text-xl/7 text-emerald-950;
+    }
+
+    .event-rich-content--modal :where(ul, ol) {
+        @apply grid gap-2 rounded-md border border-emerald-900/10 bg-emerald-50/50 p-4 pl-8;
+    }
+
+    .event-rich-content--modal li + li {
+        @apply mt-0;
+    }
+
+    .event-rich-content--modal blockquote {
+        @apply rounded-md border-l-4 border-lime-400 bg-lime-50 px-4 py-3 text-emerald-950;
+    }
+
+    .event-rich-content--modal a {
+        @apply text-emerald-900 decoration-2;
+    }
 }

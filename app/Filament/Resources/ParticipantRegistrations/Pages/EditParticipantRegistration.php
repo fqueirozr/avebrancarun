@@ -22,12 +22,12 @@ class EditParticipantRegistration extends EditRecord
     {
         return [
             Action::make('cancel')
-                ->label('Cancelar inscricao')
+                ->label('Cancelar inscrição')
                 ->icon(Heroicon::OutlinedXCircle)
                 ->color('danger')
                 ->requiresConfirmation()
-                ->modalHeading('Cancelar inscricao')
-                ->modalDescription('A inscricao sera marcada como cancelada e o participante recebera um email de atualizacao.')
+                ->modalHeading('Cancelar inscrição')
+                ->modalDescription('A inscrição será marcada como cancelada e o participante receberá um e-mail de atualização.')
                 ->visible(fn (): bool => $this->record->payment_status !== 'cancelled')
                 ->action(function (): void {
                     $this->record->forceFill([
@@ -38,8 +38,8 @@ class EditParticipantRegistration extends EditRecord
 
                     Notification::make()
                         ->success()
-                        ->title('Inscricao cancelada')
-                        ->body('O participante recebeu um email de atualizacao.')
+                        ->title('Inscrição cancelada')
+                        ->body('O participante recebeu um e-mail de atualização.')
                         ->send();
                 }),
             DeleteAction::make(),

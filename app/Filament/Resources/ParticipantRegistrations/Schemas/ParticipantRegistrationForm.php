@@ -30,10 +30,10 @@ class ParticipantRegistrationForm
                     ->minLength(11)
                     ->maxLength(11),
                 TextInput::make('guardian_name')
-                    ->label('Responsavel')
+                    ->label('Responsável')
                     ->maxLength(255),
                 TextInput::make('guardian_cpf')
-                    ->label('CPF do responsavel')
+                    ->label('CPF do responsável')
                     ->numeric()
                     ->minLength(11)
                     ->maxLength(11),
@@ -57,10 +57,10 @@ class ParticipantRegistrationForm
                     ->label('Nome do pagador')
                     ->maxLength(255),
                 TextInput::make('billing_address')
-                    ->label('Endereco do pagador')
+                    ->label('Endereço do pagador')
                     ->maxLength(255),
                 TextInput::make('billing_address_number')
-                    ->label('Numero')
+                    ->label('Número')
                     ->maxLength(20),
                 TextInput::make('billing_province')
                     ->label('Bairro')
@@ -85,7 +85,7 @@ class ParticipantRegistrationForm
                     ->disabled()
                     ->dehydrated(false),
                 TextInput::make('payment_gateway_reference')
-                    ->label('Referencia do gateway')
+                    ->label('Referência do gateway')
                     ->disabled()
                     ->dehydrated(false),
                 TextInput::make('payment_checkout_url')
@@ -95,7 +95,7 @@ class ParticipantRegistrationForm
                     ->disabled()
                     ->dehydrated(false),
                 Textarea::make('notes')
-                    ->label('Observacoes')
+                    ->label('Observações')
                     ->columnSpanFull()
                     ->maxLength(1000),
             ]);

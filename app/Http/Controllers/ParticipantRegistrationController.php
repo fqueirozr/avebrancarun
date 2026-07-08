@@ -63,7 +63,7 @@ class ParticipantRegistrationController extends Controller
         Mail::to($registration->email)->send(new ParticipantRegistrationReceived($registration));
 
         return to_route('registration')
-            ->with('status', 'Inscricao enviada com sucesso. A confirmacao de pagamento continua pendente.');
+            ->with('status', 'Inscrição enviada com sucesso. A confirmação de pagamento continua pendente.');
     }
 
     public function paymentSuccess(ParticipantRegistration $registration): RedirectResponse
@@ -77,25 +77,25 @@ class ParticipantRegistrationController extends Controller
         }
 
         return to_route('registration')
-            ->with('status', 'Pagamento recebido. Sua inscricao foi confirmada.');
+            ->with('status', 'Pagamento recebido. Sua inscrição foi confirmada.');
     }
 
     public function paymentSuccessNotice(): RedirectResponse
     {
         return to_route('registration')
-            ->with('status', 'Pagamento recebido pelo checkout. A inscricao sera confirmada apos a conciliacao automatica.');
+            ->with('status', 'Pagamento recebido pelo checkout. A inscrição será confirmada após a conciliação automática.');
     }
 
     public function paymentCancel(): RedirectResponse
     {
         return to_route('registration')
-            ->with('status', 'Checkout cancelado. Sua inscricao ficou registrada com pagamento pendente.');
+            ->with('status', 'Checkout cancelado. Sua inscrição ficou registrada com pagamento pendente.');
     }
 
     public function paymentExpired(): RedirectResponse
     {
         return to_route('registration')
-            ->with('status', 'Checkout expirado. Sua inscricao ficou registrada com pagamento pendente.');
+            ->with('status', 'Checkout expirado. Sua inscrição ficou registrada com pagamento pendente.');
     }
 
     private function shouldCreateCheckout(RaceModality $raceModality): bool
@@ -128,10 +128,10 @@ class ParticipantRegistrationController extends Controller
                 ->implode(' ');
 
             if (filled($errors)) {
-                return "Nao foi possivel abrir o checkout: {$errors}";
+                return "Não foi possível abrir o checkout: {$errors}";
             }
         }
 
-        return 'Nao foi possivel abrir o checkout. Revise os dados do pagador e tente novamente.';
+        return 'Não foi possível abrir o checkout. Revise os dados do pagador e tente novamente.';
     }
 }

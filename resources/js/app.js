@@ -48,3 +48,25 @@ document.querySelectorAll('[data-mask]').forEach((input) => {
     input.addEventListener('input', applyMask);
     applyMask();
 });
+
+document.querySelectorAll('[data-modal-open]').forEach((button) => {
+    button.addEventListener('click', () => {
+        const modal = document.getElementById(button.dataset.modalOpen);
+
+        if (modal instanceof HTMLDialogElement) {
+            modal.showModal();
+        }
+    });
+});
+
+document.querySelectorAll('dialog').forEach((modal) => {
+    modal.querySelectorAll('[data-modal-close]').forEach((button) => {
+        button.addEventListener('click', () => modal.close());
+    });
+
+    modal.addEventListener('click', (event) => {
+        if (event.target === modal) {
+            modal.close();
+        }
+    });
+});

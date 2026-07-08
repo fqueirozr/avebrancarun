@@ -359,7 +359,7 @@ test('registration update email shows cancelled status', function () {
 
     $mail->assertSeeInHtml('Maria Silva');
     $mail->assertSeeInHtml('Cancelado');
-    $mail->assertSeeInHtml('Esta inscricao foi cancelada');
+    $mail->assertSeeInHtml('Esta inscrição foi cancelada');
 });
 
 test('an authenticated admin can print the registration list', function () {
@@ -376,7 +376,7 @@ test('an authenticated admin can print the registration list', function () {
     $this->actingAs($user)
         ->get(ParticipantRegistrationResource::getUrl('print'))
         ->assertSuccessful()
-        ->assertSee('Lista de inscricoes')
+        ->assertSee('Lista de inscrições')
         ->assertSee('Maria Silva')
         ->assertSee('maria@example.com')
         ->assertSee('Pago');

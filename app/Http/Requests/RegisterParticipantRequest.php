@@ -45,6 +45,47 @@ class RegisterParticipantRequest extends FormRequest
     }
 
     /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'required' => 'Informe :attribute.',
+            'string' => 'O campo :attribute deve ser um texto.',
+            'max' => 'O campo :attribute não pode ter mais de :max caracteres.',
+            'date' => 'Informe uma data válida para :attribute.',
+            'birth_date.before' => 'A data de nascimento deve ser anterior a hoje.',
+            'email.email' => 'Informe um e-mail válido.',
+            'regex' => 'Informe um valor válido para :attribute.',
+            'race_modality_id.exists' => 'Escolha uma modalidade ativa.',
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function attributes(): array
+    {
+        return [
+            'athlete_name' => 'o nome do atleta',
+            'birth_date' => 'a data de nascimento',
+            'participant_cpf' => 'o CPF do participante',
+            'guardian_name' => 'o nome do responsável',
+            'guardian_cpf' => 'o CPF do responsável',
+            'phone' => 'o telefone',
+            'email' => 'o e-mail',
+            'billing_document' => 'o CPF ou CNPJ do pagador',
+            'billing_name' => 'o nome completo do pagador',
+            'billing_address' => 'o endereço do pagador',
+            'billing_address_number' => 'o número do endereço',
+            'billing_province' => 'o bairro do pagador',
+            'billing_postal_code' => 'o CEP do pagador',
+            'race_modality_id' => 'a modalidade',
+            'notes' => 'as observações',
+        ];
+    }
+
+    /**
      * Configure the validator instance.
      */
     public function after(): array
@@ -54,11 +95,11 @@ class RegisterParticipantRequest extends FormRequest
                 $raceModality = RaceModality::query()->find($this->input('race_modality_id'));
 
                 if (filled($this->input('participant_cpf')) && ! $this->hasValidCpf((string) $this->input('participant_cpf'))) {
-                    $validator->errors()->add('participant_cpf', 'Informe um CPF valido para o participante.');
+                    $validator->errors()->add('participant_cpf', 'Informe um CPF válido para o participante.');
                 }
 
                 if (filled($this->input('guardian_cpf')) && ! $this->hasValidCpf((string) $this->input('guardian_cpf'))) {
-                    $validator->errors()->add('guardian_cpf', 'Informe um CPF valido para o responsavel.');
+                    $validator->errors()->add('guardian_cpf', 'Informe um CPF válido para o responsável.');
                 }
 
                 if (! $this->requiresCheckoutData($raceModality)) {
@@ -76,7 +117,7 @@ class RegisterParticipantRequest extends FormRequest
                 }
 
                 if (filled($this->input('billing_document')) && ! $this->hasValidBillingDocument((string) $this->input('billing_document'))) {
-                    $validator->errors()->add('billing_document', 'Informe um CPF ou CNPJ valido.');
+                    $validator->errors()->add('billing_document', 'Informe um CPF ou CNPJ válido.');
                 }
             },
         ];
@@ -113,8 +154,8 @@ class RegisterParticipantRequest extends FormRequest
         return [
             'billing_document' => 'Informe o CPF ou CNPJ para seguir ao checkout.',
             'billing_name' => 'Informe o nome completo do pagador para seguir ao checkout.',
-            'billing_address' => 'Informe o endereco do pagador para seguir ao checkout.',
-            'billing_address_number' => 'Informe o numero do endereco para seguir ao checkout.',
+            'billing_address' => 'Informe o endereço do pagador para seguir ao checkout.',
+            'billing_address_number' => 'Informe o número do endereço para seguir ao checkout.',
             'billing_province' => 'Informe o bairro do pagador para seguir ao checkout.',
             'billing_postal_code' => 'Informe o CEP do pagador para seguir ao checkout.',
         ];

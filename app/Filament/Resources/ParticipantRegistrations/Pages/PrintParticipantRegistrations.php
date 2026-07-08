@@ -17,7 +17,7 @@ class PrintParticipantRegistrations extends Page
 
     public function getTitle(): string
     {
-        return 'Imprimir inscricoes';
+        return 'Imprimir inscrições';
     }
 
     /**

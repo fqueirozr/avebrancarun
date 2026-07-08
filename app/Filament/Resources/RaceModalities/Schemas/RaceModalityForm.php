@@ -28,11 +28,11 @@ class RaceModalityForm
                     ->required()
                     ->native(false),
                 TextInput::make('age_range')
-                    ->label('Faixa etaria')
+                    ->label('Faixa etária')
                     ->placeholder('A partir de 16 anos')
                     ->maxLength(255),
                 TextInput::make('distance')
-                    ->label('Distancia')
+                    ->label('Distância')
                     ->placeholder('6 km')
                     ->maxLength(255),
                 TextInput::make('price')
@@ -55,7 +55,7 @@ class RaceModalityForm
                     ->default(true)
                     ->required(),
                 Textarea::make('description')
-                    ->label('Descricao')
+                    ->label('Descrição')
                     ->columnSpanFull()
                     ->maxLength(1000),
             ]);

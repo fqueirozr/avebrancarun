@@ -23,7 +23,7 @@ class PaymentGatewaySettingsTable
                     ->label('Ambiente')
                     ->badge(),
                 TextColumn::make('checkout_minutes_to_expire')
-                    ->label('Expiracao')
+                    ->label('Expiração')
                     ->suffix(' min'),
                 TextColumn::make('updated_at')
                     ->label('Atualizado em')

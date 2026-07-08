@@ -20,11 +20,11 @@ class ParticipantRegistrationResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClipboardDocumentList;
 
-    protected static ?string $modelLabel = 'inscricao';
+    protected static ?string $modelLabel = 'inscrição';
 
-    protected static ?string $pluralModelLabel = 'inscricoes';
+    protected static ?string $pluralModelLabel = 'inscrições';
 
-    protected static ?string $navigationLabel = 'Inscricoes';
+    protected static ?string $navigationLabel = 'Inscrições';
 
     protected static ?int $navigationSort = 1;
 

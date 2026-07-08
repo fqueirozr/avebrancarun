@@ -21,13 +21,13 @@ class EventSettingResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCog6Tooth;
 
-    protected static ?string $modelLabel = 'configuracao do evento';
+    protected static ?string $modelLabel = 'configuração do evento';
 
-    protected static ?string $pluralModelLabel = 'configuracoes do evento';
+    protected static ?string $pluralModelLabel = 'configurações do evento';
 
     protected static ?string $navigationLabel = 'Evento';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Configuracoes';
+    protected static string|UnitEnum|null $navigationGroup = 'Configurações';
 
     protected static ?int $navigationSort = 1;
 

@@ -10,8 +10,8 @@ test('race landing page is available', function () {
     EventSetting::factory()->create([
         'event_date' => '12/10/2026',
         'event_location' => 'Parque Municipal',
-        'kit_information' => '<p><strong>Camiseta</strong>, numero de peito e medalha</p><ul><li>Retirada no local</li></ul>',
-        'regulation' => '<blockquote><p>Documento oficial em revisao</p></blockquote>',
+        'kit_information' => '<p><strong>Camiseta</strong>, número de peito e medalha</p><ul><li>Retirada no local</li></ul>',
+        'regulation' => '<blockquote><p>Documento oficial em revisão</p></blockquote>',
     ]);
 
     RaceModality::factory()->create([
@@ -27,9 +27,9 @@ test('race landing page is available', function () {
         ->assertSeeText('Corrida Ave Branca')
         ->assertSeeText('12/10/2026')
         ->assertSeeText('Parque Municipal')
-        ->assertSeeText('Camiseta, numero de peito e medalha')
+        ->assertSeeText('Camiseta, número de peito e medalha')
         ->assertSeeText('Retirada no local')
-        ->assertSeeText('Documento oficial em revisao')
+        ->assertSeeText('Documento oficial em revisão')
         ->assertSee('<strong>Camiseta</strong>', false)
         ->assertSee('<ul>', false)
         ->assertSee('<blockquote>', false)
@@ -48,7 +48,7 @@ test('registration page is available', function () {
 
     $this->get('/inscricao')
         ->assertSuccessful()
-        ->assertSeeText('Dados para inscricao')
+        ->assertSeeText('Dados para inscrição')
         ->assertSeeText('Adulto a partir de 16 anos - 6 km')
-        ->assertSeeText('Enviar inscricao');
+        ->assertSeeText('Enviar inscrição');
 });

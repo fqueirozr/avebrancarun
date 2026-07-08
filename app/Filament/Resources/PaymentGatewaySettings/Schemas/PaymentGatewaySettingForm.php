@@ -19,7 +19,7 @@ class PaymentGatewaySettingForm
                     ->schema([
                         Toggle::make('is_enabled')
                             ->label('Ativar checkout')
-                            ->helperText('Quando ativo, inscricoes com valor redirecionam para o checkout do gateway.')
+                            ->helperText('Quando ativo, inscrições com valor redirecionam para o checkout do gateway.')
                             ->default(false),
                         Select::make('gateway')
                             ->label('Provedor')
@@ -32,7 +32,7 @@ class PaymentGatewaySettingForm
                             ->label('Ambiente')
                             ->options([
                                 'sandbox' => 'Sandbox',
-                                'production' => 'Producao',
+                                'production' => 'Produção',
                             ])
                             ->default('sandbox')
                             ->required(),
@@ -41,13 +41,13 @@ class PaymentGatewaySettingForm
                             ->password()
                             ->revealable()
                             ->maxLength(65535)
-                            ->helperText('No Asaas, gere em Integracoes > API Key. A chave fica criptografada no banco.'),
+                            ->helperText('No Asaas, gere em Integrações > API Key. A chave fica criptografada no banco.'),
                     ])
                     ->columns(2),
                 Section::make('Checkout')
                     ->schema([
                         TextInput::make('checkout_minutes_to_expire')
-                            ->label('Expiracao em minutos')
+                            ->label('Expiração em minutos')
                             ->numeric()
                             ->minValue(10)
                             ->maxValue(1440)
@@ -57,13 +57,13 @@ class PaymentGatewaySettingForm
                             ->label('Meios de pagamento')
                             ->options([
                                 'PIX' => 'Pix',
-                                'CREDIT_CARD' => 'Cartao de credito',
+                                'CREDIT_CARD' => 'Cartão de crédito',
                             ])
                             ->default(['PIX', 'CREDIT_CARD'])
                             ->columns(2)
                             ->required(),
                         CheckboxList::make('charge_types')
-                            ->label('Tipo de cobranca')
+                            ->label('Tipo de cobrança')
                             ->options([
                                 'DETACHED' => 'Avulsa',
                                 'INSTALLMENT' => 'Parcelada',

@@ -15,8 +15,8 @@ class EventSettingSeeder extends Seeder
         EventSetting::query()->firstOrCreate([], [
             'event_date' => 'A confirmar',
             'event_location' => 'A confirmar',
-            'kit_information' => 'Em definicao',
-            'regulation' => 'Em revisao',
+            'kit_information' => 'Em definição',
+            'regulation' => 'Em revisão',
         ]);
     }
 }

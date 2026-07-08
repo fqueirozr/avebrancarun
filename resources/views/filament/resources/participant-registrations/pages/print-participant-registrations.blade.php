@@ -152,18 +152,18 @@
     <section class="print-list">
         <header class="print-list__header">
             <div>
-                <h2 class="print-list__title">Lista de inscricoes</h2>
+                <h2 class="print-list__title">Lista de inscrições</h2>
                 <p class="print-list__meta">Gerada em {{ now()->format('d/m/Y H:i') }}</p>
             </div>
 
             <div class="print-list__count">
-                {{ $registrations->count() }} inscricoes
+                {{ $registrations->count() }} inscrições
             </div>
         </header>
 
         @if ($registrations->isEmpty())
             <div class="print-list__empty">
-                Nenhuma inscricao encontrada.
+                Nenhuma inscrição encontrada.
             </div>
         @else
             <table class="print-list__table">
@@ -172,7 +172,7 @@
                         <th>Atleta</th>
                         <th>Nascimento</th>
                         <th>CPF participante</th>
-                        <th>Responsavel</th>
+                        <th>Responsável</th>
                         <th>Telefone</th>
                         <th>E-mail</th>
                         <th>Modalidade</th>

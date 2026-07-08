@@ -1,17 +1,17 @@
 <x-mail::message>
-# Atualizacao da inscricao
+# Atualização da inscrição
 
-Ola {{ $registration->athlete_name }},
+Olá {{ $registration->athlete_name }},
 
-A sua inscricao para a **Corrida Ave Branca** recebeu uma nova atualizacao da organizacao.
+A sua inscrição para a **Corrida Ave Branca** recebeu uma nova atualização da organização.
 
 <x-mail::panel>
 **Status do pagamento:** {{ $registration->paymentStatusLabel() }}<br>
-**Ultima atualizacao:** {{ now()->format('d/m/Y H:i') }}
+**Última atualização:** {{ now()->format('d/m/Y H:i') }}
 </x-mail::panel>
 
 <x-mail::table>
-| Dado | Informacao |
+| Dado | Informação |
 | :--- | :--- |
 | Atleta | {{ $registration->athlete_name }} |
 | Modalidade | {{ $registration->modality }} |
@@ -20,9 +20,9 @@ A sua inscricao para a **Corrida Ave Branca** recebeu uma nova atualizacao da or
 </x-mail::table>
 
 @if ($registration->payment_status === 'cancelled')
-Esta inscricao foi cancelada. Em caso de duvidas, entre em contato com a organizacao para revisar os detalhes.
+Esta inscrição foi cancelada. Em caso de dúvidas, entre em contato com a organização para revisar os detalhes.
 @else
-Guarde esta mensagem como comprovante da atualizacao mais recente da sua inscricao.
+Guarde esta mensagem como comprovante da atualização mais recente da sua inscrição.
 @endif
 
 Obrigado,<br>

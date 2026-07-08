@@ -24,13 +24,13 @@ class EventSettingsTable
                     ->label('Kit atleta')
                     ->formatStateUsing(fn (?string $state): ?string => $state === null ? null : str($state)->stripTags()->limit(50)->toString())
                     ->limit(50)
-                    ->placeholder('Em definicao')
+                    ->placeholder('Em definição')
                     ->toggleable(),
                 TextColumn::make('regulation')
                     ->label('Regulamento')
                     ->formatStateUsing(fn (?string $state): ?string => $state === null ? null : str($state)->stripTags()->limit(50)->toString())
                     ->limit(50)
-                    ->placeholder('Em revisao')
+                    ->placeholder('Em revisão')
                     ->toggleable(),
             ])
             ->filters([

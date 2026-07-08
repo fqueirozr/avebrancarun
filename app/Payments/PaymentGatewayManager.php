@@ -13,12 +13,12 @@ class PaymentGatewayManager implements PaymentGateway
         $settings = PaymentGatewaySetting::current();
 
         if (! $settings->isConfigured()) {
-            throw new RuntimeException('Gateway de pagamento nao configurado.');
+            throw new RuntimeException('Gateway de pagamento não configurado.');
         }
 
         return match ($settings->gateway) {
             'asaas' => app(AsaasCheckoutGateway::class)->createCheckout($request, $settings),
-            default => throw new RuntimeException("Gateway [{$settings->gateway}] nao suportado."),
+            default => throw new RuntimeException("Gateway [{$settings->gateway}] não suportado."),
         };
     }
 }

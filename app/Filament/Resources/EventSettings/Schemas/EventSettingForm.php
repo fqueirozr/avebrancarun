@@ -22,7 +22,7 @@ class EventSettingForm
                     ->maxLength(255),
                 RichEditor::make('kit_information')
                     ->label('Kit atleta')
-                    ->placeholder('Informe os itens do kit ou orientacoes de retirada')
+                    ->placeholder('Informe os itens do kit ou orientações de retirada')
                     ->toolbarButtons([
                         ['bold', 'italic', 'underline', 'strike', 'link'],
                         ['paragraph', 'h2', 'h3'],

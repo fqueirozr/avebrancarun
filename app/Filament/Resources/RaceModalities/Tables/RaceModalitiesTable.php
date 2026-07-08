@@ -30,11 +30,11 @@ class RaceModalitiesTable
                     ->badge()
                     ->sortable(),
                 TextColumn::make('age_range')
-                    ->label('Faixa etaria')
+                    ->label('Faixa etária')
                     ->searchable()
                     ->toggleable(),
                 TextColumn::make('distance')
-                    ->label('Distancia')
+                    ->label('Distância')
                     ->searchable(),
                 TextColumn::make('price')
                     ->label('Valor')
