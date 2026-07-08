@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'type',
     'age_range',
     'distance',
+    'google_maps_embed_url',
     'price',
     'max_participants',
     'is_active',

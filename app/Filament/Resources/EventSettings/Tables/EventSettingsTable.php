@@ -20,30 +20,31 @@ class EventSettingsTable
                     ->label('Local')
                     ->placeholder('A confirmar')
                     ->searchable(),
-                TextColumn::make('contact_email')
-                    ->label('E-mail')
-                    ->placeholder('NÃ£o informado')
-                    ->searchable(),
-                TextColumn::make('contact_phone')
-                    ->label('Telefone')
-                    ->placeholder('NÃ£o informado')
-                    ->toggleable(),
-                TextColumn::make('contact_whatsapp')
-                    ->label('WhatsApp')
-                    ->placeholder('NÃ£o informado')
+                TextColumn::make('general_information')
+                    ->label('Informações gerais')
+                    ->formatStateUsing(fn (?string $state): ?string => self::plainText($state))
+                    ->limit(50)
+                    ->placeholder('Não informado')
                     ->toggleable(),
                 TextColumn::make('kit_information')
-                    ->label('Kit atleta')
-                    ->formatStateUsing(fn (?string $state): ?string => $state === null ? null : str($state)->stripTags()->limit(50)->toString())
+                    ->label('Retirada de kit')
+                    ->formatStateUsing(fn (?string $state): ?string => self::plainText($state))
                     ->limit(50)
                     ->placeholder('Em definição')
                     ->toggleable(),
-                TextColumn::make('regulation')
-                    ->label('Regulamento')
-                    ->formatStateUsing(fn (?string $state): ?string => $state === null ? null : str($state)->stripTags()->limit(50)->toString())
-                    ->limit(50)
-                    ->placeholder('Em revisão')
+                TextColumn::make('course_images')
+                    ->label('Fotos')
+                    ->formatStateUsing(fn (?array $state): string => count($state ?? []).' foto(s)')
                     ->toggleable(),
+                TextColumn::make('contact_email')
+                    ->label('E-mail')
+                    ->placeholder('Não informado')
+                    ->searchable()
+                    ->toggleable(),
+                TextColumn::make('updated_at')
+                    ->label('Atualizado em')
+                    ->dateTime('d/m/Y H:i')
+                    ->sortable(),
             ])
             ->filters([
                 //
@@ -51,5 +52,10 @@ class EventSettingsTable
             ->recordActions([
                 EditAction::make(),
             ]);
+    }
+
+    private static function plainText(?string $state): ?string
+    {
+        return $state === null ? null : str($state)->stripTags()->limit(50)->toString();
     }
 }

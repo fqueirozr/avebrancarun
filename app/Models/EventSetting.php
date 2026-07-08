@@ -13,7 +13,14 @@ use Illuminate\Database\Eloquent\Model;
     'contact_email',
     'contact_phone',
     'contact_whatsapp',
+    'general_information',
     'kit_information',
+    'baggage_storage_information',
+    'start_groups_information',
+    'timing_information',
+    'special_registrations_information',
+    'course_information',
+    'course_images',
     'regulation',
 ])]
 class EventSetting extends Model
@@ -24,5 +31,17 @@ class EventSetting extends Model
     public static function current(): self
     {
         return self::query()->first() ?? new self;
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'course_images' => 'array',
+        ];
     }
 }

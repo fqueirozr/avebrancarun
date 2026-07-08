@@ -49,6 +49,41 @@ document.querySelectorAll('[data-mask]').forEach((input) => {
     applyMask();
 });
 
+document.querySelectorAll('[data-course-tabs]').forEach((tabsRoot) => {
+    const tabs = Array.from(tabsRoot.querySelectorAll('[data-course-tab]'));
+    const panels = Array.from(tabsRoot.querySelectorAll('[data-course-panel]'));
+
+    const activateTab = (tab) => {
+        tabs.forEach((currentTab) => {
+            currentTab.setAttribute('aria-selected', currentTab === tab ? 'true' : 'false');
+        });
+
+        panels.forEach((panel) => {
+            panel.hidden = panel.id !== tab.getAttribute('aria-controls');
+        });
+    };
+
+    tabs.forEach((tab) => {
+        tab.addEventListener('click', () => activateTab(tab));
+    });
+
+    const initialTab = tabs.find((tab) => `#${tab.getAttribute('aria-controls')}` === window.location.hash);
+
+    if (initialTab) {
+        activateTab(initialTab);
+    }
+});
+
+document.querySelectorAll('a[href^="#percurso-"]').forEach((link) => {
+    link.addEventListener('click', () => {
+        const tab = document.querySelector(`[data-course-tab][aria-controls="${link.hash.slice(1)}"]`);
+
+        if (tab instanceof HTMLButtonElement) {
+            tab.click();
+        }
+    });
+});
+
 document.querySelectorAll('[data-modal-open]').forEach((button) => {
     button.addEventListener('click', () => {
         const modal = document.getElementById(button.dataset.modalOpen);

@@ -19,7 +19,9 @@ test('race landing page is available', function () {
         'type' => 'Adulto',
         'age_range' => 'A partir de 16 anos',
         'distance' => '6 km',
+        'google_maps_embed_url' => 'https://www.google.com/maps?q=Parque%20Municipal&output=embed',
         'price' => 50,
+        'description' => '<p>Percurso adulto com retorno sinalizado.</p>',
     ]);
 
     $this->get('/')
@@ -33,6 +35,11 @@ test('race landing page is available', function () {
         ->assertSee('<strong>Camiseta</strong>', false)
         ->assertSee('<ul>', false)
         ->assertSee('<blockquote>', false)
+        ->assertSee('role="tablist"', false)
+        ->assertSee('role="tabpanel"', false)
+        ->assertSee('href="#percurso-', false)
+        ->assertSee('https://www.google.com/maps?q=Parque%20Municipal&amp;output=embed', false)
+        ->assertSeeText('Percurso adulto com retorno sinalizado.')
         ->assertSeeText('6 km')
         ->assertSeeText('Pagamento');
 });

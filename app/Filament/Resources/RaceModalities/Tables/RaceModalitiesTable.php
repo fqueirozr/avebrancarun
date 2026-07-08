@@ -36,6 +36,11 @@ class RaceModalitiesTable
                 TextColumn::make('distance')
                     ->label('Distância')
                     ->searchable(),
+                TextColumn::make('google_maps_embed_url')
+                    ->label('Mapa')
+                    ->formatStateUsing(fn (?string $state): string => filled($state) ? 'Configurado' : 'Pendente')
+                    ->badge()
+                    ->toggleable(),
                 TextColumn::make('price')
                     ->label('Valor')
                     ->formatStateUsing(fn (?string $state): string => $state === null ? 'A definir' : Number::currency((float) $state, 'BRL', 'pt_BR'))

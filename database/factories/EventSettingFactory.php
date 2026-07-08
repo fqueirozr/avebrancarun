@@ -23,7 +23,14 @@ class EventSettingFactory extends Factory
             'contact_email' => fake()->safeEmail(),
             'contact_phone' => fake()->numerify('###########'),
             'contact_whatsapp' => fake()->numerify('###########'),
+            'general_information' => fake()->paragraph(),
             'kit_information' => fake()->sentence(),
+            'baggage_storage_information' => fake()->paragraph(),
+            'start_groups_information' => fake()->paragraph(),
+            'timing_information' => fake()->paragraph(),
+            'special_registrations_information' => fake()->paragraph(),
+            'course_information' => fake()->paragraph(),
+            'course_images' => [],
             'regulation' => fake()->paragraphs(3, true),
         ];
     }

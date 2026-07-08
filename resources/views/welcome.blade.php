@@ -77,7 +77,7 @@
                 </div>
                 <div class="rounded-md border border-emerald-900/10 bg-white p-5 shadow-sm shadow-emerald-950/5">
                     <p class="text-sm font-semibold text-emerald-800">Percursos</p>
-                    <p class="mt-2 text-2xl font-black">100 m a 6 km</p>
+                    <p class="mt-2 text-2xl font-black">{{ $modalities->pluck('distance')->filter()->unique()->values()->implode(' / ') ?: 'Em breve' }}</p>
                 </div>
                 <div class="rounded-md border border-emerald-900/10 bg-white p-5 shadow-sm shadow-emerald-950/5">
                     <p class="text-sm font-semibold text-emerald-800">Pagamento</p>
@@ -105,6 +105,11 @@
                             <p class="mt-4 text-sm font-bold text-zinc-700">
                                 {{ $modality->price === null ? 'Valor a definir' : 'R$ '.number_format((float) $modality->price, 2, ',', '.') }}
                             </p>
+                            @if ($modality->google_maps_embed_url)
+                                <a href="#percurso-{{ $modality->id }}" class="mt-5 inline-flex rounded-md bg-emerald-800 px-4 py-2 text-sm font-black text-white transition hover:bg-emerald-900">
+                                    Ver percurso
+                                </a>
+                            @endif
                         </article>
                     @empty
                         <div class="rounded-md border border-amber-200 bg-amber-50 p-5 text-sm font-semibold text-amber-950 sm:col-span-2 lg:col-span-3">
@@ -115,36 +120,172 @@
             </section>
 
             <section id="programacao" class="bg-white py-16">
-                <div class="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-5 sm:px-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
-                    <div>
-                        <p class="text-sm font-bold uppercase tracking-normal text-emerald-700">Evento</p>
-                        <h2 class="mt-3 text-3xl font-black leading-tight sm:text-4xl">Informações para divulgar a corrida</h2>
-                        <p class="mt-4 text-base leading-7 text-zinc-700">
-                            A página já está preparada para receber data, local, valores, retirada de kits, regulamento e lote promocional assim que a organização fechar os detalhes.
-                        </p>
-                    </div>
+                <div class="mx-auto max-w-7xl px-5 sm:px-8">
+                    <p class="text-sm font-bold uppercase tracking-normal text-emerald-700">Evento</p>
+                    <h2 class="mt-3 text-4xl font-black leading-tight sm:text-5xl">Informações da prova</h2>
 
-                    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                        @foreach ([
-                            ['titulo' => 'Data', 'valor' => $eventSetting->event_date ?: 'A confirmar', 'modal' => null],
-                            ['titulo' => 'Local', 'valor' => $eventSetting->event_location ?: 'A confirmar', 'modal' => null],
-                            ['titulo' => 'Kit atleta', 'valor' => $eventSetting->kit_information ?: 'Em definição', 'modal' => 'kit-modal', 'botao' => 'Ver kit completo'],
-                            ['titulo' => 'Regulamento', 'valor' => $eventSetting->regulation ?: 'Em revisão', 'modal' => 'regulation-modal', 'botao' => 'Abrir regulamento'],
-                        ] as $item)
-                            <div class="rounded-md border border-zinc-200 bg-white p-5 shadow-sm shadow-zinc-950/5 transition hover:border-emerald-200">
-                                <p class="text-sm font-semibold text-zinc-500">{{ $item['titulo'] }}</p>
-                                @if ($item['modal'] === null)
-                                    <p class="mt-2 whitespace-pre-line text-xl font-black">{{ $item['valor'] }}</p>
+                    @php
+                        $courseImages = $eventSetting->course_images ?? [];
+                        $courseImage = $courseImages[0] ?? null;
+                        $courseImageUrl = $courseImage ? \Illuminate\Support\Facades\Storage::disk('public')->url($courseImage) : null;
+                        $defaultGeneralInformation = "Data: ".($eventSetting->event_date ?: 'A confirmar')."\nLocal: ".($eventSetting->event_location ?: 'A confirmar');
+                        $generalInformation = $defaultGeneralInformation.($eventSetting->general_information ? "\n\n".$eventSetting->general_information : '');
+                    @endphp
+
+                    <div class="mt-9 grid grid-cols-1 gap-4 lg:grid-cols-[1.35fr_1fr] lg:items-start">
+                        <div class="grid gap-3">
+                            @foreach ([
+                                ['titulo' => 'Informações gerais', 'valor' => $generalInformation, 'modal' => null],
+                                ['titulo' => 'Retirada de kit', 'valor' => $eventSetting->kit_information ?: 'Confira camiseta, número de peito e demais itens definidos pela organização.', 'modal' => 'kit-modal', 'botao' => 'Ver kit completo'],
+                                ['titulo' => 'Guarda-volumes', 'valor' => $eventSetting->baggage_storage_information ?: 'Serviço e orientações serão confirmados pela organização antes do evento.', 'modal' => null],
+                                ['titulo' => 'Pelotões de largada', 'valor' => $eventSetting->start_groups_information ?: 'A organização vai orientar os atletas por categoria, idade e distância no dia da prova.', 'modal' => null],
+                                ['titulo' => 'Cronometragem', 'valor' => $eventSetting->timing_information ?: 'As informações de apuração e resultados serão divulgadas nos canais oficiais do evento.', 'modal' => null],
+                                ['titulo' => 'Inscrições especiais', 'valor' => $eventSetting->special_registrations_information ?: 'Entre em contato com a organização para necessidades específicas ou orientações adicionais.', 'modal' => null],
+                            ] as $item)
+                                <details class="group rounded-md border border-emerald-900/10 bg-[#f7faf2] shadow-sm shadow-emerald-950/5 transition open:border-emerald-700/30 open:bg-white">
+                                    <summary class="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-5 text-base font-black text-zinc-950 marker:hidden">
+                                        <span>{{ $item['titulo'] }}</span>
+                                        <span class="grid size-6 shrink-0 place-items-center rounded-full bg-emerald-800 text-sm leading-none text-white transition group-open:rotate-45 group-open:bg-lime-300 group-open:text-emerald-950">+</span>
+                                    </summary>
+                                    <div class="border-t border-emerald-900/10 px-5 pb-5 pt-4">
+                                        <div class="event-rich-content">
+                                            {{ \Filament\Forms\Components\RichEditor\RichContentRenderer::make($item['valor']) }}
+                                        </div>
+                                        @if ($item['modal'] !== null)
+                                            <button type="button" data-modal-open="{{ $item['modal'] }}" class="mt-4 inline-flex rounded-md bg-emerald-800 px-4 py-2 text-sm font-black text-white transition hover:bg-emerald-900">
+                                                {{ $item['botao'] }}
+                                            </button>
+                                        @endif
+                                    </div>
+                                </details>
+                            @endforeach
+
+                            <button type="button" data-modal-open="regulation-modal" class="flex items-center justify-between gap-4 rounded-md border border-emerald-900/10 bg-[#f7faf2] px-5 py-5 text-left text-base font-black text-zinc-950 shadow-sm shadow-emerald-950/5 transition hover:border-emerald-700/30 hover:bg-white">
+                                <span>Regulamento</span>
+                                <span class="text-2xl leading-none text-emerald-800" aria-hidden="true">↗</span>
+                            </button>
+                        </div>
+
+                        <aside id="percursos" class="rounded-md border border-emerald-900/10 bg-emerald-950 p-4 text-white shadow-xl shadow-emerald-950/15 sm:p-5">
+                            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                                <div>
+                                    <p class="text-sm font-bold text-lime-200">Percursos</p>
+                                    <p class="mt-1 text-xs font-semibold text-white/70">Modalidades ativas do evento</p>
+                                </div>
+
+                                <p class="text-sm font-bold text-lime-100">
+                                    {{ $modalities->count() > 0 ? $modalities->count().' modalidades' : 'Em breve' }}
+                                </p>
+                            </div>
+
+                            @if ($modalities->isNotEmpty())
+                                <div class="mt-5 grid gap-4" data-course-tabs>
+                                    <div class="flex gap-2 overflow-x-auto rounded-md border border-white/10 bg-white/10 p-2" role="tablist" aria-label="Percursos por modalidade">
+                                        @foreach ($modalities as $modality)
+                                            <button
+                                                type="button"
+                                                id="percurso-tab-{{ $modality->id }}"
+                                                class="shrink-0 rounded-md px-4 py-2 text-left text-sm font-black text-white/75 transition hover:bg-white/10 hover:text-white aria-selected:bg-lime-300 aria-selected:text-emerald-950"
+                                                role="tab"
+                                                aria-selected="{{ $loop->first ? 'true' : 'false' }}"
+                                                aria-controls="percurso-{{ $modality->id }}"
+                                                data-course-tab
+                                            >
+                                                <span class="block">{{ $modality->distance ?: $modality->name }}</span>
+                                                <span class="mt-1 block text-xs font-semibold opacity-75">{{ $modality->type }}</span>
+                                            </button>
+                                        @endforeach
+                                    </div>
+
+                                    @foreach ($modalities as $modality)
+                                        <div
+                                            id="percurso-{{ $modality->id }}"
+                                            class="grid gap-3"
+                                            role="tabpanel"
+                                            aria-labelledby="percurso-tab-{{ $modality->id }}"
+                                            data-course-panel
+                                            @if (! $loop->first) hidden @endif
+                                        >
+                                            <div class="rounded-md border border-white/10 bg-white/10 p-3">
+                                                <div class="mb-3 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+                                                    <div>
+                                                        <p class="text-base font-black text-white">{{ $modality->name }}</p>
+                                                        <p class="text-sm font-semibold text-lime-100">{{ $modality->distance ?: 'Distância a definir' }}</p>
+                                                    </div>
+                                                    <p class="text-xs font-bold uppercase tracking-normal text-white/55">{{ $modality->age_range ?: 'Todas as idades' }}</p>
+                                                </div>
+
+                                                @if ($modality->google_maps_embed_url)
+                                                    <iframe
+                                                        src="{{ $modality->google_maps_embed_url }}"
+                                                        title="Mapa do percurso {{ $modality->displayName() }}"
+                                                        class="aspect-[4/3] w-full rounded-md border-0 bg-emerald-900"
+                                                        loading="lazy"
+                                                        allowfullscreen
+                                                        referrerpolicy="no-referrer-when-downgrade"
+                                                    ></iframe>
+                                                @elseif ($courseImageUrl)
+                                                    <img src="{{ $courseImageUrl }}" alt="Imagem do percurso da prova" class="aspect-[4/3] w-full rounded-md object-cover">
+                                                @else
+                                                    <div class="grid aspect-[4/3] place-items-center rounded-md bg-emerald-900 px-6 text-center">
+                                                        <p class="text-2xl font-black leading-tight text-white">Em breve</p>
+                                                    </div>
+                                                @endif
+                                            </div>
+
+                                            <div class="event-rich-content text-sm leading-6 text-lime-100 [&_*]:text-lime-100">
+                                                {{ \Filament\Forms\Components\RichEditor\RichContentRenderer::make($modality->description ?: $eventSetting->course_information ?: 'Logo o percurso estará disponível para você se preparar.') }}
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @else
+                                <div class="mt-5 rounded-md border border-lime-300/50 bg-lime-300/10 p-4 text-sm font-bold text-lime-100">
+                                    Logo o percurso estará disponível para você se preparar.
+                                </div>
+                            @endif
+
+                            <div class="hidden">
+                                @if (false)
+                                    <details class="group overflow-hidden rounded-md border border-white/10 bg-white/10 open:bg-white/20" @if ($loop->first) open @endif>
+                                        <summary class="flex cursor-pointer list-none items-center justify-between gap-4 px-4 py-3 marker:hidden">
+                                            <span>
+                                                <span class="block text-sm font-black text-white">{{ $modality->name }}</span>
+                                                <span class="mt-1 block text-xs font-semibold text-lime-100">{{ $modality->distance ?: 'Distância a definir' }}</span>
+                                            </span>
+                                            <span class="grid size-6 shrink-0 place-items-center rounded-full bg-lime-300 text-sm leading-none text-emerald-950 transition group-open:rotate-45">+</span>
+                                        </summary>
+
+                                        <div class="grid gap-3 border-t border-white/10 p-3">
+                                            @if ($modality->google_maps_embed_url)
+                                                <iframe
+                                                    src="{{ $modality->google_maps_embed_url }}"
+                                                    title="Mapa do percurso {{ $modality->displayName() }}"
+                                                    class="aspect-[4/3] w-full rounded-md border-0 bg-emerald-900"
+                                                    loading="lazy"
+                                                    allowfullscreen
+                                                    referrerpolicy="no-referrer-when-downgrade"
+                                                ></iframe>
+                                            @elseif ($courseImageUrl)
+                                                <img src="{{ $courseImageUrl }}" alt="Imagem do percurso da prova" class="aspect-[4/3] w-full rounded-md object-cover">
+                                            @else
+                                                <div class="grid aspect-[4/3] place-items-center rounded-md bg-emerald-900 px-6 text-center">
+                                                    <p class="text-2xl font-black leading-tight text-white">Em breve</p>
+                                                </div>
+                                            @endif
+
+                                            <div class="event-rich-content text-sm leading-6 text-lime-100 [&_*]:text-lime-100">
+                                                {{ \Filament\Forms\Components\RichEditor\RichContentRenderer::make($modality->description ?: $eventSetting->course_information ?: 'Logo o percurso estará disponível para você se preparar.') }}
+                                            </div>
+                                        </div>
+                                    </details>
                                 @else
-                                    <p class="mt-2 text-sm font-semibold leading-6 text-zinc-700">
-                                        Consulte os detalhes em uma janela rápida, sem sair da página.
-                                    </p>
-                                    <button type="button" data-modal-open="{{ $item['modal'] }}" class="mt-4 inline-flex rounded-md bg-emerald-800 px-4 py-2 text-sm font-black text-white transition hover:bg-emerald-900">
-                                        {{ $item['botao'] }}
-                                    </button>
+                                    <div class="rounded-md border border-lime-300/50 bg-lime-300/10 p-4 text-sm font-bold text-lime-100">
+                                        Logo o percurso estará disponível para você se preparar.
+                                    </div>
                                 @endif
                             </div>
-                        @endforeach
+                        </aside>
                     </div>
                 </div>
             </section>

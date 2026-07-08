@@ -22,6 +22,7 @@ class RaceModalityFactory extends Factory
             'type' => fake()->randomElement(['Infantil', 'Adulto']),
             'age_range' => fake()->randomElement(['6 a 7 anos', '8 a 9 anos', 'A partir de 14 anos']),
             'distance' => fake()->randomElement(['100 m', '200 m', '3 km', '6 km']),
+            'google_maps_embed_url' => fake()->optional()->url(),
             'price' => fake()->optional()->randomFloat(2, 20, 120),
             'max_participants' => fake()->optional()->numberBetween(20, 300),
             'is_active' => true,

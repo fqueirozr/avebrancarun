@@ -35,6 +35,12 @@ class RaceModalityForm
                     ->label('Distância')
                     ->placeholder('6 km')
                     ->maxLength(255),
+                TextInput::make('google_maps_embed_url')
+                    ->label('URL do Google Maps')
+                    ->placeholder('https://www.google.com/maps/embed?...')
+                    ->url()
+                    ->maxLength(2048)
+                    ->columnSpanFull(),
                 TextInput::make('price')
                     ->label('Valor')
                     ->numeric()
