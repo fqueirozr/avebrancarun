@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\ParticipantRegistrations\Schemas;
 
+use App\Models\Kit;
 use App\Models\ParticipantRegistration;
 use App\Models\RaceModality;
 use Filament\Forms\Components\DatePicker;
@@ -78,6 +79,12 @@ class ParticipantRegistrationForm
                 Select::make('race_modality_id')
                     ->label('Prova')
                     ->options(fn (): array => RaceModality::options())
+                    ->searchable()
+                    ->preload()
+                    ->required(),
+                Select::make('kit_id')
+                    ->label('Kit')
+                    ->options(fn (): array => Kit::options())
                     ->searchable()
                     ->preload()
                     ->required(),

@@ -92,11 +92,11 @@ class AsaasCheckoutGateway
             'items' => [
                 [
                     'externalReference' => (string) $request->registration->id,
-                    'name' => Str::limit($request->raceModality->displayName(), 30, ''),
-                    'description' => Str::limit('Inscrição Ave Branca Run - '.$request->raceModality->displayName(), 150, ''),
+                    'name' => Str::limit($request->kit->name, 30, ''),
+                    'description' => Str::limit('Inscrição Ave Branca Run - '.$request->raceModality->displayName().' - '.$request->kit->name, 150, ''),
                     'imageBase64' => $this->itemImageBase64(),
                     'quantity' => 1,
-                    'value' => $request->registration->priceFor($request->raceModality),
+                    'value' => $request->registration->priceFor($request->kit),
                 ],
             ],
             'customerData' => [

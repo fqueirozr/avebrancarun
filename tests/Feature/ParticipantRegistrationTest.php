@@ -3,6 +3,7 @@
 use App\Filament\Resources\ParticipantRegistrations\ParticipantRegistrationResource;
 use App\Mail\ParticipantRegistrationReceived;
 use App\Mail\ParticipantRegistrationUpdated;
+use App\Models\Kit;
 use App\Models\ParticipantRegistration;
 use App\Models\PaymentGatewaySetting;
 use App\Models\RaceModality;
@@ -22,15 +23,16 @@ test('a participant can submit a registration', function () {
     $raceModality = RaceModality::factory()->create([
         'name' => 'Adulto a partir de 16 anos',
         'type' => 'Adulto',
-        'age_range' => 'A partir de 16 anos',
+        'age_start' => 16,
         'distance' => '6 km',
-        'price' => null,
     ]);
+    $kit = Kit::factory()->create(['price' => 0]);
 
     $registration = ParticipantRegistration::factory()->make([
         'athlete_name' => 'Maria Silva',
         'email' => 'maria@example.com',
         'race_modality_id' => $raceModality->id,
+        'kit_id' => $kit->id,
         'modality' => $raceModality->displayName(),
     ]);
 
@@ -45,6 +47,7 @@ test('a participant can submit a registration', function () {
         'email' => $registration->email,
         'billing_document' => $registration->billing_document,
         'race_modality_id' => $raceModality->id,
+        'kit_id' => $kit->id,
         'notes' => $registration->notes,
         'emergency_contact_name' => 'Ana Silva',
         'emergency_contact_phone' => '(11) 98888-7777',
@@ -66,6 +69,7 @@ test('a participant can submit a registration', function () {
         'phone' => '11999999999',
         'billing_document' => $registration->billing_document,
         'race_modality_id' => $raceModality->id,
+        'kit_id' => $kit->id,
         'modality' => 'Adulto a partir de 16 anos - 6 km',
         'notes' => $registration->notes,
         'emergency_contact_name' => 'Ana Silva',
@@ -90,9 +94,8 @@ test('a participant can submit a registration', function () {
 });
 
 test('registration submission requires mandatory declarations', function () {
-    $raceModality = RaceModality::factory()->create([
-        'price' => null,
-    ]);
+    $raceModality = RaceModality::factory()->create();
+    $kit = Kit::factory()->create(['price' => 0]);
 
     $registration = ParticipantRegistration::factory()->make([
         'race_modality_id' => $raceModality->id,
@@ -108,6 +111,7 @@ test('registration submission requires mandatory declarations', function () {
         'phone' => '(11) 99999-9999',
         'email' => $registration->email,
         'race_modality_id' => $raceModality->id,
+        'kit_id' => $kit->id,
         'notes' => $registration->notes,
     ])
         ->assertSessionHasErrors([
@@ -120,9 +124,8 @@ test('registration submission requires mandatory declarations', function () {
 });
 
 test('minor participant registration requires guardian data', function () {
-    $raceModality = RaceModality::factory()->create([
-        'price' => null,
-    ]);
+    $raceModality = RaceModality::factory()->create();
+    $kit = Kit::factory()->create(['price' => 0]);
 
     $registration = ParticipantRegistration::factory()->make([
         'birth_date' => now()->subYears(12)->format('Y-m-d'),
@@ -137,6 +140,7 @@ test('minor participant registration requires guardian data', function () {
         'phone' => '(11) 99999-9999',
         'email' => $registration->email,
         'race_modality_id' => $raceModality->id,
+        'kit_id' => $kit->id,
         'notes' => $registration->notes,
         'accepted_regulation' => '1',
         'accepted_privacy_policy' => '1',
@@ -163,9 +167,8 @@ test('a participant is redirected to checkout when payment gateway is configured
         'charge_types' => ['DETACHED'],
     ]);
 
-    $raceModality = RaceModality::factory()->create([
-        'price' => 25,
-    ]);
+    $raceModality = RaceModality::factory()->create();
+    $kit = Kit::factory()->create(['price' => 25]);
 
     $this->app->bind(PaymentGateway::class, fn (): PaymentGateway => new class implements PaymentGateway
     {
@@ -199,6 +202,7 @@ test('a participant is redirected to checkout when payment gateway is configured
         'billing_province' => 'Centro',
         'billing_postal_code' => '70000-000',
         'race_modality_id' => $raceModality->id,
+        'kit_id' => $kit->id,
         'notes' => $registration->notes,
         'accepted_regulation' => '1',
         'accepted_privacy_policy' => '1',
@@ -241,9 +245,8 @@ test('checkout success return marks the registration as paid', function () {
 });
 
 test('paid registration requires a billing document for checkout', function () {
-    $raceModality = RaceModality::factory()->create([
-        'price' => 25,
-    ]);
+    $raceModality = RaceModality::factory()->create();
+    $kit = Kit::factory()->create(['price' => 25]);
 
     $registration = ParticipantRegistration::factory()->make([
         'race_modality_id' => $raceModality->id,
@@ -264,6 +267,7 @@ test('paid registration requires a billing document for checkout', function () {
         'billing_province' => 'Centro',
         'billing_postal_code' => '70000000',
         'race_modality_id' => $raceModality->id,
+        'kit_id' => $kit->id,
         'notes' => $registration->notes,
         'accepted_regulation' => '1',
         'accepted_privacy_policy' => '1',
@@ -273,9 +277,8 @@ test('paid registration requires a billing document for checkout', function () {
 });
 
 test('paid registration requires billing address data for checkout', function () {
-    $raceModality = RaceModality::factory()->create([
-        'price' => 25,
-    ]);
+    $raceModality = RaceModality::factory()->create();
+    $kit = Kit::factory()->create(['price' => 25]);
 
     $registration = ParticipantRegistration::factory()->make([
         'race_modality_id' => $raceModality->id,
@@ -293,6 +296,7 @@ test('paid registration requires billing address data for checkout', function ()
         'billing_document' => '52998224725',
         'billing_name' => 'Teste',
         'race_modality_id' => $raceModality->id,
+        'kit_id' => $kit->id,
         'notes' => $registration->notes,
     ])
         ->assertSessionHasErrors([
@@ -305,9 +309,8 @@ test('paid registration requires billing address data for checkout', function ()
 });
 
 test('paid registration rejects an invalid billing document before checkout', function () {
-    $raceModality = RaceModality::factory()->create([
-        'price' => 25,
-    ]);
+    $raceModality = RaceModality::factory()->create();
+    $kit = Kit::factory()->create(['price' => 25]);
 
     $registration = ParticipantRegistration::factory()->make([
         'race_modality_id' => $raceModality->id,
@@ -329,6 +332,7 @@ test('paid registration rejects an invalid billing document before checkout', fu
         'billing_province' => 'Centro',
         'billing_postal_code' => '72900000',
         'race_modality_id' => $raceModality->id,
+        'kit_id' => $kit->id,
         'notes' => $registration->notes,
     ])
         ->assertSessionHasErrors('billing_document');
@@ -347,9 +351,8 @@ test('checkout gateway failure returns the participant to the form with the gate
         'charge_types' => ['DETACHED'],
     ]);
 
-    $raceModality = RaceModality::factory()->create([
-        'price' => 25,
-    ]);
+    $raceModality = RaceModality::factory()->create();
+    $kit = Kit::factory()->create(['price' => 25]);
 
     $this->app->bind(PaymentGateway::class, fn (): PaymentGateway => new class implements PaymentGateway
     {
@@ -379,6 +382,7 @@ test('checkout gateway failure returns the participant to the form with the gate
         'billing_province' => 'Centro',
         'billing_postal_code' => '70000000',
         'race_modality_id' => $raceModality->id,
+        'kit_id' => $kit->id,
         'notes' => $registration->notes,
         'accepted_regulation' => '1',
         'accepted_privacy_policy' => '1',
@@ -399,6 +403,7 @@ test('registration submission validates required fields', function () {
             'phone',
             'email',
             'race_modality_id',
+            'kit_id',
         ]);
 });
 
@@ -406,6 +411,7 @@ test('registration submission rejects inactive modalities', function () {
     $raceModality = RaceModality::factory()->create([
         'is_active' => false,
     ]);
+    $kit = Kit::factory()->create(['price' => 0]);
 
     $registration = ParticipantRegistration::factory()->make();
 
@@ -419,6 +425,7 @@ test('registration submission rejects inactive modalities', function () {
         'phone' => $registration->phone,
         'email' => $registration->email,
         'race_modality_id' => $raceModality->id,
+        'kit_id' => $kit->id,
         'notes' => $registration->notes,
     ])
         ->assertSessionHasErrors('race_modality_id');
@@ -426,6 +433,7 @@ test('registration submission rejects inactive modalities', function () {
 
 test('registration submission rejects invalid participant and guardian cpf and phone', function () {
     $raceModality = RaceModality::factory()->create();
+    $kit = Kit::factory()->create(['price' => 0]);
     $registration = ParticipantRegistration::factory()->make();
 
     $this->post(route('registration.store'), [
@@ -438,6 +446,7 @@ test('registration submission rejects invalid participant and guardian cpf and p
         'phone' => '12345',
         'email' => $registration->email,
         'race_modality_id' => $raceModality->id,
+        'kit_id' => $kit->id,
         'notes' => $registration->notes,
     ])
         ->assertSessionHasErrors([

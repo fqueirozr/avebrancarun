@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Kit;
 use App\Models\ParticipantRegistration;
-use App\Models\RaceModality;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Carbon;
@@ -43,6 +43,7 @@ class RegisterParticipantRequest extends FormRequest
             'billing_province' => ['nullable', 'string', 'max:255'],
             'billing_postal_code' => ['nullable', 'string', 'regex:/^\d{8}$/'],
             'race_modality_id' => ['required', Rule::exists('race_modalities', 'id')->where('is_active', true)],
+            'kit_id' => ['required', Rule::exists('kits', 'id')->where('is_active', true)],
             'notes' => ['nullable', 'string', 'max:1000'],
             'emergency_contact_name' => ['nullable', 'string', 'max:255'],
             'emergency_contact_phone' => ['nullable', 'string', 'regex:/^\d{10,11}$/'],
@@ -68,6 +69,7 @@ class RegisterParticipantRequest extends FormRequest
             'email.email' => 'Informe um e-mail válido.',
             'regex' => 'Informe um valor válido para :attribute.',
             'race_modality_id.exists' => 'Escolha uma prova ativa.',
+            'kit_id.exists' => 'Escolha um kit ativo.',
             'accepted' => 'Você precisa aceitar :attribute.',
         ];
     }
@@ -93,6 +95,7 @@ class RegisterParticipantRequest extends FormRequest
             'billing_province' => 'o bairro do pagador',
             'billing_postal_code' => 'o CEP do pagador',
             'race_modality_id' => 'a prova',
+            'kit_id' => 'o kit',
             'notes' => 'as observações',
             'emergency_contact_name' => 'o nome do contato de emergência',
             'emergency_contact_phone' => 'o telefone do contato de emergência',
@@ -111,7 +114,7 @@ class RegisterParticipantRequest extends FormRequest
     {
         return [
             function (Validator $validator): void {
-                $raceModality = RaceModality::query()->find($this->input('race_modality_id'));
+                $kit = Kit::query()->find($this->input('kit_id'));
 
                 if (filled($this->input('participant_cpf')) && ! $this->hasValidCpf((string) $this->input('participant_cpf'))) {
                     $validator->errors()->add('participant_cpf', 'Informe um CPF válido para o atleta.');
@@ -131,7 +134,7 @@ class RegisterParticipantRequest extends FormRequest
                     }
                 }
 
-                if (! $this->requiresCheckoutData($raceModality)) {
+                if (! $this->requiresCheckoutData($kit)) {
                     return;
                 }
 
@@ -170,9 +173,9 @@ class RegisterParticipantRequest extends FormRequest
         }
     }
 
-    private function requiresCheckoutData(?RaceModality $raceModality): bool
+    private function requiresCheckoutData(?Kit $kit): bool
     {
-        return $raceModality !== null && $raceModality->price !== null && (float) $raceModality->price > 0;
+        return $kit !== null && (float) $kit->price > 0;
     }
 
     private function isMinorParticipant(): bool

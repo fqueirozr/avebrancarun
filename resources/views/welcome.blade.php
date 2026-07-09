@@ -91,12 +91,10 @@
                         <article class="rounded-md border border-race-cyan/15 bg-white p-6 shadow-sm shadow-amber-950/5 transition hover:-translate-y-1 hover:border-race-cyan/45 hover:shadow-lg hover:shadow-amber-950/10">
                             <div class="flex items-center justify-between gap-4">
                                 <span class="rounded-md bg-amber-100 px-3 py-1 text-sm font-bold text-race-ink">{{ $modality->type }}</span>
-                                <span class="text-sm font-semibold text-zinc-500">{{ $modality->age_range }}</span>
+                                <span class="text-sm font-semibold text-zinc-500">{{ $modality->ageRangeLabel() }}</span>
                             </div>
                             <p class="mt-6 text-5xl font-black text-zinc-950">{{ $modality->distance }}</p>
-                            <p class="mt-4 text-sm font-bold text-zinc-700">
-                                {{ $modality->price === null ? 'Valor a definir' : 'R$ '.number_format((float) $modality->price, 2, ',', '.') }}
-                            </p>
+                            <p class="mt-4 text-sm font-bold text-zinc-700">{{ $modality->name }}</p>
                             @if ($modality->google_maps_embed_url)
                                 <a href="#percurso-{{ $modality->id }}" class="mt-5 inline-flex rounded-md bg-race-blue px-4 py-2 text-sm font-black text-white transition hover:bg-race-ink">
                                     Ver percurso
@@ -109,6 +107,32 @@
                         </div>
                     @endforelse
                 </div>
+
+                @if ($kits->isNotEmpty())
+                    <div class="mt-12">
+                        <div class="max-w-2xl">
+                            <p class="text-sm font-bold uppercase tracking-normal text-race-blue">Kits</p>
+                            <h3 class="mt-3 text-2xl font-black leading-tight sm:text-3xl">Valores dos kits</h3>
+                        </div>
+
+                        <div class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                            @foreach ($kits as $kit)
+                                <article class="overflow-hidden rounded-md border border-race-cyan/15 bg-white shadow-sm shadow-amber-950/5">
+                                    @if ($kit->photo_path)
+                                        <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($kit->photo_path) }}" alt="Foto do {{ $kit->name }}" class="aspect-[4/3] w-full object-cover">
+                                    @endif
+                                    <div class="p-5">
+                                        <p class="text-lg font-black text-zinc-950">{{ $kit->name }}</p>
+                                        <p class="mt-2 text-2xl font-black text-race-blue">R$ {{ number_format((float) $kit->price, 2, ',', '.') }}</p>
+                                        @if ($kit->description)
+                                            <p class="mt-3 text-sm leading-6 text-zinc-600">{{ $kit->description }}</p>
+                                        @endif
+                                    </div>
+                                </article>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
                 </div>
             </section>
 
@@ -205,7 +229,7 @@
                                                         <p class="text-base font-black text-white">{{ $modality->name }}</p>
                                                         <p class="text-sm font-semibold text-race-ice">{{ $modality->distance ?: 'Distância a definir' }}</p>
                                                     </div>
-                                                    <p class="text-xs font-bold uppercase tracking-normal text-white/55">{{ $modality->age_range ?: 'Todas as idades' }}</p>
+                                                    <p class="text-xs font-bold uppercase tracking-normal text-white/55">{{ $modality->ageRangeLabel() }}</p>
                                                 </div>
 
                                                 @if ($modality->google_maps_embed_url)

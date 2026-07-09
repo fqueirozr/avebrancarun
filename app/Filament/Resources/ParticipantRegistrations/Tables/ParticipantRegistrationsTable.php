@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\ParticipantRegistrations\Tables;
 
 use App\Mail\ParticipantRegistrationUpdated;
+use App\Models\Kit;
 use App\Models\ParticipantRegistration;
 use App\Models\RaceModality;
 use Filament\Actions\Action;
@@ -32,6 +33,11 @@ class ParticipantRegistrationsTable
                     ->searchable()
                     ->sortable()
                     ->wrap(),
+                TextColumn::make('kit.name')
+                    ->label('Kit')
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(),
                 TextColumn::make('participant_cpf')
                     ->label('CPF atleta')
                     ->searchable()
@@ -103,6 +109,9 @@ class ParticipantRegistrationsTable
 
                         return $query->where('modality', $modality?->displayName());
                     }),
+                SelectFilter::make('kit_id')
+                    ->label('Kit')
+                    ->options(fn (): array => Kit::options()),
             ])
             ->defaultSort('created_at', 'desc')
             ->recordActions([

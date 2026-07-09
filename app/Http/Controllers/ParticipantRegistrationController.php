@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\RegisterParticipantRequest;
 use App\Mail\ParticipantRegistrationReceived;
 use App\Mail\ParticipantRegistrationUpdated;
+use App\Models\Kit;
 use App\Models\ParticipantRegistration;
 use App\Models\PaymentGatewaySetting;
 use App\Models\RaceModality;
@@ -24,6 +25,7 @@ class ParticipantRegistrationController extends Controller
     {
         $validated = $request->validated();
         $raceModality = RaceModality::query()->findOrFail($validated['race_modality_id']);
+        $kit = Kit::query()->findOrFail($validated['kit_id']);
         unset(
             $validated['accepted_regulation'],
             $validated['accepted_privacy_policy'],
@@ -40,11 +42,12 @@ class ParticipantRegistrationController extends Controller
             'modality' => $raceModality->displayName(),
         ]);
 
-        if ($this->shouldCreateCheckout($raceModality)) {
+        if ($this->shouldCreateCheckout($kit)) {
             try {
                 $checkout = $this->paymentGateway->createCheckout(new CheckoutRequest(
                     registration: $registration,
                     raceModality: $raceModality,
+                    kit: $kit,
                     successUrl: $this->paymentSuccessUrl($registration),
                     cancelUrl: route('registration.payment.cancel'),
                     expiredUrl: route('registration.payment.expired'),
@@ -108,9 +111,9 @@ class ParticipantRegistrationController extends Controller
             ->with('status', 'Checkout expirado. Sua inscrição ficou registrada com pagamento pendente.');
     }
 
-    private function shouldCreateCheckout(RaceModality $raceModality): bool
+    private function shouldCreateCheckout(Kit $kit): bool
     {
-        if ($raceModality->price === null || (float) $raceModality->price <= 0) {
+        if ((float) $kit->price <= 0) {
             return false;
         }
 

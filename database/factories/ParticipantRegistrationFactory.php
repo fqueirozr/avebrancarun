@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Kit;
 use App\Models\ParticipantRegistration;
 use App\Models\RaceModality;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -34,6 +35,7 @@ class ParticipantRegistrationFactory extends Factory
             'billing_province' => fake()->city(),
             'billing_postal_code' => fake()->numerify('########'),
             'race_modality_id' => fn (): int => RaceModality::query()->value('id') ?? RaceModality::factory()->create()->id,
+            'kit_id' => fn (): int => Kit::query()->value('id') ?? Kit::factory()->create()->id,
             'modality' => fn (array $attributes): string => RaceModality::query()
                 ->find($attributes['race_modality_id'])
                 ->displayName(),

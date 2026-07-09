@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\EventSetting;
+use App\Models\Kit;
 use App\Models\RaceModality;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -17,11 +18,15 @@ test('race landing page is available', function () {
     RaceModality::factory()->create([
         'name' => 'Adulto a partir de 16 anos',
         'type' => 'Adulto',
-        'age_range' => 'A partir de 16 anos',
+        'age_start' => 16,
         'distance' => '6 km',
         'google_maps_embed_url' => 'https://www.google.com/maps?q=Parque%20Municipal&output=embed',
-        'price' => 50,
         'description' => '<p>Percurso adulto com retorno sinalizado.</p>',
+    ]);
+
+    Kit::factory()->create([
+        'name' => 'Kit Corrida',
+        'price' => 50,
     ]);
 
     $this->get('/')
@@ -52,8 +57,12 @@ test('registration page is available', function () {
     RaceModality::factory()->create([
         'name' => 'Adulto a partir de 16 anos',
         'type' => 'Adulto',
-        'age_range' => 'A partir de 16 anos',
+        'age_start' => 16,
         'distance' => '6 km',
+    ]);
+
+    Kit::factory()->create([
+        'name' => 'Kit Corrida',
         'price' => 50,
     ]);
 
@@ -61,6 +70,7 @@ test('registration page is available', function () {
         ->assertSuccessful()
         ->assertSeeText('Dados para inscrição')
         ->assertSeeText('Adulto a partir de 16 anos - 6 km')
+        ->assertSeeText('Kit Corrida')
         ->assertSee('data-modal-open="registration-regulation-modal"', false)
         ->assertSee('data-modal-open="registration-privacy-policy-modal"', false)
         ->assertSeeText('Regulamento oficial da prova')

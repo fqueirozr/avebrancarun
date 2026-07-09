@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use Database\Factories\RaceModalityFactory;
+use Database\Factories\KitFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -10,19 +10,15 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable([
     'name',
-    'type',
-    'age_start',
-    'age_end',
-    'distance',
-    'google_maps_embed_url',
-    'max_participants',
+    'photo_path',
+    'description',
+    'price',
     'is_active',
     'sort_order',
-    'description',
 ])]
-class RaceModality extends Model
+class Kit extends Model
 {
-    /** @use HasFactory<RaceModalityFactory> */
+    /** @use HasFactory<KitFactory> */
     use HasFactory;
 
     /**
@@ -31,32 +27,6 @@ class RaceModality extends Model
     public function participantRegistrations(): HasMany
     {
         return $this->hasMany(ParticipantRegistration::class);
-    }
-
-    public function displayName(): string
-    {
-        if ($this->distance === null || $this->distance === '') {
-            return $this->name;
-        }
-
-        return "{$this->name} - {$this->distance}";
-    }
-
-    public function ageRangeLabel(): string
-    {
-        if ($this->age_start !== null && $this->age_end !== null) {
-            return "{$this->age_start} a {$this->age_end} anos";
-        }
-
-        if ($this->age_start !== null) {
-            return "A partir de {$this->age_start} anos";
-        }
-
-        if ($this->age_end !== null) {
-            return "Até {$this->age_end} anos";
-        }
-
-        return 'Todas as idades';
     }
 
     /**
@@ -77,10 +47,15 @@ class RaceModality extends Model
             ->orderBy('sort_order')
             ->orderBy('name')
             ->get()
-            ->mapWithKeys(fn (RaceModality $modality): array => [
-                $modality->id => $modality->displayName(),
+            ->mapWithKeys(fn (Kit $kit): array => [
+                $kit->id => $kit->displayName(),
             ])
             ->all();
+    }
+
+    public function displayName(): string
+    {
+        return "{$this->name} - R$ ".number_format((float) $this->price, 2, ',', '.');
     }
 
     /**
@@ -91,8 +66,7 @@ class RaceModality extends Model
     protected function casts(): array
     {
         return [
-            'age_start' => 'integer',
-            'age_end' => 'integer',
+            'price' => 'decimal:2',
             'is_active' => 'boolean',
         ];
     }

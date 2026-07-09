@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Kit;
 use App\Models\ParticipantRegistration;
 use App\Models\PaymentGatewaySetting;
 use App\Models\RaceModality;
@@ -32,6 +33,9 @@ test('asaas checkout gateway creates a checkout session', function () {
     $raceModality = RaceModality::factory()->create([
         'name' => 'Adulto',
         'distance' => '6 km',
+    ]);
+    $kit = Kit::factory()->create([
+        'name' => 'Kit Corrida',
         'price' => 25,
     ]);
 
@@ -51,6 +55,7 @@ test('asaas checkout gateway creates a checkout session', function () {
     $checkout = (new AsaasCheckoutGateway)->createCheckout(new CheckoutRequest(
         registration: $registration,
         raceModality: $raceModality,
+        kit: $kit,
         successUrl: 'https://example.com/success',
         cancelUrl: 'https://example.com/cancel',
         expiredUrl: 'https://example.com/expired',
@@ -102,9 +107,8 @@ test('asaas checkout gateway retries with credit card when pix key is missing', 
         'charge_types' => ['DETACHED'],
     ]);
 
-    $raceModality = RaceModality::factory()->create([
-        'price' => 25,
-    ]);
+    $raceModality = RaceModality::factory()->create();
+    $kit = Kit::factory()->create(['price' => 25]);
 
     $registration = ParticipantRegistration::factory()->create([
         'race_modality_id' => $raceModality->id,
@@ -113,6 +117,7 @@ test('asaas checkout gateway retries with credit card when pix key is missing', 
     $checkout = (new AsaasCheckoutGateway)->createCheckout(new CheckoutRequest(
         registration: $registration,
         raceModality: $raceModality,
+        kit: $kit,
         successUrl: 'https://example.com/success',
         cancelUrl: 'https://example.com/cancel',
         expiredUrl: 'https://example.com/expired',
@@ -145,9 +150,8 @@ test('asaas checkout gateway applies the legal senior discount for participants 
         'charge_types' => ['DETACHED'],
     ]);
 
-    $raceModality = RaceModality::factory()->create([
-        'price' => 80,
-    ]);
+    $raceModality = RaceModality::factory()->create();
+    $kit = Kit::factory()->create(['price' => 80]);
 
     $registration = ParticipantRegistration::factory()->create([
         'birth_date' => today()->subYears(66)->subDay()->format('Y-m-d'),
@@ -157,6 +161,7 @@ test('asaas checkout gateway applies the legal senior discount for participants 
     (new AsaasCheckoutGateway)->createCheckout(new CheckoutRequest(
         registration: $registration,
         raceModality: $raceModality,
+        kit: $kit,
         successUrl: 'https://example.com/success',
         cancelUrl: 'https://example.com/cancel',
         expiredUrl: 'https://example.com/expired',

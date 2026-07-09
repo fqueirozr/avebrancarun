@@ -4,6 +4,7 @@ use App\Http\Controllers\AsaasWebhookController;
 use App\Http\Controllers\ContactMessageController;
 use App\Http\Controllers\ParticipantRegistrationController;
 use App\Models\EventSetting;
+use App\Models\Kit;
 use App\Models\RaceModality;
 use Illuminate\Support\Facades\Route;
 
@@ -15,6 +16,11 @@ Route::get('/', function () {
             ->orderBy('sort_order')
             ->orderBy('name')
             ->get(),
+        'kits' => Kit::query()
+            ->where('is_active', true)
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->get(),
     ]);
 })->name('home');
 
@@ -22,6 +28,11 @@ Route::get('/inscricao', function () {
     return view('registration', [
         'eventSetting' => EventSetting::current(),
         'modalities' => RaceModality::query()
+            ->where('is_active', true)
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->get(),
+        'kits' => Kit::query()
             ->where('is_active', true)
             ->orderBy('sort_order')
             ->orderBy('name')

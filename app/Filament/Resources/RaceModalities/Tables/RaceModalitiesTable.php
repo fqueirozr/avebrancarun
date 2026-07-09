@@ -10,7 +10,6 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Illuminate\Support\Number;
 
 class RaceModalitiesTable
 {
@@ -29,8 +28,9 @@ class RaceModalitiesTable
                     ->label('Tipo')
                     ->badge()
                     ->sortable(),
-                TextColumn::make('age_range')
+                TextColumn::make('age_start')
                     ->label('Faixa etária')
+                    ->formatStateUsing(fn (mixed $state, $record): string => $record->ageRangeLabel())
                     ->searchable()
                     ->toggleable(),
                 TextColumn::make('distance')
@@ -41,10 +41,6 @@ class RaceModalitiesTable
                     ->formatStateUsing(fn (?string $state): string => filled($state) ? 'Configurado' : 'Pendente')
                     ->badge()
                     ->toggleable(),
-                TextColumn::make('price')
-                    ->label('Valor')
-                    ->formatStateUsing(fn (?string $state): string => $state === null ? 'A definir' : Number::currency((float) $state, 'BRL', 'pt_BR'))
-                    ->sortable(),
                 TextColumn::make('max_participants')
                     ->label('Limite de atletas')
                     ->placeholder('Sem limite')

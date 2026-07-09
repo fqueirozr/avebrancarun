@@ -27,10 +27,15 @@ class RaceModalityForm
                     ])
                     ->required()
                     ->native(false),
-                TextInput::make('age_range')
-                    ->label('Faixa etária')
-                    ->placeholder('A partir de 16 anos')
-                    ->maxLength(255),
+                TextInput::make('age_start')
+                    ->label('Idade inicial')
+                    ->integer()
+                    ->minValue(0),
+                TextInput::make('age_end')
+                    ->label('Idade final')
+                    ->integer()
+                    ->minValue(0)
+                    ->gte('age_start'),
                 TextInput::make('distance')
                     ->label('Distância')
                     ->placeholder('6 km')
@@ -41,11 +46,6 @@ class RaceModalityForm
                     ->url()
                     ->maxLength(2048)
                     ->columnSpanFull(),
-                TextInput::make('price')
-                    ->label('Valor')
-                    ->numeric()
-                    ->prefix('R$')
-                    ->minValue(0),
                 TextInput::make('max_participants')
                     ->label('Limite de atletas')
                     ->integer()

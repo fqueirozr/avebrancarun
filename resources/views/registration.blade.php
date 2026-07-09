@@ -231,9 +231,7 @@
                                     <input type="radio" name="race_modality_id" value="{{ $modality->id }}" @checked((int) old('race_modality_id') === $modality->id) class="mt-1 size-4 accent-race-cyan" required>
                                     <span class="grid gap-1">
                                         <span class="font-bold">{{ $modality->displayName() }}</span>
-                                        <span class="text-zinc-600">
-                                            {{ $modality->price === null ? 'Valor a definir' : 'R$ '.number_format((float) $modality->price, 2, ',', '.') }}
-                                        </span>
+                                        <span class="text-zinc-600">{{ $modality->ageRangeLabel() }}</span>
                                     </span>
                                 </label>
                             @empty
@@ -243,6 +241,36 @@
                             @endforelse
                         </div>
                         @error('race_modality_id')
+                            <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
+                        @enderror
+                    </fieldset>
+
+                    <fieldset class="grid min-w-0 gap-3 border-b border-zinc-200 pb-6">
+                        <legend class="mb-4 text-base font-black text-zinc-950">Kit</legend>
+                        <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
+                            @forelse ($kits as $kit)
+                                <label class="grid min-h-24 overflow-hidden rounded-md border border-zinc-200 text-sm transition has-checked:border-race-cyan has-checked:bg-amber-50">
+                                    @if ($kit->photo_path)
+                                        <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($kit->photo_path) }}" alt="Foto do {{ $kit->name }}" class="aspect-[4/3] w-full object-cover">
+                                    @endif
+                                    <span class="flex items-start gap-3 px-4 py-3">
+                                        <input type="radio" name="kit_id" value="{{ $kit->id }}" @checked((int) old('kit_id') === $kit->id) class="mt-1 size-4 accent-race-cyan" required>
+                                        <span class="grid gap-1">
+                                            <span class="font-bold">{{ $kit->name }}</span>
+                                            <span class="font-black text-race-blue">R$ {{ number_format((float) $kit->price, 2, ',', '.') }}</span>
+                                            @if ($kit->description)
+                                                <span class="text-zinc-600">{{ $kit->description }}</span>
+                                            @endif
+                                        </span>
+                                    </span>
+                                </label>
+                            @empty
+                                <div class="rounded-md border border-amber-200 bg-amber-50 p-4 text-sm font-semibold text-amber-950 md:col-span-2">
+                                    Nenhum kit ativo no momento.
+                                </div>
+                            @endforelse
+                        </div>
+                        @error('kit_id')
                             <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
                         @enderror
                     </fieldset>
@@ -335,10 +363,10 @@
                     <div class="grid gap-3 rounded-md bg-zinc-50 p-5 sm:grid-cols-[1fr_auto] sm:items-center">
                         <div>
                             <p class="font-black">Confirmação pendente</p>
-                            <p class="mt-1 text-sm leading-6 text-zinc-600">A inscrição será registrada e, se houver valor configurado, você seguirá para o pagamento.</p>
+                            <p class="mt-1 text-sm leading-6 text-zinc-600">A inscrição será registrada e o valor do kit selecionado será usado no pagamento.</p>
                         </div>
 
-                        <button type="submit" @disabled($modalities->isEmpty()) class="rounded-md bg-race-blue px-5 py-3 text-sm font-black text-white transition hover:bg-race-ink disabled:cursor-not-allowed disabled:bg-zinc-400">
+                        <button type="submit" @disabled($modalities->isEmpty() || $kits->isEmpty()) class="rounded-md bg-race-blue px-5 py-3 text-sm font-black text-white transition hover:bg-race-ink disabled:cursor-not-allowed disabled:bg-zinc-400">
                             Enviar inscrição
                         </button>
                     </div>

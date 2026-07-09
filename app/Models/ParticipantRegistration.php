@@ -24,6 +24,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'billing_province',
     'billing_postal_code',
     'race_modality_id',
+    'kit_id',
     'modality',
     'notes',
     'emergency_contact_name',
@@ -56,6 +57,14 @@ class ParticipantRegistration extends Model
     public function raceModality(): BelongsTo
     {
         return $this->belongsTo(RaceModality::class);
+    }
+
+    /**
+     * @return BelongsTo<Kit, $this>
+     */
+    public function kit(): BelongsTo
+    {
+        return $this->belongsTo(Kit::class);
     }
 
     /**
@@ -100,9 +109,9 @@ class ParticipantRegistration extends Model
         return $this->birth_date->age > self::SeniorLegalDiscountMinimumAge;
     }
 
-    public function priceFor(RaceModality $raceModality): float
+    public function priceFor(Kit $kit): float
     {
-        $price = (float) $raceModality->price;
+        $price = (float) $kit->price;
 
         if (! $this->isEligibleForSeniorLegalDiscount()) {
             return $price;
