@@ -15,14 +15,15 @@ A sua inscrição para a **Ave Branca Run** já está em análise pela organiza�
 | :--- | :--- |
 | Atleta | {{ $registration->athlete_name }} |
 | Data de nascimento | {{ $registration->birth_date->format('d/m/Y') }} |
-| CPF do participante | {{ $registration->participant_cpf }} |
-| Responsável | {{ $registration->guardian_name ?: 'Não informado' }} |
-| CPF do responsável | {{ $registration->guardian_cpf ?: 'Não informado' }} |
+| Sexo | {{ $registration->sexLabel() }} |
+| CPF do atleta | {{ $registration->participant_cpf }} |
+| Responsável Legal | {{ $registration->guardian_name ?: 'Não informado' }} |
+| CPF do responsável legal | {{ $registration->guardian_cpf ?: 'Não informado' }} |
 | Telefone | {{ $registration->phone }} |
 | Email | {{ $registration->email }} |
 | Pagador | {{ $registration->billing_name ?: 'Não informado' }} |
 | CPF/CNPJ do pagador | {{ $registration->billing_document ?: 'Não informado' }} |
-| Modalidade | {{ $registration->modality }} |
+| Prova | {{ $registration->modality }} |
 | Observações | {{ $registration->notes ?: 'Não informado' }} |
 | Contato de emergência | {{ $registration->emergency_contact_name ?: 'Não informado' }} |
 | Telefone de emergência | {{ $registration->emergency_contact_phone ?: 'Não informado' }} |

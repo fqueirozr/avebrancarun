@@ -171,11 +171,12 @@
                     <tr>
                         <th>Atleta</th>
                         <th>Nascimento</th>
-                        <th>CPF participante</th>
-                        <th>Responsável</th>
+                        <th>Sexo</th>
+                        <th>CPF atleta</th>
+                        <th>Responsável Legal</th>
                         <th>Telefone</th>
                         <th>E-mail</th>
-                        <th>Modalidade</th>
+                        <th>Prova</th>
                         <th>Pagamento</th>
                         <th>Inscrito em</th>
                     </tr>
@@ -185,6 +186,7 @@
                         <tr>
                             <td>{{ $registration->athlete_name }}</td>
                             <td>{{ $registration->birth_date?->format('d/m/Y') }}</td>
+                            <td>{{ $registration->sexLabel() }}</td>
                             <td>{{ $registration->participant_cpf }}</td>
                             <td>{{ $registration->guardian_name ?: '-' }}</td>
                             <td>{{ $registration->phone }}</td>

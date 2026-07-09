@@ -37,6 +37,7 @@ test('a participant can submit a registration', function () {
     $this->post(route('registration.store'), [
         'athlete_name' => $registration->athlete_name,
         'birth_date' => $registration->birth_date->format('Y-m-d'),
+        'sex' => 'female',
         'participant_cpf' => '529.982.247-25',
         'guardian_name' => $registration->guardian_name,
         'guardian_cpf' => '153.509.460-56',
@@ -59,6 +60,7 @@ test('a participant can submit a registration', function () {
     $this->assertDatabaseHas(ParticipantRegistration::class, [
         'athlete_name' => 'Maria Silva',
         'email' => 'maria@example.com',
+        'sex' => 'female',
         'participant_cpf' => '52998224725',
         'guardian_cpf' => '15350946056',
         'phone' => '11999999999',
@@ -99,6 +101,7 @@ test('registration submission requires mandatory declarations', function () {
     $this->post(route('registration.store'), [
         'athlete_name' => $registration->athlete_name,
         'birth_date' => $registration->birth_date->format('Y-m-d'),
+        'sex' => $registration->sex,
         'participant_cpf' => '529.982.247-25',
         'guardian_name' => $registration->guardian_name,
         'guardian_cpf' => '153.509.460-56',
@@ -129,6 +132,7 @@ test('minor participant registration requires guardian data', function () {
     $this->post(route('registration.store'), [
         'athlete_name' => $registration->athlete_name,
         'birth_date' => $registration->birth_date->format('Y-m-d'),
+        'sex' => $registration->sex,
         'participant_cpf' => '529.982.247-25',
         'phone' => '(11) 99999-9999',
         'email' => $registration->email,
@@ -182,6 +186,7 @@ test('a participant is redirected to checkout when payment gateway is configured
     $this->post(route('registration.store'), [
         'athlete_name' => $registration->athlete_name,
         'birth_date' => $registration->birth_date->format('Y-m-d'),
+        'sex' => $registration->sex,
         'participant_cpf' => $registration->participant_cpf,
         'guardian_name' => $registration->guardian_name,
         'guardian_cpf' => $registration->guardian_cpf,
@@ -247,6 +252,7 @@ test('paid registration requires a billing document for checkout', function () {
     $this->post(route('registration.store'), [
         'athlete_name' => $registration->athlete_name,
         'birth_date' => $registration->birth_date->format('Y-m-d'),
+        'sex' => $registration->sex,
         'participant_cpf' => $registration->participant_cpf,
         'guardian_name' => $registration->guardian_name,
         'guardian_cpf' => $registration->guardian_cpf,
@@ -278,6 +284,7 @@ test('paid registration requires billing address data for checkout', function ()
     $this->post(route('registration.store'), [
         'athlete_name' => $registration->athlete_name,
         'birth_date' => $registration->birth_date->format('Y-m-d'),
+        'sex' => $registration->sex,
         'participant_cpf' => $registration->participant_cpf,
         'guardian_name' => $registration->guardian_name,
         'guardian_cpf' => $registration->guardian_cpf,
@@ -309,6 +316,7 @@ test('paid registration rejects an invalid billing document before checkout', fu
     $this->post(route('registration.store'), [
         'athlete_name' => $registration->athlete_name,
         'birth_date' => $registration->birth_date->format('Y-m-d'),
+        'sex' => $registration->sex,
         'participant_cpf' => $registration->participant_cpf,
         'guardian_name' => $registration->guardian_name,
         'guardian_cpf' => $registration->guardian_cpf,
@@ -358,6 +366,7 @@ test('checkout gateway failure returns the participant to the form with the gate
     $this->post(route('registration.store'), [
         'athlete_name' => $registration->athlete_name,
         'birth_date' => $registration->birth_date->format('Y-m-d'),
+        'sex' => $registration->sex,
         'participant_cpf' => $registration->participant_cpf,
         'guardian_name' => $registration->guardian_name,
         'guardian_cpf' => $registration->guardian_cpf,
@@ -385,6 +394,7 @@ test('registration submission validates required fields', function () {
         ->assertSessionHasErrors([
             'athlete_name',
             'birth_date',
+            'sex',
             'participant_cpf',
             'phone',
             'email',
@@ -402,6 +412,7 @@ test('registration submission rejects inactive modalities', function () {
     $this->post(route('registration.store'), [
         'athlete_name' => $registration->athlete_name,
         'birth_date' => $registration->birth_date->format('Y-m-d'),
+        'sex' => $registration->sex,
         'participant_cpf' => $registration->participant_cpf,
         'guardian_name' => $registration->guardian_name,
         'guardian_cpf' => $registration->guardian_cpf,
@@ -420,6 +431,7 @@ test('registration submission rejects invalid participant and guardian cpf and p
     $this->post(route('registration.store'), [
         'athlete_name' => $registration->athlete_name,
         'birth_date' => $registration->birth_date->format('Y-m-d'),
+        'sex' => $registration->sex,
         'participant_cpf' => '111.111.111-11',
         'guardian_name' => 'Joao Silva',
         'guardian_cpf' => '222.222.222-22',

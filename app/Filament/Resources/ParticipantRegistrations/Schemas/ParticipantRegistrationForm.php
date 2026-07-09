@@ -24,17 +24,21 @@ class ParticipantRegistrationForm
                 DatePicker::make('birth_date')
                     ->label('Data de nascimento')
                     ->required(),
+                Select::make('sex')
+                    ->label('Sexo')
+                    ->options(ParticipantRegistration::sexOptions())
+                    ->required(),
                 TextInput::make('participant_cpf')
-                    ->label('CPF do participante')
+                    ->label('CPF do atleta')
                     ->numeric()
                     ->required()
                     ->minLength(11)
                     ->maxLength(11),
                 TextInput::make('guardian_name')
-                    ->label('Responsável')
+                    ->label('Responsável Legal')
                     ->maxLength(255),
                 TextInput::make('guardian_cpf')
-                    ->label('CPF do responsável')
+                    ->label('CPF do responsável legal')
                     ->numeric()
                     ->minLength(11)
                     ->maxLength(11),
@@ -72,7 +76,7 @@ class ParticipantRegistrationForm
                     ->minLength(8)
                     ->maxLength(8),
                 Select::make('race_modality_id')
-                    ->label('Modalidade')
+                    ->label('Prova')
                     ->options(fn (): array => RaceModality::options())
                     ->searchable()
                     ->preload()

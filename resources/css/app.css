@@ -6,11 +6,11 @@
 @theme {
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
-    --color-race-night: #020713;
-    --color-race-ink: #06172a;
-    --color-race-blue: #075f98;
-    --color-race-cyan: #24c8ff;
-    --color-race-ice: #e6f8ff;
+    --color-race-night: #020712;
+    --color-race-ink: #07182d;
+    --color-race-blue: #0759a5;
+    --color-race-cyan: #f5b51b;
+    --color-race-ice: #fff4cf;
 }
 
 @layer components {
@@ -95,7 +95,7 @@
     }
 
     .event-rich-content--modal :where(ul, ol) {
-        @apply grid gap-2 rounded-md border border-race-cyan/15 bg-sky-50/70 p-4 pl-8;
+        @apply grid gap-2 rounded-md border border-race-cyan/15 bg-amber-50/70 p-4 pl-8;
     }
 
     .event-rich-content--modal li + li {
@@ -103,7 +103,7 @@
     }
 
     .event-rich-content--modal blockquote {
-        @apply rounded-md border-l-4 border-race-cyan bg-sky-50 px-4 py-3 text-race-ink;
+        @apply rounded-md border-l-4 border-race-cyan bg-amber-50 px-4 py-3 text-race-ink;
     }
 
     .event-rich-content--modal a {

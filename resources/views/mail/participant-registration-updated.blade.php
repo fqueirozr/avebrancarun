@@ -14,7 +14,8 @@ A sua inscrição para a **Ave Branca Run** recebeu uma nova atualização da or
 | Dado | Informação |
 | :--- | :--- |
 | Atleta | {{ $registration->athlete_name }} |
-| Modalidade | {{ $registration->modality }} |
+| Sexo | {{ $registration->sexLabel() }} |
+| Prova | {{ $registration->modality }} |
 | Telefone | {{ $registration->phone }} |
 | Email | {{ $registration->email }} |
 </x-mail::table>

@@ -21,11 +21,11 @@ class RaceModalityResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    protected static ?string $modelLabel = 'modalidade';
+    protected static ?string $modelLabel = 'prova';
 
-    protected static ?string $pluralModelLabel = 'modalidades';
+    protected static ?string $pluralModelLabel = 'provas';
 
-    protected static ?string $navigationLabel = 'Modalidades';
+    protected static ?string $navigationLabel = 'Provas';
 
     protected static string|UnitEnum|null $navigationGroup = 'Configuracoes';
 

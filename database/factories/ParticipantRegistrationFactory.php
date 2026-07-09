@@ -21,6 +21,7 @@ class ParticipantRegistrationFactory extends Factory
         return [
             'athlete_name' => fake()->name(),
             'birth_date' => fake()->dateTimeBetween('-45 years', '-18 years')->format('Y-m-d'),
+            'sex' => fake()->randomElement(array_keys(ParticipantRegistration::sexOptions())),
             'participant_cpf' => '52998224725',
             'guardian_name' => fake()->optional()->name(),
             'guardian_cpf' => fake()->optional()->randomElement(['15350946056', '11144477735']),

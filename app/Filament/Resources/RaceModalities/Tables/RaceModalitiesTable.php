@@ -46,7 +46,7 @@ class RaceModalitiesTable
                     ->formatStateUsing(fn (?string $state): string => $state === null ? 'A definir' : Number::currency((float) $state, 'BRL', 'pt_BR'))
                     ->sortable(),
                 TextColumn::make('max_participants')
-                    ->label('Limite')
+                    ->label('Limite de atletas')
                     ->placeholder('Sem limite')
                     ->sortable()
                     ->toggleable(),

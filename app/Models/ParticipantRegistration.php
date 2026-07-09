@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 #[Fillable([
     'athlete_name',
     'birth_date',
+    'sex',
     'participant_cpf',
     'guardian_name',
     'guardian_cpf',
@@ -67,6 +68,22 @@ class ParticipantRegistration extends Model
             'paid' => 'Pago',
             'cancelled' => 'Cancelado',
         ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public static function sexOptions(): array
+    {
+        return [
+            'male' => 'Masculino',
+            'female' => 'Feminino',
+        ];
+    }
+
+    public function sexLabel(): string
+    {
+        return self::sexOptions()[$this->sex] ?? 'Não informado';
     }
 
     public function paymentStatusLabel(): string

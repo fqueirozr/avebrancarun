@@ -47,7 +47,7 @@ class RaceModalityForm
                     ->prefix('R$')
                     ->minValue(0),
                 TextInput::make('max_participants')
-                    ->label('Limite de participantes')
+                    ->label('Limite de atletas')
                     ->integer()
                     ->minValue(1),
                 TextInput::make('sort_order')

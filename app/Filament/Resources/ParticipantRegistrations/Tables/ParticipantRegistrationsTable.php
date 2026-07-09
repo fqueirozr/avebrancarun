@@ -28,16 +28,20 @@ class ParticipantRegistrationsTable
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('modality')
-                    ->label('Modalidade')
+                    ->label('Prova')
                     ->searchable()
                     ->sortable()
                     ->wrap(),
                 TextColumn::make('participant_cpf')
-                    ->label('CPF participante')
+                    ->label('CPF atleta')
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('sex')
+                    ->label('Sexo')
+                    ->formatStateUsing(fn (?string $state): string => ParticipantRegistration::sexOptions()[$state] ?? 'Não informado')
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('guardian_cpf')
-                    ->label('CPF responsável')
+                    ->label('CPF responsável legal')
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('phone')
@@ -84,8 +88,11 @@ class ParticipantRegistrationsTable
                 SelectFilter::make('payment_status')
                     ->label('Pagamento')
                     ->options(ParticipantRegistration::paymentStatusOptions()),
+                SelectFilter::make('sex')
+                    ->label('Sexo')
+                    ->options(ParticipantRegistration::sexOptions()),
                 SelectFilter::make('modality')
-                    ->label('Modalidade')
+                    ->label('Prova')
                     ->options(fn (): array => RaceModality::options())
                     ->query(function ($query, array $data) {
                         if (blank($data['value'])) {
@@ -106,7 +113,7 @@ class ParticipantRegistrationsTable
                     ->color('danger')
                     ->requiresConfirmation()
                     ->modalHeading('Cancelar inscrição')
-                    ->modalDescription('A inscrição será marcada como cancelada e o participante receberá um e-mail de atualização.')
+                    ->modalDescription('A inscrição será marcada como cancelada e o atleta receberá um e-mail de atualização.')
                     ->visible(fn (ParticipantRegistration $record): bool => $record->payment_status !== 'cancelled')
                     ->action(function (ParticipantRegistration $record): void {
                         $record->forceFill([
@@ -118,7 +125,7 @@ class ParticipantRegistrationsTable
                         Notification::make()
                             ->success()
                             ->title('Inscrição cancelada')
-                            ->body('O participante recebeu um e-mail de atualização.')
+                            ->body('O atleta recebeu um e-mail de atualização.')
                             ->send();
                     }),
             ])

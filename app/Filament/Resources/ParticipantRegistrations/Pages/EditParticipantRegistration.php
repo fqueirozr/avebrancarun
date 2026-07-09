@@ -27,7 +27,7 @@ class EditParticipantRegistration extends EditRecord
                 ->color('danger')
                 ->requiresConfirmation()
                 ->modalHeading('Cancelar inscrição')
-                ->modalDescription('A inscrição será marcada como cancelada e o participante receberá um e-mail de atualização.')
+                ->modalDescription('A inscrição será marcada como cancelada e o atleta receberá um e-mail de atualização.')
                 ->visible(fn (): bool => $this->record->payment_status !== 'cancelled')
                 ->action(function (): void {
                     $this->record->forceFill([
@@ -39,7 +39,7 @@ class EditParticipantRegistration extends EditRecord
                     Notification::make()
                         ->success()
                         ->title('Inscrição cancelada')
-                        ->body('O participante recebeu um e-mail de atualização.')
+                        ->body('O atleta recebeu um e-mail de atualização.')
                         ->send();
                 }),
             DeleteAction::make(),

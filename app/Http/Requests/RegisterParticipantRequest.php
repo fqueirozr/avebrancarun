@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\ParticipantRegistration;
 use App\Models\RaceModality;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -29,6 +30,7 @@ class RegisterParticipantRequest extends FormRequest
         return [
             'athlete_name' => ['required', 'string', 'max:255'],
             'birth_date' => ['required', 'date', 'before:today'],
+            'sex' => ['required', Rule::in(array_keys(ParticipantRegistration::sexOptions()))],
             'participant_cpf' => ['required', 'string', 'regex:/^\d{11}$/'],
             'guardian_name' => ['nullable', 'string', 'max:255'],
             'guardian_cpf' => ['nullable', 'string', 'regex:/^\d{11}$/'],
@@ -65,7 +67,7 @@ class RegisterParticipantRequest extends FormRequest
             'birth_date.before' => 'A data de nascimento deve ser anterior a hoje.',
             'email.email' => 'Informe um e-mail válido.',
             'regex' => 'Informe um valor válido para :attribute.',
-            'race_modality_id.exists' => 'Escolha uma modalidade ativa.',
+            'race_modality_id.exists' => 'Escolha uma prova ativa.',
             'accepted' => 'Você precisa aceitar :attribute.',
         ];
     }
@@ -78,9 +80,10 @@ class RegisterParticipantRequest extends FormRequest
         return [
             'athlete_name' => 'o nome do atleta',
             'birth_date' => 'a data de nascimento',
-            'participant_cpf' => 'o CPF do participante',
-            'guardian_name' => 'o nome do responsável',
-            'guardian_cpf' => 'o CPF do responsável',
+            'sex' => 'o sexo',
+            'participant_cpf' => 'o CPF do atleta',
+            'guardian_name' => 'o nome do responsável legal',
+            'guardian_cpf' => 'o CPF do responsável legal',
             'phone' => 'o telefone',
             'email' => 'o e-mail',
             'billing_document' => 'o CPF ou CNPJ do pagador',
@@ -89,7 +92,7 @@ class RegisterParticipantRequest extends FormRequest
             'billing_address_number' => 'o número do endereço',
             'billing_province' => 'o bairro do pagador',
             'billing_postal_code' => 'o CEP do pagador',
-            'race_modality_id' => 'a modalidade',
+            'race_modality_id' => 'a prova',
             'notes' => 'as observações',
             'emergency_contact_name' => 'o nome do contato de emergência',
             'emergency_contact_phone' => 'o telefone do contato de emergência',
@@ -111,20 +114,20 @@ class RegisterParticipantRequest extends FormRequest
                 $raceModality = RaceModality::query()->find($this->input('race_modality_id'));
 
                 if (filled($this->input('participant_cpf')) && ! $this->hasValidCpf((string) $this->input('participant_cpf'))) {
-                    $validator->errors()->add('participant_cpf', 'Informe um CPF válido para o participante.');
+                    $validator->errors()->add('participant_cpf', 'Informe um CPF válido para o atleta.');
                 }
 
                 if (filled($this->input('guardian_cpf')) && ! $this->hasValidCpf((string) $this->input('guardian_cpf'))) {
-                    $validator->errors()->add('guardian_cpf', 'Informe um CPF válido para o responsável.');
+                    $validator->errors()->add('guardian_cpf', 'Informe um CPF válido para o responsável legal.');
                 }
 
                 if ($this->isMinorParticipant()) {
                     if (blank($this->input('guardian_name'))) {
-                        $validator->errors()->add('guardian_name', 'Informe o nome do responsável para participantes menores de idade.');
+                        $validator->errors()->add('guardian_name', 'Informe o nome do responsável legal para atletas menores de idade.');
                     }
 
                     if (blank($this->input('guardian_cpf'))) {
-                        $validator->errors()->add('guardian_cpf', 'Informe o CPF do responsável para participantes menores de idade.');
+                        $validator->errors()->add('guardian_cpf', 'Informe o CPF do responsável legal para atletas menores de idade.');
                     }
                 }
 
