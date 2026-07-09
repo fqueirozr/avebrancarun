@@ -35,6 +35,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'privacy_policy_version',
     'privacy_policy_acceptance_ip',
     'privacy_policy_acceptance_user_agent',
+    'data_confirmation_accepted_at',
+    'data_confirmation_acceptance_ip',
+    'data_confirmation_acceptance_user_agent',
     'payment_status',
     'payment_gateway',
     'payment_gateway_reference',
@@ -132,6 +135,7 @@ class ParticipantRegistration extends Model
             'health_notes' => 'encrypted',
             'promotional_opt_in' => 'boolean',
             'privacy_policy_accepted_at' => 'datetime',
+            'data_confirmation_accepted_at' => 'datetime',
         ];
     }
 }

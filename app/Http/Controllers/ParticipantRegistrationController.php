@@ -30,6 +30,7 @@ class ParticipantRegistrationController extends Controller
             $validated['accepted_regulation'],
             $validated['accepted_privacy_policy'],
             $validated['accepted_fitness_declaration'],
+            $validated['accepted_data_confirmation'],
         );
 
         $registration = ParticipantRegistration::create([
@@ -39,6 +40,9 @@ class ParticipantRegistrationController extends Controller
             'privacy_policy_version' => ParticipantRegistration::PrivacyPolicyVersion,
             'privacy_policy_acceptance_ip' => $request->ip(),
             'privacy_policy_acceptance_user_agent' => $request->userAgent(),
+            'data_confirmation_accepted_at' => now(),
+            'data_confirmation_acceptance_ip' => $request->ip(),
+            'data_confirmation_acceptance_user_agent' => $request->userAgent(),
             'modality' => $raceModality->displayName(),
         ]);
 

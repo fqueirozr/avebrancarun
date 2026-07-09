@@ -29,8 +29,6 @@ class EventSettingFactory extends Factory
             'start_groups_information' => fake()->paragraph(),
             'timing_information' => fake()->paragraph(),
             'special_registrations_information' => fake()->paragraph(),
-            'course_information' => fake()->paragraph(),
-            'course_images' => [],
             'regulation' => fake()->paragraphs(3, true),
         ];
     }

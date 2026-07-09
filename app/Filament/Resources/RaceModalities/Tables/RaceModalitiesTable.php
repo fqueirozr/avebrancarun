@@ -36,10 +36,25 @@ class RaceModalitiesTable
                 TextColumn::make('distance')
                     ->label('Distância')
                     ->searchable(),
+                TextColumn::make('race_date')
+                    ->label('Data')
+                    ->date('d/m/Y')
+                    ->placeholder('A confirmar')
+                    ->sortable()
+                    ->toggleable(),
+                TextColumn::make('race_time')
+                    ->label('Horário')
+                    ->formatStateUsing(fn (?string $state): ?string => $state === null ? null : str($state)->substr(0, 5)->toString())
+                    ->placeholder('A confirmar')
+                    ->toggleable(),
                 TextColumn::make('google_maps_embed_url')
                     ->label('Mapa')
                     ->formatStateUsing(fn (?string $state): string => filled($state) ? 'Configurado' : 'Pendente')
                     ->badge()
+                    ->toggleable(),
+                TextColumn::make('course_images')
+                    ->label('Fotos')
+                    ->formatStateUsing(fn (?array $state): string => count($state ?? []).' foto(s)')
                     ->toggleable(),
                 TextColumn::make('max_participants')
                     ->label('Limite de atletas')

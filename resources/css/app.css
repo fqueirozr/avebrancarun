@@ -11,9 +11,41 @@
     --color-race-blue: #0759a5;
     --color-race-cyan: #f5b51b;
     --color-race-ice: #fff4cf;
+    --color-race-mist: #eef7ff;
+    --color-race-steel: #164169;
 }
 
 @layer components {
+    .section-kicker {
+        @apply text-sm font-black uppercase tracking-normal text-race-blue;
+    }
+
+    .race-panel {
+        @apply rounded-md border border-race-blue/10 bg-white shadow-sm shadow-race-night/5;
+    }
+
+    .race-panel-dark {
+        @apply rounded-md border border-white/10 bg-race-night text-white shadow-xl shadow-race-night/25;
+    }
+
+    .parallax-layer {
+        transform: translate3d(0, var(--parallax-y, 0px), 0);
+        will-change: transform;
+    }
+
+    .reveal-on-scroll {
+        opacity: 0;
+        transform: translateY(22px);
+        transition:
+            opacity 700ms ease,
+            transform 700ms ease;
+    }
+
+    .reveal-on-scroll.is-visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
     .event-rich-content {
         @apply text-sm/6 font-semibold text-zinc-800;
     }
@@ -108,5 +140,18 @@
 
     .event-rich-content--modal a {
         @apply text-race-blue decoration-2;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .parallax-layer,
+    .reveal-on-scroll,
+    .reveal-on-scroll.is-visible {
+        transform: none;
+        transition: none;
+    }
+
+    .reveal-on-scroll {
+        opacity: 1;
     }
 }

@@ -49,6 +49,187 @@ document.querySelectorAll('[data-mask]').forEach((input) => {
     applyMask();
 });
 
+document.querySelectorAll('[data-registration-form]').forEach((form) => {
+    const steps = Array.from(form.querySelectorAll('[data-registration-step]'));
+    const guardianStep = form.querySelector('[data-guardian-step]');
+    const birthDateInput = form.querySelector('input[name="birth_date"]');
+    const previousButton = form.querySelector('[data-registration-prev]');
+    const nextButton = form.querySelector('[data-registration-next]');
+    const submitButton = form.querySelector('[data-registration-submit]');
+    const progressLabel = form.querySelector('[data-registration-progress-label]');
+    const progressTitle = form.querySelector('[data-registration-progress-title]');
+    const progressBar = form.querySelector('[data-registration-progress-bar]');
+    const review = form.querySelector('[data-registration-review]');
+    let currentStepIndex = 0;
+
+    const fieldLabels = {
+        athlete_name: 'Nome do atleta',
+        participant_cpf: 'CPF do atleta',
+        birth_date: 'Data de nascimento',
+        sex: 'Sexo',
+        phone: 'Telefone',
+        email: 'E-mail',
+        guardian_name: 'Nome do responsavel legal',
+        guardian_cpf: 'CPF do responsavel legal',
+        billing_name: 'Nome do pagador',
+        billing_document: 'CPF/CNPJ do pagador',
+        billing_address: 'Endereco',
+        billing_province: 'Bairro',
+        billing_address_number: 'Numero',
+        billing_postal_code: 'CEP',
+        race_modality_id: 'Prova',
+        kit_id: 'Kit',
+        notes: 'Detalhes gerais',
+        emergency_contact_name: 'Contato de emergencia',
+        emergency_contact_phone: 'Telefone de emergencia',
+        health_notes: 'Saude e suporte emergencial',
+    };
+
+    const visibleSteps = () => steps.filter((step) => !step.dataset.skipStep);
+
+    const isMinorBirthDate = () => {
+        if (!birthDateInput?.value) {
+            return false;
+        }
+
+        const birthDate = new Date(`${birthDateInput.value}T00:00:00`);
+
+        if (Number.isNaN(birthDate.getTime())) {
+            return false;
+        }
+
+        const adultDate = new Date();
+        adultDate.setFullYear(adultDate.getFullYear() - 18);
+        adultDate.setHours(0, 0, 0, 0);
+
+        return birthDate > adultDate;
+    };
+
+    const syncGuardianStep = () => {
+        if (!guardianStep) {
+            return;
+        }
+
+        const shouldShow = isMinorBirthDate();
+        guardianStep.dataset.skipStep = shouldShow ? '' : 'true';
+        guardianStep.hidden = !shouldShow;
+
+        guardianStep.querySelectorAll('input, textarea, select').forEach((field) => {
+            field.required = shouldShow;
+
+            if (!shouldShow) {
+                field.value = '';
+            }
+        });
+    };
+
+    const selectedLabel = (field) => {
+        if (field.type === 'radio') {
+            const checked = form.querySelector(`input[name="${field.name}"]:checked`);
+
+            return checked?.closest('label')?.innerText.trim() ?? '';
+        }
+
+        if (field.type === 'checkbox') {
+            return field.checked ? 'Sim' : 'Nao';
+        }
+
+        return field.value.trim();
+    };
+
+    const updateReview = () => {
+        if (!review) {
+            return;
+        }
+
+        review.innerHTML = '';
+
+        const fields = Array.from(form.querySelectorAll('input[name], textarea[name], select[name]'))
+            .filter((field) => !field.closest('[data-registration-step]')?.dataset.skipStep)
+            .filter((field) => field.name in fieldLabels)
+            .filter((field, index, fieldsList) => field.type !== 'radio' || fieldsList.findIndex((item) => item.name === field.name) === index);
+
+        fields.forEach((field) => {
+            const value = selectedLabel(field) || 'Nao informado';
+            const item = document.createElement('div');
+            const term = document.createElement('dt');
+            const description = document.createElement('dd');
+
+            item.className = 'rounded-md border border-zinc-200 bg-white p-3';
+            term.className = 'font-bold text-zinc-700';
+            term.textContent = fieldLabels[field.name];
+            description.className = 'mt-1 break-words text-zinc-950';
+            description.textContent = value;
+            item.append(term, description);
+            review.appendChild(item);
+        });
+    };
+
+    const validateCurrentStep = () => {
+        const currentStep = visibleSteps()[currentStepIndex];
+        const controls = Array.from(currentStep.querySelectorAll('input, textarea, select'));
+
+        for (const control of controls) {
+            if (!control.checkValidity()) {
+                control.reportValidity();
+
+                return false;
+            }
+        }
+
+        return true;
+    };
+
+    const renderStep = () => {
+        syncGuardianStep();
+
+        const currentVisibleSteps = visibleSteps();
+        currentStepIndex = Math.min(currentStepIndex, currentVisibleSteps.length - 1);
+
+        steps.forEach((step) => {
+            step.hidden = step !== currentVisibleSteps[currentStepIndex] || Boolean(step.dataset.skipStep);
+        });
+
+        const isFirstStep = currentStepIndex === 0;
+        const isLastStep = currentStepIndex === currentVisibleSteps.length - 1;
+        const progress = ((currentStepIndex + 1) / currentVisibleSteps.length) * 100;
+
+        previousButton.hidden = isFirstStep;
+        nextButton.hidden = isLastStep;
+        submitButton.hidden = !isLastStep;
+        progressLabel.textContent = `Etapa ${currentStepIndex + 1} de ${currentVisibleSteps.length}`;
+        progressTitle.textContent = currentVisibleSteps[currentStepIndex].dataset.stepTitle;
+        progressBar.style.width = `${progress}%`;
+
+        if (isLastStep) {
+            updateReview();
+        }
+    };
+
+    birthDateInput?.addEventListener('change', () => {
+        syncGuardianStep();
+        renderStep();
+    });
+
+    previousButton?.addEventListener('click', () => {
+        currentStepIndex = Math.max(0, currentStepIndex - 1);
+        renderStep();
+    });
+
+    nextButton?.addEventListener('click', () => {
+        if (!validateCurrentStep()) {
+            return;
+        }
+
+        currentStepIndex = Math.min(visibleSteps().length - 1, currentStepIndex + 1);
+        renderStep();
+    });
+
+    form.addEventListener('submit', updateReview);
+
+    renderStep();
+});
+
 document.querySelectorAll('[data-course-tabs]').forEach((tabsRoot) => {
     const tabs = Array.from(tabsRoot.querySelectorAll('[data-course-tab]'));
     const panels = Array.from(tabsRoot.querySelectorAll('[data-course-panel]'));
@@ -105,3 +286,60 @@ document.querySelectorAll('dialog').forEach((modal) => {
         }
     });
 });
+
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+if (!prefersReducedMotion) {
+    const parallaxLayers = Array.from(document.querySelectorAll('[data-parallax-speed]'));
+    let parallaxFrame = null;
+
+    const syncParallax = () => {
+        parallaxFrame = null;
+
+        parallaxLayers.forEach((layer) => {
+            const speed = Number.parseFloat(layer.dataset.parallaxSpeed || '0.12');
+            const bounds = layer.getBoundingClientRect();
+            const viewportCenter = window.innerHeight / 2;
+            const layerCenter = bounds.top + bounds.height / 2;
+            const offset = (viewportCenter - layerCenter) * speed;
+
+            layer.style.setProperty('--parallax-y', `${offset.toFixed(2)}px`);
+        });
+    };
+
+    const requestParallaxSync = () => {
+        if (parallaxFrame !== null) {
+            return;
+        }
+
+        parallaxFrame = window.requestAnimationFrame(syncParallax);
+    };
+
+    if (parallaxLayers.length > 0) {
+        window.addEventListener('scroll', requestParallaxSync, { passive: true });
+        window.addEventListener('resize', requestParallaxSync);
+        syncParallax();
+    }
+}
+
+const revealItems = Array.from(document.querySelectorAll('[data-reveal]'));
+
+if (revealItems.length > 0 && 'IntersectionObserver' in window && !prefersReducedMotion) {
+    const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+            if (!entry.isIntersecting) {
+                return;
+            }
+
+            entry.target.classList.add('is-visible');
+            revealObserver.unobserve(entry.target);
+        });
+    }, {
+        rootMargin: '0px 0px -12% 0px',
+        threshold: 0.12,
+    });
+
+    revealItems.forEach((item) => revealObserver.observe(item));
+} else {
+    revealItems.forEach((item) => item.classList.add('is-visible'));
+}

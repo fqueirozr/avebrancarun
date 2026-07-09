@@ -7,8 +7,8 @@
 
         <title>Inscrição | Ave Branca Run</title>
 
-        <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="any">
-        <link rel="apple-touch-icon" href="{{ asset('images/ave-branca-logo.png') }}">
+        <link rel="icon" href="{{ asset('images/favicon-60-anos.png') }}" type="image/png">
+        <link rel="apple-touch-icon" href="{{ asset('images/favicon-60-anos.png') }}">
 
         @fonts
         @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -18,11 +18,10 @@
             <nav class="mx-auto flex max-w-7xl items-center justify-between px-5 py-5 sm:px-8" aria-label="Navegação principal">
                 <a href="{{ route('home') }}" class="flex items-center gap-3">
                     <img
-                        src="{{ asset('images/ave-branca-logo.png') }}"
-                        alt="Logo do Clube de Desbravadores Ave Branca"
-                        class="size-14 rounded-full border border-race-cyan/30 bg-white object-cover shadow-sm"
+                        src="{{ asset('images/ave-branca-run-logo.png') }}"
+                        alt="Ave Branca Run"
+                        class="h-14 w-auto max-w-[210px] object-contain sm:h-16 sm:max-w-[260px]"
                     >
-                    <span class="text-sm font-semibold uppercase tracking-normal text-race-ink">Ave Branca Run</span>
                 </a>
 
                 <a href="{{ route('home') }}" class="rounded-md border border-zinc-200 px-4 py-2 text-sm font-bold text-zinc-800 transition hover:bg-zinc-50">
@@ -77,10 +76,20 @@
                     </div>
                 @enderror
 
-                <form action="{{ route('registration.store') }}" method="POST" class="mt-7 grid grid-cols-1 gap-5">
+                <form action="{{ route('registration.store') }}" method="POST" class="mt-7 grid grid-cols-1 gap-5" data-registration-form>
                     @csrf
 
-                    <fieldset class="grid min-w-0 gap-5 border-b border-zinc-200 pb-6">
+                    <div class="grid gap-3 rounded-md border border-race-cyan/25 bg-[#f7fbff] p-4" data-registration-progress>
+                        <div class="flex items-center justify-between gap-3">
+                            <p class="text-sm font-black text-race-ink" data-registration-progress-label>Etapa 1 de 6</p>
+                            <p class="text-xs font-bold uppercase tracking-normal text-race-blue" data-registration-progress-title>Atleta</p>
+                        </div>
+                        <div class="h-2 overflow-hidden rounded-full bg-white">
+                            <div class="h-full rounded-full bg-race-cyan transition-all" style="width: 16.6667%" data-registration-progress-bar></div>
+                        </div>
+                    </div>
+
+                    <fieldset class="grid min-w-0 gap-5 border-b border-zinc-200 pb-6" data-registration-step data-step-title="Atleta">
                         <legend class="mb-4 text-base font-black text-zinc-950">Atleta</legend>
 
                         <div class="grid min-w-0 grid-cols-1 gap-5 md:grid-cols-2">
@@ -142,7 +151,7 @@
                         </div>
                     </fieldset>
 
-                    <fieldset class="grid min-w-0 gap-5 border-b border-zinc-200 pb-6">
+                    <fieldset class="grid min-w-0 gap-5 border-b border-zinc-200 pb-6" data-registration-step data-guardian-step data-step-title="Responsavel legal">
                         <legend class="mb-4 text-base font-black text-zinc-950">Responsável Legal</legend>
 
                         <div class="grid min-w-0 grid-cols-1 gap-5 md:grid-cols-2">
@@ -164,7 +173,7 @@
                         </div>
                     </fieldset>
 
-                    <fieldset class="grid min-w-0 gap-5 border-b border-zinc-200 pb-6">
+                    <fieldset class="grid min-w-0 gap-5 border-b border-zinc-200 pb-6" data-registration-step data-step-title="Pagador">
                         <legend class="mb-4 text-base font-black text-zinc-950">Pagador</legend>
 
                         <div class="grid min-w-0 grid-cols-1 gap-5 md:grid-cols-2">
@@ -220,7 +229,7 @@
                         </div>
                     </fieldset>
 
-                    <fieldset class="grid min-w-0 gap-3 border-b border-zinc-200 pb-6">
+                    <fieldset class="grid min-w-0 gap-3 border-b border-zinc-200 pb-6" data-registration-step data-step-title="Prova">
                         <legend class="mb-4 text-base font-black text-zinc-950">Prova</legend>
                         <div class="rounded-md border border-race-cyan/30 bg-amber-50 px-4 py-3 text-sm font-semibold leading-6 text-race-ink">
                             O desconto legal de {{ number_format(\App\Models\ParticipantRegistration::SeniorLegalDiscountRate * 100, 0, ',', '.') }}% para atletas com mais de {{ \App\Models\ParticipantRegistration::SeniorLegalDiscountMinimumAge }} anos é calculado automaticamente pela data de nascimento informada.
@@ -245,7 +254,7 @@
                         @enderror
                     </fieldset>
 
-                    <fieldset class="grid min-w-0 gap-3 border-b border-zinc-200 pb-6">
+                    <fieldset class="grid min-w-0 gap-3 border-b border-zinc-200 pb-6" data-registration-step data-step-title="Kit">
                         <legend class="mb-4 text-base font-black text-zinc-950">Kit</legend>
                         <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
                             @forelse ($kits as $kit)
@@ -275,7 +284,7 @@
                         @enderror
                     </fieldset>
 
-                    <fieldset class="grid min-w-0 gap-5">
+                    <fieldset class="grid min-w-0 gap-5" data-registration-step data-step-title="Observacoes">
                         <legend class="mb-4 text-base font-black text-zinc-950">Observações</legend>
 
                         <label class="grid min-w-0 gap-2">
@@ -314,8 +323,13 @@
                         </label>
                     </fieldset>
 
-                    <fieldset class="grid min-w-0 gap-4 border-t border-zinc-200 pt-6">
+                    <fieldset class="grid min-w-0 gap-4 border-t border-zinc-200 pt-6" data-registration-step data-step-title="Conferencia">
                         <legend class="mb-1 text-base font-black text-zinc-950">Declarações obrigatórias</legend>
+
+                        <div class="rounded-md border border-race-cyan/25 bg-[#f7fbff] p-4">
+                            <p class="font-black text-race-ink">Confira os dados informados</p>
+                            <dl class="mt-4 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2" data-registration-review></dl>
+                        </div>
 
                         <div class="flex items-start gap-3 rounded-md border border-zinc-200 bg-white px-4 py-3 text-sm font-semibold text-zinc-800 transition has-checked:border-race-cyan has-checked:bg-amber-50">
                             <input id="accepted_regulation" type="checkbox" name="accepted_regulation" value="1" @checked(old('accepted_regulation')) class="mt-1 size-4 accent-race-cyan" required>
@@ -352,6 +366,14 @@
                         @enderror
 
                         <label class="flex items-start gap-3 rounded-md border border-zinc-200 bg-white px-4 py-3 text-sm font-semibold text-zinc-800 transition has-checked:border-race-cyan has-checked:bg-amber-50">
+                            <input type="checkbox" name="accepted_data_confirmation" value="1" @checked(old('accepted_data_confirmation')) class="mt-1 size-4 accent-race-cyan" required>
+                            <span>Confirmo que todas as informações preenchidas são verdadeiras e estou ciente de que dados falsos geram punições previstas em lei.</span>
+                        </label>
+                        @error('accepted_data_confirmation')
+                            <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
+                        @enderror
+
+                        <label class="flex items-start gap-3 rounded-md border border-zinc-200 bg-white px-4 py-3 text-sm font-semibold text-zinc-800 transition has-checked:border-race-cyan has-checked:bg-amber-50">
                             <input type="checkbox" name="promotional_opt_in" value="1" @checked(old('promotional_opt_in')) class="mt-1 size-4 accent-race-cyan">
                             <span>Autorizo receber comunicações promocionais sobre futuras corridas e ações do organizador. Posso solicitar o descadastramento a qualquer momento.</span>
                         </label>
@@ -360,15 +382,23 @@
                         @enderror
                     </fieldset>
 
-                    <div class="grid gap-3 rounded-md bg-zinc-50 p-5 sm:grid-cols-[1fr_auto] sm:items-center">
+                    <div class="grid gap-3 rounded-md bg-zinc-50 p-5 sm:grid-cols-[1fr_auto] sm:items-center" data-registration-actions>
                         <div>
                             <p class="font-black">Confirmação pendente</p>
                             <p class="mt-1 text-sm leading-6 text-zinc-600">A inscrição será registrada e o valor do kit selecionado será usado no pagamento.</p>
                         </div>
 
-                        <button type="submit" @disabled($modalities->isEmpty() || $kits->isEmpty()) class="rounded-md bg-race-blue px-5 py-3 text-sm font-black text-white transition hover:bg-race-ink disabled:cursor-not-allowed disabled:bg-zinc-400">
-                            Enviar inscrição
-                        </button>
+                        <div class="flex flex-wrap gap-3 sm:justify-end">
+                            <button type="button" class="rounded-md border border-zinc-300 bg-white px-5 py-3 text-sm font-black text-zinc-800 transition hover:bg-zinc-50" data-registration-prev>
+                                Voltar
+                            </button>
+                            <button type="button" class="rounded-md bg-race-blue px-5 py-3 text-sm font-black text-white transition hover:bg-race-ink" data-registration-next>
+                                Continuar
+                            </button>
+                            <button type="submit" @disabled($modalities->isEmpty() || $kits->isEmpty()) class="rounded-md bg-race-blue px-5 py-3 text-sm font-black text-white transition hover:bg-race-ink disabled:cursor-not-allowed disabled:bg-zinc-400" data-registration-submit>
+                                Enviar inscrição
+                            </button>
+                        </div>
                     </div>
                 </form>
             </section>

@@ -20,8 +20,10 @@ test('race landing page is available', function () {
         'type' => 'Adulto',
         'age_start' => 16,
         'distance' => '6 km',
+        'race_date' => '2026-10-12',
+        'race_time' => '07:30:00',
         'google_maps_embed_url' => 'https://www.google.com/maps?q=Parque%20Municipal&output=embed',
-        'description' => '<p>Percurso adulto com retorno sinalizado.</p>',
+        'course_information' => '<p>Percurso adulto com retorno sinalizado.</p>',
     ]);
 
     Kit::factory()->create([
@@ -44,6 +46,7 @@ test('race landing page is available', function () {
         ->assertSee('role="tabpanel"', false)
         ->assertSee('href="#percurso-', false)
         ->assertSee('https://www.google.com/maps?q=Parque%20Municipal&amp;output=embed', false)
+        ->assertSeeText('12/10/2026 às 07:30')
         ->assertSeeText('Percurso adulto com retorno sinalizado.')
         ->assertSeeText('6 km')
         ->assertSeeText('Pagamento');

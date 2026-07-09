@@ -14,7 +14,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'age_start',
     'age_end',
     'distance',
+    'race_date',
+    'race_time',
     'google_maps_embed_url',
+    'course_information',
+    'course_images',
     'max_participants',
     'is_active',
     'sort_order',
@@ -93,6 +97,8 @@ class RaceModality extends Model
         return [
             'age_start' => 'integer',
             'age_end' => 'integer',
+            'race_date' => 'date',
+            'course_images' => 'array',
             'is_active' => 'boolean',
         ];
     }

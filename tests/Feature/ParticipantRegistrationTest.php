@@ -56,6 +56,7 @@ test('a participant can submit a registration', function () {
         'accepted_regulation' => '1',
         'accepted_privacy_policy' => '1',
         'accepted_fitness_declaration' => '1',
+        'accepted_data_confirmation' => '1',
     ])
         ->assertRedirectToRoute('registration')
         ->assertSessionHas('status');
@@ -84,7 +85,10 @@ test('a participant can submit a registration', function () {
     expect($storedRegistration->health_notes)->toBe('Alergia a amendoim.')
         ->and($storedRegistration->privacy_policy_accepted_at)->not->toBeNull()
         ->and($storedRegistration->privacy_policy_acceptance_ip)->not->toBeNull()
-        ->and($storedRegistration->privacy_policy_acceptance_user_agent)->not->toBeNull();
+        ->and($storedRegistration->privacy_policy_acceptance_user_agent)->not->toBeNull()
+        ->and($storedRegistration->data_confirmation_accepted_at)->not->toBeNull()
+        ->and($storedRegistration->data_confirmation_acceptance_ip)->not->toBeNull()
+        ->and($storedRegistration->data_confirmation_acceptance_user_agent)->not->toBeNull();
 
     Mail::assertSent(ParticipantRegistrationReceived::class, function (ParticipantRegistrationReceived $mail) {
         return $mail->hasTo('maria@example.com')
@@ -118,6 +122,7 @@ test('registration submission requires mandatory declarations', function () {
             'accepted_regulation',
             'accepted_privacy_policy',
             'accepted_fitness_declaration',
+            'accepted_data_confirmation',
         ]);
 
     expect(ParticipantRegistration::query()->count())->toBe(0);
@@ -145,6 +150,7 @@ test('minor participant registration requires guardian data', function () {
         'accepted_regulation' => '1',
         'accepted_privacy_policy' => '1',
         'accepted_fitness_declaration' => '1',
+        'accepted_data_confirmation' => '1',
     ])
         ->assertSessionHasErrors([
             'guardian_name',
@@ -207,6 +213,7 @@ test('a participant is redirected to checkout when payment gateway is configured
         'accepted_regulation' => '1',
         'accepted_privacy_policy' => '1',
         'accepted_fitness_declaration' => '1',
+        'accepted_data_confirmation' => '1',
     ])
         ->assertRedirect('https://checkout.example/checkout_123');
 
@@ -272,6 +279,7 @@ test('paid registration requires a billing document for checkout', function () {
         'accepted_regulation' => '1',
         'accepted_privacy_policy' => '1',
         'accepted_fitness_declaration' => '1',
+        'accepted_data_confirmation' => '1',
     ])
         ->assertSessionHasErrors('billing_document');
 });
@@ -387,6 +395,7 @@ test('checkout gateway failure returns the participant to the form with the gate
         'accepted_regulation' => '1',
         'accepted_privacy_policy' => '1',
         'accepted_fitness_declaration' => '1',
+        'accepted_data_confirmation' => '1',
     ])
         ->assertSessionHasErrors('checkout');
 

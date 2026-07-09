@@ -24,8 +24,6 @@ class EventSettingSeeder extends Seeder
             'start_groups_information' => 'A organização vai orientar os atletas por categoria, idade e distância no dia da prova.',
             'timing_information' => 'As informações de apuração e resultados serão divulgadas nos canais oficiais do evento.',
             'special_registrations_information' => 'Entre em contato com a organização para necessidades específicas ou orientações adicionais.',
-            'course_information' => 'Logo o percurso estará disponível para você se preparar.',
-            'course_images' => null,
             'regulation' => 'Em revisão',
         ]);
     }

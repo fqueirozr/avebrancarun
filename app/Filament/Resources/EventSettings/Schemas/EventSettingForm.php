@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources\EventSettings\Schemas;
 
-use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
@@ -51,24 +50,6 @@ class EventSettingForm
                         self::richEditor('timing_information', 'Cronometragem', 'Informe como funcionará a apuração e divulgação dos resultados'),
                         self::richEditor('special_registrations_information', 'Inscrições especiais', 'Informe regras para PCD, cortesias ou necessidades específicas'),
                         self::richEditor('regulation', 'Regulamento', 'Informe as principais regras do evento'),
-                    ])
-                    ->columns(2)
-                    ->columnSpanFull(),
-                Section::make('Percurso')
-                    ->schema([
-                        self::richEditor('course_information', 'Informações do percurso', 'Informe detalhes do trajeto, hidratação, altimetria ou avisos'),
-                        FileUpload::make('course_images')
-                            ->label('Fotos do percurso')
-                            ->image()
-                            ->multiple()
-                            ->reorderable()
-                            ->appendFiles()
-                            ->disk('public')
-                            ->directory('event-settings/course-images')
-                            ->visibility('public')
-                            ->maxFiles(6)
-                            ->maxSize(4096)
-                            ->columnSpanFull(),
                     ])
                     ->columns(2)
                     ->columnSpanFull(),

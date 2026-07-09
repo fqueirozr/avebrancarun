@@ -32,10 +32,6 @@ class EventSettingsTable
                     ->limit(50)
                     ->placeholder('Em definição')
                     ->toggleable(),
-                TextColumn::make('course_images')
-                    ->label('Fotos')
-                    ->formatStateUsing(fn (?array $state): string => count($state ?? []).' foto(s)')
-                    ->toggleable(),
                 TextColumn::make('contact_email')
                     ->label('E-mail')
                     ->placeholder('Não informado')

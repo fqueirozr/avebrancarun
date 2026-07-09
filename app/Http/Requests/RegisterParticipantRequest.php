@@ -52,6 +52,7 @@ class RegisterParticipantRequest extends FormRequest
             'accepted_regulation' => ['accepted'],
             'accepted_privacy_policy' => ['accepted'],
             'accepted_fitness_declaration' => ['accepted'],
+            'accepted_data_confirmation' => ['accepted'],
         ];
     }
 

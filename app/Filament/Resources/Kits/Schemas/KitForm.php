@@ -22,7 +22,9 @@ class KitForm
                     ->label('Foto')
                     ->image()
                     ->imageEditor()
+                    ->disk('public')
                     ->directory('kits')
+                    ->visibility('public')
                     ->columnSpanFull(),
                 TextInput::make('price')
                     ->label('Valor')
