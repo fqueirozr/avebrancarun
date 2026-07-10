@@ -124,7 +124,6 @@
                             <label class="grid min-w-0 gap-2">
                                 <span class="text-sm font-bold leading-5 text-zinc-800">Data de nascimento</span>
                                 <input type="date" name="birth_date" value="{{ old('birth_date') }}" class="min-w-0 rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-race-cyan focus:ring-3 focus:ring-amber-100" required>
-                                <span class="text-xs font-semibold leading-5 text-race-blue">Atletas com mais de {{ \App\Models\ParticipantRegistration::SeniorLegalDiscountMinimumAge }} anos recebem desconto legal de {{ number_format(\App\Models\ParticipantRegistration::SeniorLegalDiscountRate * 100, 0, ',', '.') }}% no checkout.</span>
                                 @error('birth_date')
                                     <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
                                 @enderror
@@ -160,6 +159,18 @@
                                     <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
                                 @enderror
                             </label>
+
+                            <label class="flex items-start gap-3 rounded-md border border-zinc-200 bg-zinc-50 p-4 md:col-span-2">
+                                <input type="hidden" name="filled_by_legal_representative" value="0">
+                                <input type="checkbox" name="filled_by_legal_representative" value="1" @checked(old('filled_by_legal_representative')) class="mt-1 size-4 shrink-0 accent-race-cyan" data-legal-representative-checkbox>
+                                <span class="grid gap-1">
+                                    <span class="text-sm font-bold leading-5 text-zinc-800">O preenchimento está sendo realizado pelo representante legal</span>
+                                    <span class="text-xs font-semibold leading-5 text-zinc-500">Em razão de menoridade, tutela, curatela ou impossibilidade do titular de responder por si.</span>
+                                </span>
+                            </label>
+                            @error('filled_by_legal_representative')
+                                <span class="text-sm font-semibold text-red-700 md:col-span-2">{{ $message }}</span>
+                            @enderror
                         </div>
                     </fieldset>
 
@@ -168,15 +179,15 @@
 
                         <div class="grid min-w-0 grid-cols-1 gap-5 md:grid-cols-2">
                             <label class="grid min-w-0 gap-2">
-                                <span class="text-sm font-bold leading-5 text-zinc-800">Nome do responsável legal</span>
-                                <input type="text" name="guardian_name" value="{{ old('guardian_name') }}" class="min-w-0 rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-race-cyan focus:ring-3 focus:ring-amber-100" placeholder="Obrigatório para menores">
+                                <span class="text-sm font-bold leading-5 text-zinc-800">Nome do representante legal</span>
+                                <input type="text" name="guardian_name" value="{{ old('guardian_name') }}" class="min-w-0 rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-race-cyan focus:ring-3 focus:ring-amber-100" placeholder="Nome completo">
                                 @error('guardian_name')
                                     <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
                                 @enderror
                             </label>
 
                             <label class="grid min-w-0 gap-2">
-                                <span class="text-sm font-bold leading-5 text-zinc-800">CPF do responsável legal</span>
+                                <span class="text-sm font-bold leading-5 text-zinc-800">CPF do representante legal</span>
                                 <input type="text" name="guardian_cpf" value="{{ old('guardian_cpf') }}" inputmode="numeric" data-mask="cpf" class="min-w-0 rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-race-cyan focus:ring-3 focus:ring-amber-100" placeholder="000.000.000-00">
                                 @error('guardian_cpf')
                                     <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
@@ -243,9 +254,6 @@
 
                     <fieldset class="grid min-w-0 gap-3 border-b border-zinc-200 pb-6" data-registration-step data-step-title="Prova">
                         <legend class="mb-4 text-base font-black text-zinc-950">Prova</legend>
-                        <div class="rounded-md border border-race-cyan/30 bg-amber-50 px-4 py-3 text-sm font-semibold leading-6 text-race-ink">
-                            O desconto legal de {{ number_format(\App\Models\ParticipantRegistration::SeniorLegalDiscountRate * 100, 0, ',', '.') }}% para atletas com mais de {{ \App\Models\ParticipantRegistration::SeniorLegalDiscountMinimumAge }} anos é calculado automaticamente pela data de nascimento informada.
-                        </div>
                         <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
                             @forelse ($modalities as $modality)
                                 @php($modalityIsFull = $modality->participantLimitHasBeenReached())
@@ -272,19 +280,28 @@
 
                     <fieldset class="grid min-w-0 gap-3 border-b border-zinc-200 pb-6" data-registration-step data-step-title="Kit">
                         <legend class="mb-4 text-base font-black text-zinc-950">Kit</legend>
+                        <div class="grid gap-3 rounded-md border border-race-cyan/30 bg-amber-50 px-4 py-3 text-sm leading-6 text-race-ink">
+                            <p class="font-bold">Vai se inscrever como PCD, 60+ ou Meia Social? Confira as dicas:</p>
+                            <p><strong>Desconto já aplicado:</strong> Os valores dessas categorias já estão com o desconto incluso no app (e não é preciso anexar o laudo PCD na inscrição).</p>
+                            <p class="font-bold">No dia da retirada do kit:</p>
+                            <ul class="list-disc space-y-2 pl-5">
+                                <li><strong>PCD e 60+:</strong> Basta apresentar seu documento de comprovação.</li>
+                                <li><strong>Meia Social:</strong> Pedimos a gentileza de levar o alimento não perecível para doação.</li>
+                            </ul>
+                        </div>
                         <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
                             @forelse ($kits as $kit)
-                                <label class="grid min-h-24 overflow-hidden rounded-md border border-zinc-200 text-sm transition has-checked:border-race-cyan has-checked:bg-amber-50">
-                                    @if ($kit->photo_path)
-                                        <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($kit->photo_path) }}" alt="Foto do {{ $kit->name }}" class="aspect-[4/3] w-full object-cover">
-                                    @endif
+                                <label class="rounded-md border border-zinc-200 text-sm transition has-checked:border-race-cyan has-checked:bg-amber-50">
                                     <span class="flex items-start gap-3 px-4 py-3">
                                         <input type="radio" name="kit_id" value="{{ $kit->id }}" @checked((int) old('kit_id') === $kit->id) class="mt-1 size-4 accent-race-cyan" required>
                                         <span class="grid gap-1">
                                             <span class="font-bold">{{ $kit->name }}</span>
                                             <span class="font-black text-race-blue">R$ {{ number_format((float) $kit->price, 2, ',', '.') }}</span>
+                                            @if ($kit->is_half_registration)
+                                                <span class="font-semibold text-race-blue">Kit específico para PCD, pessoas com 60 anos ou mais e Meia Social. O preço exibido já inclui o desconto.</span>
+                                            @endif
                                             @if ($kit->description)
-                                                <span class="text-zinc-600">{{ $kit->description }}</span>
+                                                <span class="line-clamp-2 text-zinc-600">{{ $kit->description }}</span>
                                             @endif
                                         </span>
                                     </span>
@@ -415,6 +432,9 @@
                                 Enviar inscrição
                             </button>
                         </div>
+                        <p class="text-xs font-semibold leading-5 text-zinc-500">
+                            O número de protocolo será gerado automaticamente ao salvar os dados da inscrição no banco de dados.
+                        </p>
                     </div>
                 </form>
             </section>
@@ -452,7 +472,7 @@
                     <p><strong>Versão {{ \App\Models\ParticipantRegistration::PrivacyPolicyVersion }}.</strong> Esta Política de Privacidade descreve como a organização da Ave Branca Run trata dados pessoais no fluxo de inscrição, pagamento e operação do evento.</p>
 
                     <h3>1. Dados coletados</h3>
-                    <p>Coletamos dados de identificação e contato do atleta, como nome, data de nascimento, CPF, telefone, e-mail, prova escolhida e dados do responsável legal quando o atleta for menor de idade. Quando houver pagamento, coletamos os dados do pagador necessários ao checkout, como nome, CPF ou CNPJ, endereço, número, bairro e CEP.</p>
+                    <p>Coletamos dados de identificação e contato do atleta, como nome, data de nascimento, CPF, telefone, e-mail, prova escolhida e dados do responsável legal quando o atleta for menor de idade. O app não coleta nem valida laudo de PCD. Quando houver pagamento, coletamos os dados do pagador necessários ao checkout, como nome, CPF ou CNPJ, endereço, número, bairro e CEP.</p>
                     <p>Campos de observações gerais devem ser usados para informações operacionais não sensíveis. Informações de saúde, alergias, medicamentos, restrições médicas, contato de emergência e dados semelhantes devem ser informados apenas nos campos próprios de saúde e emergência.</p>
 
                     <h3>2. Finalidades e bases de tratamento</h3>

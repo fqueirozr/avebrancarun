@@ -270,6 +270,44 @@ test('minor participant registration requires guardian data', function () {
     expect(ParticipantRegistration::query()->count())->toBe(0);
 });
 
+test('legal representative option requires and stores representative data', function () {
+    Mail::fake();
+
+    $raceModality = RaceModality::factory()->create();
+    $kit = Kit::factory()->create(['price' => 0]);
+
+    $this->post(route('registration.store'), validRegistrationPayload($raceModality, $kit, [
+        'guardian_name' => null,
+        'guardian_cpf' => null,
+        'filled_by_legal_representative' => '1',
+    ]))->assertSessionHasErrors(['guardian_name', 'guardian_cpf']);
+
+    $this->post(route('registration.store'), validRegistrationPayload($raceModality, $kit, [
+        'filled_by_legal_representative' => '1',
+    ]))->assertRedirectToRoute('registration');
+
+    $registration = ParticipantRegistration::query()->sole();
+
+    expect($registration->filled_by_legal_representative)->toBeTrue()
+        ->and($registration->guardian_name)->toBe('Ana Silva')
+        ->and($registration->guardian_cpf)->toBe('15350946056');
+});
+
+test('every registration receives a unique protocol shown in its receipt', function () {
+    $firstRegistration = ParticipantRegistration::factory()->create([
+        'protocol_number' => 'PROTOCOLO-INFORMADO-EXTERNAMENTE',
+    ]);
+    $secondRegistration = ParticipantRegistration::factory()->create();
+
+    expect($firstRegistration->protocol_number)
+        ->toStartWith('AVR-')
+        ->not->toBe('PROTOCOLO-INFORMADO-EXTERNAMENTE')
+        ->not->toBe($secondRegistration->protocol_number);
+
+    (new ParticipantRegistrationReceived($firstRegistration))
+        ->assertSeeInHtml($firstRegistration->protocol_number);
+});
+
 test('a participant is redirected to checkout when payment gateway is configured', function () {
     Mail::fake();
 

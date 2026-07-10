@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'photo_path',
     'description',
     'price',
+    'is_half_registration',
     'is_active',
     'sort_order',
 ])]
@@ -67,6 +68,7 @@ class Kit extends Model
     {
         return [
             'price' => 'decimal:2',
+            'is_half_registration' => 'boolean',
             'is_active' => 'boolean',
         ];
     }

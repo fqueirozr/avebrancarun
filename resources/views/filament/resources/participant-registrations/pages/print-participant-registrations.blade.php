@@ -169,6 +169,7 @@
             <table class="print-list__table">
                 <thead>
                     <tr>
+                        <th>Protocolo</th>
                         <th>Atleta</th>
                         <th>Nascimento</th>
                         <th>Sexo</th>
@@ -184,6 +185,7 @@
                 <tbody>
                     @foreach ($registrations as $registration)
                         <tr>
+                            <td>{{ $registration->protocol_number }}</td>
                             <td>{{ $registration->athlete_name }}</td>
                             <td>{{ $registration->birth_date?->format('d/m/Y') }}</td>
                             <td>{{ $registration->sexLabel() }}</td>

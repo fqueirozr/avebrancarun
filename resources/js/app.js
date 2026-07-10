@@ -53,6 +53,7 @@ document.querySelectorAll('[data-registration-form]').forEach((form) => {
     const steps = Array.from(form.querySelectorAll('[data-registration-step]'));
     const guardianStep = form.querySelector('[data-guardian-step]');
     const birthDateInput = form.querySelector('input[name="birth_date"]');
+    const legalRepresentativeCheckbox = form.querySelector('[data-legal-representative-checkbox]');
     const previousButton = form.querySelector('[data-registration-prev]');
     const nextButton = form.querySelector('[data-registration-next]');
     const submitButton = form.querySelector('[data-registration-submit]');
@@ -71,6 +72,7 @@ document.querySelectorAll('[data-registration-form]').forEach((form) => {
         email: 'E-mail',
         guardian_name: 'Nome do responsavel legal',
         guardian_cpf: 'CPF do responsavel legal',
+        filled_by_legal_representative: 'Preenchida pelo representante legal',
         billing_name: 'Nome do pagador',
         billing_document: 'CPF/CNPJ do pagador',
         billing_address: 'Endereco',
@@ -110,7 +112,13 @@ document.querySelectorAll('[data-registration-form]').forEach((form) => {
             return;
         }
 
-        const shouldShow = isMinorBirthDate();
+        const isMinor = isMinorBirthDate();
+
+        if (isMinor && legalRepresentativeCheckbox) {
+            legalRepresentativeCheckbox.checked = true;
+        }
+
+        const shouldShow = isMinor || legalRepresentativeCheckbox?.checked;
         guardianStep.dataset.skipStep = shouldShow ? '' : 'true';
         guardianStep.hidden = !shouldShow;
 
@@ -210,6 +218,7 @@ document.querySelectorAll('[data-registration-form]').forEach((form) => {
         syncGuardianStep();
         renderStep();
     });
+    legalRepresentativeCheckbox?.addEventListener('change', syncGuardianStep);
 
     previousButton?.addEventListener('click', () => {
         currentStepIndex = Math.max(0, currentStepIndex - 1);

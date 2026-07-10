@@ -131,7 +131,7 @@ test('asaas checkout gateway retries with credit card when pix key is missing', 
     });
 });
 
-test('asaas checkout gateway applies the legal senior discount for participants older than 65', function () {
+test('asaas checkout gateway uses the registered package price without additional discounts', function () {
     Http::fake([
         'api-sandbox.asaas.com/v3/checkouts' => Http::response([
             'id' => 'checkout_senior_123',
@@ -151,10 +151,12 @@ test('asaas checkout gateway applies the legal senior discount for participants 
     ]);
 
     $raceModality = RaceModality::factory()->create();
-    $kit = Kit::factory()->create(['price' => 80]);
+    $kit = Kit::factory()->create([
+        'price' => 80,
+        'is_half_registration' => true,
+    ]);
 
     $registration = ParticipantRegistration::factory()->create([
-        'birth_date' => today()->subYears(66)->subDay()->format('Y-m-d'),
         'race_modality_id' => $raceModality->id,
     ]);
 
@@ -169,6 +171,6 @@ test('asaas checkout gateway applies the legal senior discount for participants 
 
     Http::assertSent(function ($request): bool {
         return $request->url() === 'https://api-sandbox.asaas.com/v3/checkouts'
-            && $request['items'][0]['value'] === 40.0;
+            && $request['items'][0]['value'] === 80.0;
     });
 });

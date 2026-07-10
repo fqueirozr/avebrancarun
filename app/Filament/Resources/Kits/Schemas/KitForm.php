@@ -32,6 +32,10 @@ class KitForm
                     ->prefix('R$')
                     ->required()
                     ->minValue(0),
+                Toggle::make('is_half_registration')
+                    ->label('Pacote para PCD e idosos 60+')
+                    ->helperText('Informe no campo Valor o preço final deste pacote; nenhum desconto será calculado no checkout.')
+                    ->default(false),
                 TextInput::make('sort_order')
                     ->label('Ordem')
                     ->integer()

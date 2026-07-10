@@ -36,6 +36,7 @@ class RegisterParticipantRequest extends FormRequest
             'participant_cpf' => ['required', 'string', 'regex:/^\d{11}$/'],
             'guardian_name' => ['nullable', 'string', 'max:255'],
             'guardian_cpf' => ['nullable', 'string', 'regex:/^\d{11}$/'],
+            'filled_by_legal_representative' => ['required', 'boolean'],
             'phone' => ['required', 'string', 'regex:/^\d{10,11}$/'],
             'email' => ['required', 'email', 'max:255'],
             'billing_document' => ['nullable', 'string', 'regex:/^\d{11}(\d{3})?$/'],
@@ -151,13 +152,13 @@ class RegisterParticipantRequest extends FormRequest
                     $validator->errors()->add('guardian_cpf', 'Informe um CPF válido para o responsável legal.');
                 }
 
-                if ($this->isMinorParticipant()) {
+                if ($this->requiresLegalRepresentative()) {
                     if (blank($this->input('guardian_name'))) {
-                        $validator->errors()->add('guardian_name', 'Informe o nome do responsável legal para atletas menores de idade.');
+                        $validator->errors()->add('guardian_name', 'Informe o nome do representante legal.');
                     }
 
                     if (blank($this->input('guardian_cpf'))) {
-                        $validator->errors()->add('guardian_cpf', 'Informe o CPF do responsável legal para atletas menores de idade.');
+                        $validator->errors()->add('guardian_cpf', 'Informe o CPF do representante legal.');
                     }
                 }
 
@@ -198,6 +199,11 @@ class RegisterParticipantRequest extends FormRequest
                 $field => $digits === '' && $field !== 'participant_cpf' && $field !== 'phone' ? null : $digits,
             ]);
         }
+
+        $this->merge([
+            'filled_by_legal_representative' => $this->isMinorParticipant()
+                || $this->boolean('filled_by_legal_representative'),
+        ]);
     }
 
     private function requiresCheckoutData(?Kit $kit): bool
@@ -220,6 +226,11 @@ class RegisterParticipantRequest extends FormRequest
         $birthDate = Carbon::parse($birthDateValue);
 
         return $birthDate->isAfter(today()->subYears(18));
+    }
+
+    private function requiresLegalRepresentative(): bool
+    {
+        return $this->isMinorParticipant() || $this->boolean('filled_by_legal_representative');
     }
 
     /**

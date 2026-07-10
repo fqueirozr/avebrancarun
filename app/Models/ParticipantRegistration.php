@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Str;
 
 #[Fillable([
     'athlete_name',
@@ -15,6 +16,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'participant_cpf',
     'guardian_name',
     'guardian_cpf',
+    'filled_by_legal_representative',
     'phone',
     'email',
     'billing_document',
@@ -49,10 +51,6 @@ class ParticipantRegistration extends Model
     use HasFactory;
 
     public const PrivacyPolicyVersion = '2026-07-08';
-
-    public const SeniorLegalDiscountMinimumAge = 65;
-
-    public const SeniorLegalDiscountRate = 0.5;
 
     protected $hidden = [
         'registration_identity',
@@ -107,29 +105,15 @@ class ParticipantRegistration extends Model
         return self::paymentStatusOptions()[$this->payment_status] ?? 'Pendente';
     }
 
-    public function isEligibleForSeniorLegalDiscount(): bool
-    {
-        if ($this->birth_date === null) {
-            return false;
-        }
-
-        return $this->birth_date->age > self::SeniorLegalDiscountMinimumAge;
-    }
-
     public function priceFor(Kit $kit): float
     {
-        $price = (float) $kit->price;
-
-        if (! $this->isEligibleForSeniorLegalDiscount()) {
-            return $price;
-        }
-
-        return round($price * self::SeniorLegalDiscountRate, 2);
+        return (float) $kit->price;
     }
 
     protected static function booted(): void
     {
         static::creating(function (ParticipantRegistration $registration): void {
+            $registration->protocol_number = 'AVR-'.Str::ulid();
             $registration->registration_identity = $registration->participant_cpf;
         });
 
@@ -151,6 +135,7 @@ class ParticipantRegistration extends Model
             'birth_date' => 'date',
             'health_notes' => 'encrypted',
             'promotional_opt_in' => 'boolean',
+            'filled_by_legal_representative' => 'boolean',
             'privacy_policy_accepted_at' => 'datetime',
             'data_confirmation_accepted_at' => 'datetime',
         ];

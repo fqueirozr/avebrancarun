@@ -125,7 +125,7 @@ class ParticipantRegistrationController extends Controller
         Mail::to($registration->email)->send(new ParticipantRegistrationReceived($registration));
 
         return to_route('registration')
-            ->with('status', 'Inscrição enviada com sucesso. A confirmação de pagamento continua pendente.');
+            ->with('status', "Inscrição enviada com sucesso. Protocolo: {$registration->protocol_number}. A confirmação de pagamento continua pendente.");
     }
 
     public function paymentSuccess(ParticipantRegistration $registration): RedirectResponse

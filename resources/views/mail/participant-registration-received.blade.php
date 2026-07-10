@@ -7,18 +7,21 @@ A sua inscrição para a **Ave Branca Run** já está em análise pela organiza�
 
 <x-mail::panel>
 **Status da inscrição:** Recebida<br>
+**Protocolo:** {{ $registration->protocol_number }}<br>
 **Status do pagamento:** Pendente
 </x-mail::panel>
 
 <x-mail::table>
 | Dado | Informação |
 | :--- | :--- |
+| Protocolo | {{ $registration->protocol_number }} |
 | Atleta | {{ $registration->athlete_name }} |
 | Data de nascimento | {{ $registration->birth_date->format('d/m/Y') }} |
 | Sexo | {{ $registration->sexLabel() }} |
 | CPF do atleta | {{ $registration->participant_cpf }} |
 | Responsável Legal | {{ $registration->guardian_name ?: 'Não informado' }} |
 | CPF do responsável legal | {{ $registration->guardian_cpf ?: 'Não informado' }} |
+| Preenchida pelo representante legal | {{ $registration->filled_by_legal_representative ? 'Sim' : 'Não' }} |
 | Telefone | {{ $registration->phone }} |
 | Email | {{ $registration->email }} |
 | Pagador | {{ $registration->billing_name ?: 'Não informado' }} |

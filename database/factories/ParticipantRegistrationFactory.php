@@ -28,6 +28,7 @@ class ParticipantRegistrationFactory extends Factory
             'participant_cpf' => $participantCpf,
             'guardian_name' => null,
             'guardian_cpf' => null,
+            'filled_by_legal_representative' => false,
             'phone' => '11999999999',
             'email' => fake()->safeEmail(),
             'billing_document' => $participantCpf,

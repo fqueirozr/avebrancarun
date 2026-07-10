@@ -24,6 +24,10 @@ class ParticipantRegistrationsTable
         return $table
             ->poll('10s')
             ->columns([
+                TextColumn::make('protocol_number')
+                    ->label('Protocolo')
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('athlete_name')
                     ->label('Atleta')
                     ->searchable()

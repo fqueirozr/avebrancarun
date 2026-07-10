@@ -7,6 +7,7 @@ A sua inscrição para a **Ave Branca Run** recebeu uma nova atualização da or
 
 <x-mail::panel>
 **Status do pagamento:** {{ $registration->paymentStatusLabel() }}<br>
+**Protocolo:** {{ $registration->protocol_number }}<br>
 **Última atualização:** {{ now()->format('d/m/Y H:i') }}
 </x-mail::panel>
 

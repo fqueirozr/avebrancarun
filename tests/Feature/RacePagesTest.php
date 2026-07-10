@@ -66,7 +66,10 @@ test('registration page is available', function () {
 
     Kit::factory()->create([
         'name' => 'Kit Corrida',
+        'photo_path' => 'kits/kit-corrida.jpg',
+        'description' => 'Camiseta e número de peito.',
         'price' => 50,
+        'is_half_registration' => true,
     ]);
 
     $this->get('/inscricao')
@@ -74,6 +77,10 @@ test('registration page is available', function () {
         ->assertSeeText('Dados para inscrição')
         ->assertSeeText('Adulto a partir de 16 anos - 6 km')
         ->assertSeeText('Kit Corrida')
+        ->assertSeeText('Camiseta e número de peito.')
+        ->assertSeeText('R$ 50,00')
+        ->assertSeeText('Kit específico para PCD, pessoas com 60 anos ou mais e Meia Social. O preço exibido já inclui o desconto.')
+        ->assertDontSee('Foto do Kit Corrida')
         ->assertSee('data-modal-open="registration-regulation-modal"', false)
         ->assertSee('data-modal-open="registration-privacy-policy-modal"', false)
         ->assertSeeText('Regulamento oficial da prova')
@@ -82,6 +89,11 @@ test('registration page is available', function () {
         ->assertSeeText('Retenção, exclusão e anonimização')
         ->assertSeeText('Comunicações promocionais')
         ->assertSeeText('Saúde e suporte emergencial')
-        ->assertSeeText('desconto legal de 50%')
-        ->assertSeeText('Enviar inscrição');
+        ->assertSeeText('Vai se inscrever como PCD, 60+ ou Meia Social? Confira as dicas:')
+        ->assertSeeText('Desconto já aplicado: Os valores dessas categorias já estão com o desconto incluso no app (e não é preciso anexar o laudo PCD na inscrição).')
+        ->assertSeeText('No dia da retirada do kit:')
+        ->assertSeeText('PCD e 60+: Basta apresentar seu documento de comprovação.')
+        ->assertSeeText('Meia Social: Pedimos a gentileza de levar o alimento não perecível para doação.')
+        ->assertSeeText('Enviar inscrição')
+        ->assertSeeText('O número de protocolo será gerado automaticamente ao salvar os dados da inscrição no banco de dados.');
 });

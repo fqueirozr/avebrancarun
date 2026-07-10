@@ -18,6 +18,11 @@ class ParticipantRegistrationForm
     {
         return $schema
             ->components([
+                TextInput::make('protocol_number')
+                    ->label('Protocolo')
+                    ->helperText('Gerado automaticamente ao salvar a inscrição no banco de dados.')
+                    ->disabled()
+                    ->dehydrated(false),
                 TextInput::make('athlete_name')
                     ->label('Nome do atleta')
                     ->required()
@@ -43,6 +48,8 @@ class ParticipantRegistrationForm
                     ->numeric()
                     ->minLength(11)
                     ->maxLength(11),
+                Toggle::make('filled_by_legal_representative')
+                    ->label('Preenchida pelo representante legal'),
                 TextInput::make('phone')
                     ->label('Telefone')
                     ->required()
