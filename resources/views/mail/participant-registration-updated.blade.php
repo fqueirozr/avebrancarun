@@ -1,9 +1,9 @@
 <x-mail::message>
-# Atualização da inscrição
+# Sua inscrição foi atualizada
 
 Olá {{ $registration->athlete_name }},
 
-A sua inscrição para a **Ave Branca Run** recebeu uma nova atualização da organização.
+Temos uma novidade sobre sua inscrição na **Ave Branca Run**.
 
 <x-mail::panel>
 **Status do pagamento:** {{ $registration->paymentStatusLabel() }}<br>
@@ -15,10 +15,7 @@ A sua inscrição para a **Ave Branca Run** recebeu uma nova atualização da or
 | Dado | Informação |
 | :--- | :--- |
 | Atleta | {{ $registration->athlete_name }} |
-| Sexo | {{ $registration->sexLabel() }} |
 | Prova | {{ $registration->modality }} |
-| Telefone | {{ $registration->phone }} |
-| Email | {{ $registration->email }} |
 </x-mail::table>
 
 @if ($registration->payment_status === 'cancelled')
@@ -28,7 +25,7 @@ Guarde esta mensagem como comprovante da atualização mais recente da sua inscr
 @endif
 
 <x-mail::button :url="URL::signedRoute('athlete.show', ['registration' => $registration])">
-Acessar página do atleta
+Ver minha inscrição
 </x-mail::button>
 
 Obrigado,<br>

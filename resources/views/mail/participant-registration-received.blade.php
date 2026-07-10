@@ -1,9 +1,9 @@
 <x-mail::message>
-# Inscrição recebida
+# Inscrição recebida ✓
 
 Olá {{ $registration->athlete_name }},
 
-A sua inscrição para a **Ave Branca Run** já está em análise pela organização. Confira os dados registrados abaixo.
+Recebemos sua inscrição para a **Ave Branca Run**. Agora ela está em análise pela organização.
 
 <x-mail::panel>
 **Status da inscrição:** Recebida<br>
@@ -16,28 +16,14 @@ A sua inscrição para a **Ave Branca Run** já está em análise pela organiza�
 | :--- | :--- |
 | Protocolo | {{ $registration->protocol_number }} |
 | Atleta | {{ $registration->athlete_name }} |
-| Data de nascimento | {{ $registration->birth_date->format('d/m/Y') }} |
-| Sexo | {{ $registration->sexLabel() }} |
-| CPF do atleta | {{ $registration->participant_cpf }} |
-| Responsável Legal | {{ $registration->guardian_name ?: 'Não informado' }} |
-| CPF do responsável legal | {{ $registration->guardian_cpf ?: 'Não informado' }} |
-| Preenchida pelo representante legal | {{ $registration->filled_by_legal_representative ? 'Sim' : 'Não' }} |
-| Telefone | {{ $registration->phone }} |
-| Email | {{ $registration->email }} |
-| Pagador | {{ $registration->billing_name ?: 'Não informado' }} |
-| CPF/CNPJ do pagador | {{ $registration->billing_document ?: 'Não informado' }} |
 | Prova | {{ $registration->modality }} |
-| Observações | {{ $registration->notes ?: 'Não informado' }} |
-| Contato de emergência | {{ $registration->emergency_contact_name ?: 'Não informado' }} |
-| Telefone de emergência | {{ $registration->emergency_contact_phone ?: 'Não informado' }} |
-| Saúde e emergência | {{ $registration->health_notes ?: 'Não informado' }} |
-| Política de Privacidade aceita | {{ $registration->privacy_policy_version }} em {{ $registration->privacy_policy_accepted_at?->format('d/m/Y H:i') }} |
+| Pagamento | Pendente |
 </x-mail::table>
 
-A confirmação final será enviada assim que o pagamento for definido. Guarde este e-mail para consultar os dados da sua inscrição.
+A confirmação final será enviada assim que o pagamento for definido. Por segurança, dados pessoais e informações de saúde não são exibidos neste e-mail.
 
 <x-mail::button :url="URL::signedRoute('athlete.show', ['registration' => $registration])">
-Acessar página do atleta
+Ver minha inscrição
 </x-mail::button>
 
 Obrigado,<br>
