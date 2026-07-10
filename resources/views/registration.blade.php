@@ -76,6 +76,18 @@
                     </div>
                 @enderror
 
+                @error('registration')
+                    <div class="mt-6 rounded-md border border-red-200 bg-red-50 p-4 text-sm font-bold text-red-900">
+                        {{ $message }}
+                    </div>
+                @enderror
+
+                @if ($eventSetting->registrationDeadlineHasPassed() || $eventSetting->registrationLimitHasBeenReached())
+                    <div class="mt-6 rounded-md border border-red-200 bg-red-50 p-4 text-sm font-bold text-red-900">
+                        {{ $eventSetting->registrationDeadlineHasPassed() ? 'O prazo para inscrições foi encerrado.' : 'O limite total de inscrições foi atingido.' }}
+                    </div>
+                @endif
+
                 <form action="{{ route('registration.store') }}" method="POST" class="mt-7 grid grid-cols-1 gap-5" data-registration-form>
                     @csrf
 
@@ -236,11 +248,15 @@
                         </div>
                         <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
                             @forelse ($modalities as $modality)
-                                <label class="flex min-h-20 items-start gap-3 rounded-md border border-zinc-200 px-4 py-3 text-sm transition has-checked:border-race-cyan has-checked:bg-amber-50">
-                                    <input type="radio" name="race_modality_id" value="{{ $modality->id }}" @checked((int) old('race_modality_id') === $modality->id) class="mt-1 size-4 accent-race-cyan" required>
+                                @php($modalityIsFull = $modality->participantLimitHasBeenReached())
+                                <label class="flex min-h-20 items-start gap-3 rounded-md border border-zinc-200 px-4 py-3 text-sm transition has-checked:border-race-cyan has-checked:bg-amber-50 has-disabled:cursor-not-allowed has-disabled:bg-zinc-100 has-disabled:text-zinc-500">
+                                    <input type="radio" name="race_modality_id" value="{{ $modality->id }}" @checked((int) old('race_modality_id') === $modality->id) @disabled($modalityIsFull) class="mt-1 size-4 accent-race-cyan" required>
                                     <span class="grid gap-1">
                                         <span class="font-bold">{{ $modality->displayName() }}</span>
                                         <span class="text-zinc-600">{{ $modality->ageRangeLabel() }}</span>
+                                        @if ($modalityIsFull)
+                                            <span class="font-bold text-red-700">Vagas esgotadas</span>
+                                        @endif
                                     </span>
                                 </label>
                             @empty
@@ -395,7 +411,7 @@
                             <button type="button" class="rounded-md bg-race-blue px-5 py-3 text-sm font-black text-white transition hover:bg-race-ink" data-registration-next>
                                 Continuar
                             </button>
-                            <button type="submit" @disabled($modalities->isEmpty() || $kits->isEmpty()) class="rounded-md bg-race-blue px-5 py-3 text-sm font-black text-white transition hover:bg-race-ink disabled:cursor-not-allowed disabled:bg-zinc-400" data-registration-submit>
+                            <button type="submit" @disabled($modalities->isEmpty() || $kits->isEmpty() || $eventSetting->registrationDeadlineHasPassed() || $eventSetting->registrationLimitHasBeenReached()) class="rounded-md bg-race-blue px-5 py-3 text-sm font-black text-white transition hover:bg-race-ink disabled:cursor-not-allowed disabled:bg-zinc-400" data-registration-submit>
                                 Enviar inscrição
                             </button>
                         </div>

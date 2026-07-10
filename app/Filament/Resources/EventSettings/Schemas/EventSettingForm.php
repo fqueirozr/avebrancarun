@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\EventSettings\Schemas;
 
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
@@ -23,6 +24,16 @@ class EventSettingForm
                             ->label('Local')
                             ->placeholder('A confirmar')
                             ->maxLength(255),
+                        DateTimePicker::make('registration_deadline')
+                            ->label('Prazo máximo para inscrição')
+                            ->seconds(false)
+                            ->native(false)
+                            ->helperText('Após esta data e horário, novas inscrições serão bloqueadas.'),
+                        TextInput::make('max_registrations')
+                            ->label('Limite total de inscrições')
+                            ->integer()
+                            ->minValue(1)
+                            ->helperText('Deixe vazio para não aplicar um limite geral.'),
                         TextInput::make('contact_email')
                             ->label('E-mail de contato')
                             ->placeholder('contato@evento.com.br')

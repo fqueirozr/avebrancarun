@@ -3,6 +3,7 @@
 use App\Filament\Resources\ParticipantRegistrations\ParticipantRegistrationResource;
 use App\Mail\ParticipantRegistrationReceived;
 use App\Mail\ParticipantRegistrationUpdated;
+use App\Models\EventSetting;
 use App\Models\Kit;
 use App\Models\ParticipantRegistration;
 use App\Models\PaymentGatewaySetting;
@@ -16,6 +17,115 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
 
 uses(RefreshDatabase::class);
+
+/**
+ * @return array<string, mixed>
+ */
+function validRegistrationPayload(RaceModality $raceModality, Kit $kit, array $overrides = []): array
+{
+    return array_replace([
+        'athlete_name' => 'Maria Silva',
+        'birth_date' => '1990-05-10',
+        'sex' => 'female',
+        'participant_cpf' => '529.982.247-25',
+        'guardian_name' => 'Ana Silva',
+        'guardian_cpf' => '153.509.460-56',
+        'phone' => '(11) 99999-9999',
+        'email' => 'maria@example.com',
+        'race_modality_id' => $raceModality->id,
+        'kit_id' => $kit->id,
+        'accepted_regulation' => '1',
+        'accepted_privacy_policy' => '1',
+        'accepted_fitness_declaration' => '1',
+        'accepted_data_confirmation' => '1',
+    ], $overrides);
+}
+
+test('registration submission rejects an expired deadline', function () {
+    EventSetting::factory()->create([
+        'registration_deadline' => now()->subMinute(),
+    ]);
+    $raceModality = RaceModality::factory()->create();
+    $kit = Kit::factory()->create(['price' => 0]);
+
+    $this->post(route('registration.store'), validRegistrationPayload($raceModality, $kit))
+        ->assertSessionHasErrors('registration');
+
+    expect(ParticipantRegistration::query()->count())->toBe(0);
+});
+
+test('registration submission rejects a reached event limit', function () {
+    EventSetting::factory()->create([
+        'max_registrations' => 1,
+    ]);
+    $raceModality = RaceModality::factory()->create();
+    $kit = Kit::factory()->create(['price' => 0]);
+    ParticipantRegistration::factory()->create([
+        'race_modality_id' => $raceModality->id,
+        'kit_id' => $kit->id,
+    ]);
+
+    $this->post(route('registration.store'), validRegistrationPayload($raceModality, $kit, [
+        'participant_cpf' => '153.509.460-56',
+    ]))->assertSessionHasErrors('registration');
+});
+
+test('registration submission rejects a reached modality limit', function () {
+    $raceModality = RaceModality::factory()->create([
+        'max_participants' => 1,
+    ]);
+    $kit = Kit::factory()->create(['price' => 0]);
+    ParticipantRegistration::factory()->create([
+        'race_modality_id' => $raceModality->id,
+        'kit_id' => $kit->id,
+    ]);
+
+    $this->post(route('registration.store'), validRegistrationPayload($raceModality, $kit, [
+        'participant_cpf' => '153.509.460-56',
+    ]))->assertSessionHasErrors('race_modality_id');
+});
+
+test('registration submission calculates the age range on the race date', function (string $birthDate, bool $isAccepted) {
+    Mail::fake();
+
+    $raceModality = RaceModality::factory()->create([
+        'age_start' => 16,
+        'age_end' => 17,
+        'race_date' => '2026-09-20',
+    ]);
+    $kit = Kit::factory()->create(['price' => 0]);
+
+    $response = $this->post(route('registration.store'), validRegistrationPayload($raceModality, $kit, [
+        'birth_date' => $birthDate,
+    ]));
+
+    if ($isAccepted) {
+        $response->assertSessionDoesntHaveErrors('birth_date');
+        expect(ParticipantRegistration::query()->count())->toBe(1);
+    } else {
+        $response->assertSessionHasErrors('birth_date');
+        expect(ParticipantRegistration::query()->count())->toBe(0);
+    }
+})->with([
+    'turns 16 on the race date' => ['2010-09-20', true],
+    'is still 15 on the race date' => ['2010-09-21', false],
+    'turns 18 on the race date' => ['2008-09-20', false],
+]);
+
+test('an athlete cannot register twice with the same cpf', function () {
+    $raceModality = RaceModality::factory()->create();
+    $kit = Kit::factory()->create(['price' => 0]);
+    ParticipantRegistration::factory()->create([
+        'participant_cpf' => '52998224725',
+        'race_modality_id' => $raceModality->id,
+        'kit_id' => $kit->id,
+    ]);
+
+    $this->post(route('registration.store'), validRegistrationPayload($raceModality, $kit))
+        ->assertSessionHasErrors('participant_cpf');
+
+    expect(ParticipantRegistration::query()->count())->toBe(1);
+});
 
 test('a participant can submit a registration', function () {
     Mail::fake();

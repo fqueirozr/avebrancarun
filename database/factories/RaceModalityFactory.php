@@ -17,23 +17,21 @@ class RaceModalityFactory extends Factory
      */
     public function definition(): array
     {
-        $ageStart = fake()->numberBetween(6, 16);
-
         return [
-            'name' => fake()->randomElement(['Infantil 6-7 anos', 'Infantil 8-9 anos', 'Adulto a partir de 14 anos']),
-            'type' => fake()->randomElement(['Infantil', 'Adulto']),
-            'age_start' => $ageStart,
-            'age_end' => fake()->optional()->numberBetween($ageStart, 17),
-            'distance' => fake()->randomElement(['100 m', '200 m', '3 km', '6 km']),
-            'race_date' => fake()->optional()->date(),
-            'race_time' => fake()->optional()->time('H:i:s'),
-            'google_maps_embed_url' => fake()->optional()->url(),
-            'course_information' => fake()->optional()->paragraph(),
+            'name' => 'Adulto a partir de 16 anos',
+            'type' => 'Adulto',
+            'age_start' => 16,
+            'age_end' => null,
+            'distance' => '6 km',
+            'race_date' => '2026-09-20',
+            'race_time' => '07:30:00',
+            'google_maps_embed_url' => 'https://www.google.com/maps?q=Taguaparque%20Taguatinga%20DF&output=embed',
+            'course_information' => 'Tempo máximo de prova: 1h30.',
             'course_images' => [],
-            'max_participants' => fake()->optional()->numberBetween(20, 300),
+            'max_participants' => null,
             'is_active' => true,
-            'sort_order' => fake()->numberBetween(1, 99),
-            'description' => fake()->optional()->sentence(),
+            'sort_order' => 60,
+            'description' => 'Corrida ou caminhada para participantes a partir de 16 anos.',
         ];
     }
 }

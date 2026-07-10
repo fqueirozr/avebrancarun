@@ -11,8 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('event_settings_and_kits', function (Blueprint $table) {
-            //
+        Schema::table('event_settings', function (Blueprint $table) {
+            $table->dateTime('registration_deadline')->nullable()->after('event_location');
+            $table->unsignedInteger('max_registrations')->nullable()->after('registration_deadline');
+        });
+
+        Schema::table('participant_registrations', function (Blueprint $table) {
+            $table->string('registration_identity', 11)->nullable()->unique()->after('participant_cpf');
         });
     }
 
@@ -21,8 +26,12 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('event_settings_and_kits', function (Blueprint $table) {
-            //
+        Schema::table('participant_registrations', function (Blueprint $table) {
+            $table->dropColumn('registration_identity');
+        });
+
+        Schema::table('event_settings', function (Blueprint $table) {
+            $table->dropColumn(['registration_deadline', 'max_registrations']);
         });
     }
 };

@@ -18,12 +18,12 @@ class KitFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->randomElement(['Kit Corrida', 'Kit Infantil', 'Kit Completo']),
+            'name' => 'Pacote Oficial',
             'photo_path' => null,
-            'description' => fake()->optional()->sentence(),
-            'price' => fake()->randomFloat(2, 20, 120),
+            'description' => 'Camiseta oficial, medalha para concluintes, número de peito e chip de cronometragem quando aplicável.',
+            'price' => 139.90,
             'is_active' => true,
-            'sort_order' => fake()->numberBetween(1, 99),
+            'sort_order' => 10,
         ];
     }
 }

@@ -2,8 +2,10 @@
 
 namespace App\Http\Requests;
 
+use App\Models\EventSetting;
 use App\Models\Kit;
 use App\Models\ParticipantRegistration;
+use App\Models\RaceModality;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Carbon;
@@ -116,6 +118,30 @@ class RegisterParticipantRequest extends FormRequest
         return [
             function (Validator $validator): void {
                 $kit = Kit::query()->find($this->input('kit_id'));
+                $eventSetting = EventSetting::current();
+                $raceModality = RaceModality::query()->find($this->input('race_modality_id'));
+
+                if ($eventSetting->registrationDeadlineHasPassed()) {
+                    $validator->errors()->add('registration', 'O prazo para inscrições foi encerrado.');
+                } elseif ($eventSetting->registrationLimitHasBeenReached()) {
+                    $validator->errors()->add('registration', 'O limite total de inscrições foi atingido.');
+                }
+
+                if (filled($this->input('participant_cpf')) && ParticipantRegistration::query()->where('participant_cpf', $this->input('participant_cpf'))->exists()) {
+                    $validator->errors()->add('participant_cpf', 'Este atleta já possui uma inscrição.');
+                }
+
+                if ($raceModality?->participantLimitHasBeenReached()) {
+                    $validator->errors()->add('race_modality_id', 'O limite de inscrições desta prova foi atingido.');
+                }
+
+                if ($raceModality !== null && filled($this->input('birth_date')) && strtotime((string) $this->input('birth_date')) !== false) {
+                    $birthDate = Carbon::parse((string) $this->input('birth_date'));
+
+                    if (! $raceModality->acceptsBirthDate($birthDate)) {
+                        $validator->errors()->add('birth_date', "A idade do atleta na data da prova não atende à faixa etária: {$raceModality->ageRangeLabel()}.");
+                    }
+                }
 
                 if (filled($this->input('participant_cpf')) && ! $this->hasValidCpf((string) $this->input('participant_cpf'))) {
                     $validator->errors()->add('participant_cpf', 'Informe um CPF válido para o atleta.');

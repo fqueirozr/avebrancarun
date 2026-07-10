@@ -19,23 +19,25 @@ class ParticipantRegistrationFactory extends Factory
      */
     public function definition(): array
     {
+        $participantCpf = $this->validCpf();
+
         return [
             'athlete_name' => fake()->name(),
-            'birth_date' => fake()->dateTimeBetween('-45 years', '-18 years')->format('Y-m-d'),
+            'birth_date' => fake()->dateTimeBetween('1980-01-01', '2000-09-20')->format('Y-m-d'),
             'sex' => fake()->randomElement(array_keys(ParticipantRegistration::sexOptions())),
-            'participant_cpf' => '52998224725',
-            'guardian_name' => fake()->optional()->name(),
-            'guardian_cpf' => fake()->optional()->randomElement(['15350946056', '11144477735']),
+            'participant_cpf' => $participantCpf,
+            'guardian_name' => null,
+            'guardian_cpf' => null,
             'phone' => '11999999999',
             'email' => fake()->safeEmail(),
-            'billing_document' => '52998224725',
+            'billing_document' => $participantCpf,
             'billing_name' => fake()->name(),
             'billing_address' => fake()->streetName(),
             'billing_address_number' => fake()->buildingNumber(),
             'billing_province' => fake()->city(),
             'billing_postal_code' => fake()->numerify('########'),
-            'race_modality_id' => fn (): int => RaceModality::query()->value('id') ?? RaceModality::factory()->create()->id,
-            'kit_id' => fn (): int => Kit::query()->value('id') ?? Kit::factory()->create()->id,
+            'race_modality_id' => RaceModality::factory(),
+            'kit_id' => Kit::factory(),
             'modality' => fn (array $attributes): string => RaceModality::query()
                 ->find($attributes['race_modality_id'])
                 ->displayName(),
@@ -48,7 +50,27 @@ class ParticipantRegistrationFactory extends Factory
             'privacy_policy_version' => ParticipantRegistration::PrivacyPolicyVersion,
             'privacy_policy_acceptance_ip' => fake()->ipv4(),
             'privacy_policy_acceptance_user_agent' => fake()->userAgent(),
+            'data_confirmation_accepted_at' => now(),
+            'data_confirmation_acceptance_ip' => fake()->ipv4(),
+            'data_confirmation_acceptance_user_agent' => fake()->userAgent(),
             'payment_status' => 'pending',
         ];
+    }
+
+    private function validCpf(): string
+    {
+        $cpf = fake()->unique()->numerify('#########');
+
+        for ($digit = 9; $digit < 11; $digit++) {
+            $sum = 0;
+
+            for ($position = 0; $position < $digit; $position++) {
+                $sum += (int) $cpf[$position] * (($digit + 1) - $position);
+            }
+
+            $cpf .= (string) (((10 * $sum) % 11) % 10);
+        }
+
+        return $cpf;
     }
 }

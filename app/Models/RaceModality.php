@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
 
 #[Fillable([
     'name',
@@ -63,6 +64,30 @@ class RaceModality extends Model
         return 'Todas as idades';
     }
 
+    public function acceptsBirthDate(Carbon $birthDate): bool
+    {
+        $referenceDate = $this->race_date ?? today();
+        $age = $referenceDate->year - $birthDate->year;
+
+        if ($referenceDate->format('md') < $birthDate->format('md')) {
+            $age--;
+        }
+
+        return ($this->age_start === null || $age >= $this->age_start)
+            && ($this->age_end === null || $age <= $this->age_end);
+    }
+
+    public function participantLimitHasBeenReached(): bool
+    {
+        if ($this->max_participants === null) {
+            return false;
+        }
+
+        return $this->participantRegistrations()
+            ->where('payment_status', '!=', 'cancelled')
+            ->count() >= $this->max_participants;
+    }
+
     /**
      * @return array<int, string>
      */
@@ -99,6 +124,7 @@ class RaceModality extends Model
             'age_end' => 'integer',
             'race_date' => 'date',
             'course_images' => 'array',
+            'max_participants' => 'integer',
             'is_active' => 'boolean',
         ];
     }

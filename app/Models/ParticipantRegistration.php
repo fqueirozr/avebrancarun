@@ -54,6 +54,10 @@ class ParticipantRegistration extends Model
 
     public const SeniorLegalDiscountRate = 0.5;
 
+    protected $hidden = [
+        'registration_identity',
+    ];
+
     /**
      * @return BelongsTo<RaceModality, $this>
      */
@@ -121,6 +125,19 @@ class ParticipantRegistration extends Model
         }
 
         return round($price * self::SeniorLegalDiscountRate, 2);
+    }
+
+    protected static function booted(): void
+    {
+        static::creating(function (ParticipantRegistration $registration): void {
+            $registration->registration_identity = $registration->participant_cpf;
+        });
+
+        static::updating(function (ParticipantRegistration $registration): void {
+            if ($registration->registration_identity !== null) {
+                $registration->registration_identity = $registration->participant_cpf;
+            }
+        });
     }
 
     /**

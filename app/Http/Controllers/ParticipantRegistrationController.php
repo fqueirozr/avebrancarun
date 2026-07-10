@@ -5,16 +5,21 @@ namespace App\Http\Controllers;
 use App\Http\Requests\RegisterParticipantRequest;
 use App\Mail\ParticipantRegistrationReceived;
 use App\Mail\ParticipantRegistrationUpdated;
+use App\Models\EventSetting;
 use App\Models\Kit;
 use App\Models\ParticipantRegistration;
 use App\Models\PaymentGatewaySetting;
 use App\Models\RaceModality;
 use App\Payments\CheckoutRequest;
 use App\Payments\PaymentGateway;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Validation\ValidationException;
 use Throwable;
 
 class ParticipantRegistrationController extends Controller
@@ -24,7 +29,6 @@ class ParticipantRegistrationController extends Controller
     public function store(RegisterParticipantRequest $request): RedirectResponse
     {
         $validated = $request->validated();
-        $raceModality = RaceModality::query()->findOrFail($validated['race_modality_id']);
         $kit = Kit::query()->findOrFail($validated['kit_id']);
         unset(
             $validated['accepted_regulation'],
@@ -33,18 +37,59 @@ class ParticipantRegistrationController extends Controller
             $validated['accepted_data_confirmation'],
         );
 
-        $registration = ParticipantRegistration::create([
-            ...$validated,
-            'promotional_opt_in' => (bool) ($validated['promotional_opt_in'] ?? false),
-            'privacy_policy_accepted_at' => now(),
-            'privacy_policy_version' => ParticipantRegistration::PrivacyPolicyVersion,
-            'privacy_policy_acceptance_ip' => $request->ip(),
-            'privacy_policy_acceptance_user_agent' => $request->userAgent(),
-            'data_confirmation_accepted_at' => now(),
-            'data_confirmation_acceptance_ip' => $request->ip(),
-            'data_confirmation_acceptance_user_agent' => $request->userAgent(),
-            'modality' => $raceModality->displayName(),
-        ]);
+        try {
+            [$registration, $raceModality] = DB::transaction(function () use ($request, $validated): array {
+                $eventSetting = EventSetting::query()->lockForUpdate()->first();
+                $raceModality = RaceModality::query()->lockForUpdate()->findOrFail($validated['race_modality_id']);
+
+                if (! $raceModality->is_active) {
+                    throw ValidationException::withMessages(['race_modality_id' => 'Escolha uma prova ativa.']);
+                }
+
+                if (! $raceModality->acceptsBirthDate(Carbon::parse($validated['birth_date']))) {
+                    throw ValidationException::withMessages([
+                        'birth_date' => "A idade do atleta na data da prova não atende à faixa etária: {$raceModality->ageRangeLabel()}.",
+                    ]);
+                }
+
+                if ($eventSetting?->registrationDeadlineHasPassed()) {
+                    throw ValidationException::withMessages(['registration' => 'O prazo para inscrições foi encerrado.']);
+                }
+
+                if ($eventSetting?->registrationLimitHasBeenReached()) {
+                    throw ValidationException::withMessages(['registration' => 'O limite total de inscrições foi atingido.']);
+                }
+
+                if ($raceModality->participantLimitHasBeenReached()) {
+                    throw ValidationException::withMessages(['race_modality_id' => 'O limite de inscrições desta prova foi atingido.']);
+                }
+
+                if (ParticipantRegistration::query()->where('participant_cpf', $validated['participant_cpf'])->exists()) {
+                    throw ValidationException::withMessages(['participant_cpf' => 'Este atleta já possui uma inscrição.']);
+                }
+
+                $registration = ParticipantRegistration::create([
+                    ...$validated,
+                    'promotional_opt_in' => (bool) ($validated['promotional_opt_in'] ?? false),
+                    'privacy_policy_accepted_at' => now(),
+                    'privacy_policy_version' => ParticipantRegistration::PrivacyPolicyVersion,
+                    'privacy_policy_acceptance_ip' => $request->ip(),
+                    'privacy_policy_acceptance_user_agent' => $request->userAgent(),
+                    'data_confirmation_accepted_at' => now(),
+                    'data_confirmation_acceptance_ip' => $request->ip(),
+                    'data_confirmation_acceptance_user_agent' => $request->userAgent(),
+                    'modality' => $raceModality->displayName(),
+                ]);
+
+                return [$registration, $raceModality];
+            }, attempts: 3);
+        } catch (QueryException $exception) {
+            if ($exception->getCode() === '23000' && str_contains($exception->getMessage(), 'registration_identity')) {
+                throw ValidationException::withMessages(['participant_cpf' => 'Este atleta já possui uma inscrição.']);
+            }
+
+            throw $exception;
+        }
 
         if ($this->shouldCreateCheckout($kit)) {
             try {
