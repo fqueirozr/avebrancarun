@@ -37,6 +37,10 @@ A sua inscrição para a **Ave Branca Run** já está em análise pela organiza�
 
 A confirmação final será enviada assim que o pagamento for definido. Guarde este e-mail para consultar os dados da sua inscrição.
 
+<x-mail::button :url="URL::signedRoute('athlete.show', ['registration' => $registration])">
+Acessar página do atleta
+</x-mail::button>
+
 Obrigado,<br>
 {{ config('app.name') }}
 </x-mail::message>

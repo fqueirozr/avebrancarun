@@ -14,19 +14,35 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="bg-[#f7fbff] text-zinc-950 antialiased">
-        <header class="border-b border-race-cyan/20 bg-white">
-            <nav class="mx-auto flex max-w-7xl items-center justify-between px-5 py-5 sm:px-8" aria-label="Navegação principal">
-                <a href="{{ route('home') }}" class="flex items-center gap-3">
+        <header class="sticky top-0 z-50 border-b border-white/10 bg-race-night/95 text-white shadow-lg shadow-race-night/20 backdrop-blur">
+            <nav class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-3 sm:px-8 sm:py-4" aria-label="Navegação principal">
+                <a href="{{ route('home') }}" class="flex min-w-0 items-center gap-3 rounded-md outline-none transition focus-visible:ring-3 focus-visible:ring-race-cyan/35" aria-label="Ir para a página inicial da Ave Branca Run">
                     <img
                         src="{{ asset('images/ave-branca-run-logo.png') }}"
                         alt="Ave Branca Run"
-                        class="h-14 w-auto max-w-[210px] object-contain sm:h-16 sm:max-w-[260px]"
+                        class="h-11 w-auto max-w-40 shrink-0 object-contain sm:h-14 sm:max-w-[220px]"
                     >
+
+                    <span class="hidden min-w-0 border-l border-white/15 pl-3 sm:grid">
+                        <span class="text-xs font-black uppercase tracking-wide text-race-cyan">Inscrição 2026</span>
+                        <span class="truncate text-sm font-semibold text-white/60">Formulário do atleta</span>
+                    </span>
                 </a>
 
-                <a href="{{ route('home') }}" class="rounded-md border border-zinc-200 px-4 py-2 text-sm font-bold text-zinc-800 transition hover:bg-zinc-50">
-                    Voltar ao site
-                </a>
+                <div class="flex shrink-0 items-center gap-3">
+                    <span class="hidden items-center gap-2 text-xs font-bold text-white/65 md:flex">
+                        <span class="size-2 rounded-full bg-emerald-400 ring-4 ring-emerald-400/15" aria-hidden="true"></span>
+                        Ambiente seguro
+                    </span>
+
+                    <a href="{{ route('home') }}" class="inline-flex min-h-10 items-center justify-center gap-2 rounded-md border border-white/15 bg-white/5 px-3 py-2 text-sm font-black text-white shadow-sm transition hover:border-race-cyan hover:bg-race-cyan hover:text-race-night focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-race-cyan/35 sm:px-4">
+                        <svg class="size-4" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                            <path d="M12.5 15 7.5 10l5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span class="hidden sm:inline">Voltar ao site</span>
+                        <span class="sm:hidden">Voltar</span>
+                    </a>
+                </div>
             </nav>
         </header>
 
@@ -254,11 +270,11 @@
 
                     <fieldset class="grid min-w-0 gap-3 border-b border-zinc-200 pb-6" data-registration-step data-step-title="Prova">
                         <legend class="mb-4 text-base font-black text-zinc-950">Prova</legend>
-                        <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
+                        <div class="grid grid-cols-1 gap-3 md:grid-cols-2" data-modality-options>
                             @forelse ($modalities as $modality)
                                 @php($modalityIsFull = $modality->participantLimitHasBeenReached())
-                                <label class="flex min-h-20 items-start gap-3 rounded-md border border-zinc-200 px-4 py-3 text-sm transition has-checked:border-race-cyan has-checked:bg-amber-50 has-disabled:cursor-not-allowed has-disabled:bg-zinc-100 has-disabled:text-zinc-500">
-                                    <input type="radio" name="race_modality_id" value="{{ $modality->id }}" @checked((int) old('race_modality_id') === $modality->id) @disabled($modalityIsFull) class="mt-1 size-4 accent-race-cyan" required>
+                                <label class="flex min-h-20 items-start gap-3 rounded-md border border-zinc-200 px-4 py-3 text-sm transition has-checked:border-race-cyan has-checked:bg-amber-50 has-disabled:cursor-not-allowed has-disabled:bg-zinc-100 has-disabled:text-zinc-500" data-modality-option data-age-start="{{ $modality->age_start }}" data-age-end="{{ $modality->age_end }}" data-race-date="{{ ($modality->race_date ?? today())->toDateString() }}">
+                                    <input type="radio" name="race_modality_id" value="{{ $modality->id }}" @checked((int) old('race_modality_id') === $modality->id) @disabled($modalityIsFull) data-unavailable="{{ $modalityIsFull ? 'true' : 'false' }}" class="mt-1 size-4 accent-race-cyan" required>
                                     <span class="grid gap-1">
                                         <span class="font-bold">{{ $modality->displayName() }}</span>
                                         <span class="text-zinc-600">{{ $modality->ageRangeLabel() }}</span>
@@ -272,6 +288,9 @@
                                     Nenhuma prova ativa no momento.
                                 </div>
                             @endforelse
+                        </div>
+                        <div class="rounded-md border border-amber-200 bg-amber-50 p-4 text-sm font-semibold text-amber-950" data-no-compatible-modality hidden>
+                            Informe a data de nascimento do atleta para visualizar as provas disponíveis para a idade dele.
                         </div>
                         @error('race_modality_id')
                             <span class="text-sm font-semibold text-red-700">{{ $message }}</span>

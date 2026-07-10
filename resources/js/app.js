@@ -53,6 +53,8 @@ document.querySelectorAll('[data-registration-form]').forEach((form) => {
     const steps = Array.from(form.querySelectorAll('[data-registration-step]'));
     const guardianStep = form.querySelector('[data-guardian-step]');
     const birthDateInput = form.querySelector('input[name="birth_date"]');
+    const modalityOptions = Array.from(form.querySelectorAll('[data-modality-option]'));
+    const noCompatibleModality = form.querySelector('[data-no-compatible-modality]');
     const legalRepresentativeCheckbox = form.querySelector('[data-legal-representative-checkbox]');
     const previousButton = form.querySelector('[data-registration-prev]');
     const nextButton = form.querySelector('[data-registration-next]');
@@ -129,6 +131,50 @@ document.querySelectorAll('[data-registration-form]').forEach((form) => {
                 field.value = '';
             }
         });
+    };
+
+    const ageOnDate = (birthDate, referenceDate) => {
+        let age = referenceDate.getFullYear() - birthDate.getFullYear();
+        const hasNotHadBirthday = referenceDate.getMonth() < birthDate.getMonth()
+            || (referenceDate.getMonth() === birthDate.getMonth() && referenceDate.getDate() < birthDate.getDate());
+
+        if (hasNotHadBirthday) {
+            age--;
+        }
+
+        return age;
+    };
+
+    const syncModalityOptions = () => {
+        const birthDate = birthDateInput?.value ? new Date(`${birthDateInput.value}T00:00:00`) : null;
+        let compatibleOptions = 0;
+
+        modalityOptions.forEach((option) => {
+            const input = option.querySelector('input[name="race_modality_id"]');
+            const raceDate = new Date(`${option.dataset.raceDate}T00:00:00`);
+            const age = birthDate && !Number.isNaN(birthDate.getTime()) ? ageOnDate(birthDate, raceDate) : null;
+            const ageStart = option.dataset.ageStart === '' ? null : Number(option.dataset.ageStart);
+            const ageEnd = option.dataset.ageEnd === '' ? null : Number(option.dataset.ageEnd);
+            const isCompatible = age !== null
+                && (ageStart === null || age >= ageStart)
+                && (ageEnd === null || age <= ageEnd);
+
+            option.hidden = !isCompatible;
+            input.disabled = !isCompatible || input.dataset.unavailable === 'true';
+
+            if (!isCompatible) {
+                input.checked = false;
+            } else {
+                compatibleOptions++;
+            }
+        });
+
+        if (noCompatibleModality) {
+            noCompatibleModality.hidden = compatibleOptions > 0;
+            noCompatibleModality.textContent = birthDate
+                ? 'Nenhuma prova está disponível para a idade do atleta.'
+                : 'Informe a data de nascimento do atleta para visualizar as provas disponíveis para a idade dele.';
+        }
     };
 
     const selectedLabel = (field) => {
@@ -216,6 +262,7 @@ document.querySelectorAll('[data-registration-form]').forEach((form) => {
 
     birthDateInput?.addEventListener('change', () => {
         syncGuardianStep();
+        syncModalityOptions();
         renderStep();
     });
     legalRepresentativeCheckbox?.addEventListener('change', syncGuardianStep);
@@ -236,6 +283,7 @@ document.querySelectorAll('[data-registration-form]').forEach((form) => {
 
     form.addEventListener('submit', updateReview);
 
+    syncModalityOptions();
     renderStep();
 });
 

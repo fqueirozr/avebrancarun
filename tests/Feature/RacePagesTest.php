@@ -28,6 +28,7 @@ test('race landing page is available', function () {
 
     Kit::factory()->create([
         'name' => 'Kit Corrida',
+        'photo_path' => 'kits/kit-corrida.jpg',
         'price' => 50,
     ]);
 
@@ -49,6 +50,8 @@ test('race landing page is available', function () {
         ->assertSeeText('12/10/2026 às 07:30')
         ->assertSeeText('Percurso adulto com retorno sinalizado.')
         ->assertSeeText('6 km')
+        ->assertSee('src="'.asset('storage/kits/kit-corrida.jpg').'"', false)
+        ->assertSee('alt="Foto do Kit Corrida"', false)
         ->assertSeeText('Pagamento');
 });
 
@@ -76,6 +79,10 @@ test('registration page is available', function () {
         ->assertSuccessful()
         ->assertSeeText('Dados para inscrição')
         ->assertSeeText('Adulto a partir de 16 anos - 6 km')
+        ->assertSee('data-modality-option', false)
+        ->assertSee('data-age-start="16"', false)
+        ->assertSee('data-race-date="2026-09-20"', false)
+        ->assertSeeText('Informe a data de nascimento do atleta para visualizar as provas disponíveis para a idade dele.')
         ->assertSeeText('Kit Corrida')
         ->assertSeeText('Camiseta e número de peito.')
         ->assertSeeText('R$ 50,00')

@@ -27,6 +27,10 @@ Esta inscrição foi cancelada. Em caso de dúvidas, entre em contato com a orga
 Guarde esta mensagem como comprovante da atualização mais recente da sua inscrição.
 @endif
 
+<x-mail::button :url="URL::signedRoute('athlete.show', ['registration' => $registration])">
+Acessar página do atleta
+</x-mail::button>
+
 Obrigado,<br>
 {{ config('app.name') }}
 </x-mail::message>

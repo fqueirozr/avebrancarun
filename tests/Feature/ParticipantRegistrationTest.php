@@ -308,6 +308,17 @@ test('every registration receives a unique protocol shown in its receipt', funct
         ->assertSeeInHtml($firstRegistration->protocol_number);
 });
 
+test('the registration factory generates unique protocols without model events', function () {
+    $registrations = ParticipantRegistration::withoutEvents(
+        fn () => ParticipantRegistration::factory()->count(10)->create()
+    );
+
+    $protocolNumbers = $registrations->pluck('protocol_number');
+
+    expect($protocolNumbers)->each->toStartWith('AVR-');
+    expect($protocolNumbers->unique())->toHaveCount(10);
+});
+
 test('a participant is redirected to checkout when payment gateway is configured', function () {
     Mail::fake();
 

@@ -6,6 +6,7 @@ use App\Models\Kit;
 use App\Models\ParticipantRegistration;
 use App\Models\RaceModality;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 /**
  * @extends Factory<ParticipantRegistration>
@@ -22,6 +23,7 @@ class ParticipantRegistrationFactory extends Factory
         $participantCpf = $this->validCpf();
 
         return [
+            'protocol_number' => 'AVR-'.Str::ulid(),
             'athlete_name' => fake()->name(),
             'birth_date' => fake()->dateTimeBetween('1980-01-01', '2000-09-20')->format('Y-m-d'),
             'sex' => fake()->randomElement(array_keys(ParticipantRegistration::sexOptions())),

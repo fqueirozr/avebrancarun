@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AsaasWebhookController;
+use App\Http\Controllers\AthletePageController;
 use App\Http\Controllers\ContactMessageController;
 use App\Http\Controllers\ParticipantRegistrationController;
 use App\Models\EventSetting;
@@ -40,6 +41,9 @@ Route::get('/inscricao', function () {
     ]);
 })->name('registration');
 Route::post('/inscricao', [ParticipantRegistrationController::class, 'store'])->name('registration.store');
+Route::get('/atleta/{registration}', AthletePageController::class)
+    ->middleware('signed')
+    ->name('athlete.show');
 Route::post('/contato', [ContactMessageController::class, 'store'])->name('contact.store');
 Route::get('/inscricao/{registration}/pagamento/sucesso', [ParticipantRegistrationController::class, 'paymentSuccess'])
     ->middleware('signed')

@@ -99,6 +99,33 @@ class ParticipantRegistrationForm
                     ->label('Status do pagamento')
                     ->options(ParticipantRegistration::paymentStatusOptions())
                     ->required(),
+                TextInput::make('bib_number')
+                    ->label('Número de peito')
+                    ->maxLength(50),
+                Select::make('result_status')
+                    ->label('Status na prova')
+                    ->options(ParticipantRegistration::resultStatusOptions())
+                    ->required(),
+                TextInput::make('elapsed_time')
+                    ->label('Tempo oficial')
+                    ->placeholder('00:42:18')
+                    ->regex('/^\d{2}:\d{2}:\d{2}$/')
+                    ->helperText('Use o formato HH:MM:SS.'),
+                TextInput::make('result_category')
+                    ->label('Categoria do resultado')
+                    ->maxLength(100),
+                TextInput::make('overall_rank')
+                    ->label('Classificação geral')
+                    ->numeric()
+                    ->minValue(1),
+                TextInput::make('sex_rank')
+                    ->label('Classificação por sexo')
+                    ->numeric()
+                    ->minValue(1),
+                TextInput::make('category_rank')
+                    ->label('Classificação na categoria')
+                    ->numeric()
+                    ->minValue(1),
                 TextInput::make('payment_gateway')
                     ->label('Gateway')
                     ->disabled()

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\ParticipantRegistrations\Tables;
 
+use App\Filament\Exports\ParticipantRegistrationExporter;
 use App\Mail\ParticipantRegistrationUpdated;
 use App\Models\Kit;
 use App\Models\ParticipantRegistration;
@@ -10,6 +11,7 @@ use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ExportAction;
 use Filament\Notifications\Notification;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
@@ -118,6 +120,11 @@ class ParticipantRegistrationsTable
                     ->options(fn (): array => Kit::options()),
             ])
             ->defaultSort('created_at', 'desc')
+            ->headerActions([
+                ExportAction::make()
+                    ->label('Exportar para Excel')
+                    ->exporter(ParticipantRegistrationExporter::class),
+            ])
             ->recordActions([
                 EditAction::make(),
                 Action::make('cancel')

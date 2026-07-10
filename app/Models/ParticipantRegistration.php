@@ -28,6 +28,13 @@ use Illuminate\Support\Str;
     'race_modality_id',
     'kit_id',
     'modality',
+    'bib_number',
+    'result_status',
+    'elapsed_time',
+    'result_category',
+    'overall_rank',
+    'sex_rank',
+    'category_rank',
     'notes',
     'emergency_contact_name',
     'emergency_contact_phone',
@@ -100,6 +107,23 @@ class ParticipantRegistration extends Model
         return self::sexOptions()[$this->sex] ?? 'Não informado';
     }
 
+    /** @return array<string, string> */
+    public static function resultStatusOptions(): array
+    {
+        return [
+            'awaiting' => 'Aguardando resultado',
+            'finished' => 'Concluiu a prova',
+            'did_not_start' => 'Não largou',
+            'did_not_finish' => 'Não concluiu',
+            'disqualified' => 'Desclassificado',
+        ];
+    }
+
+    public function resultStatusLabel(): string
+    {
+        return self::resultStatusOptions()[$this->result_status] ?? self::resultStatusOptions()['awaiting'];
+    }
+
     public function paymentStatusLabel(): string
     {
         return self::paymentStatusOptions()[$this->payment_status] ?? 'Pendente';
@@ -138,6 +162,9 @@ class ParticipantRegistration extends Model
             'filled_by_legal_representative' => 'boolean',
             'privacy_policy_accepted_at' => 'datetime',
             'data_confirmation_accepted_at' => 'datetime',
+            'overall_rank' => 'integer',
+            'sex_rank' => 'integer',
+            'category_rank' => 'integer',
         ];
     }
 }
