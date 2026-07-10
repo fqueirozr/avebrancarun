@@ -162,7 +162,6 @@ test('a participant can submit a registration', function () {
         'emergency_contact_name' => 'Ana Silva',
         'emergency_contact_phone' => '(11) 98888-7777',
         'health_notes' => 'Alergia a amendoim.',
-        'promotional_opt_in' => '1',
         'accepted_regulation' => '1',
         'accepted_privacy_policy' => '1',
         'accepted_fitness_declaration' => '1',
@@ -185,7 +184,6 @@ test('a participant can submit a registration', function () {
         'notes' => $registration->notes,
         'emergency_contact_name' => 'Ana Silva',
         'emergency_contact_phone' => '11988887777',
-        'promotional_opt_in' => true,
         'privacy_policy_version' => ParticipantRegistration::PrivacyPolicyVersion,
         'payment_status' => 'pending',
     ]);

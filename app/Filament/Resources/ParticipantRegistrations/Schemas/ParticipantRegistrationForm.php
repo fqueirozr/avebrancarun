@@ -156,8 +156,6 @@ class ParticipantRegistrationForm
                     ->label('Saúde e emergência')
                     ->columnSpanFull()
                     ->maxLength(1000),
-                Toggle::make('promotional_opt_in')
-                    ->label('Aceitou comunicações promocionais'),
                 TextInput::make('privacy_policy_version')
                     ->label('Versão da política aceita')
                     ->disabled()

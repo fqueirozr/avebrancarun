@@ -48,7 +48,6 @@ class ParticipantRegistrationFactory extends Factory
             'emergency_contact_name' => fake()->optional()->name(),
             'emergency_contact_phone' => fake()->optional()->numerify('119########'),
             'health_notes' => fake()->optional()->sentence(),
-            'promotional_opt_in' => false,
             'privacy_policy_accepted_at' => now(),
             'privacy_policy_version' => ParticipantRegistration::PrivacyPolicyVersion,
             'privacy_policy_acceptance_ip' => fake()->ipv4(),

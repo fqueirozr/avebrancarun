@@ -94,7 +94,7 @@ test('registration page is available', function () {
         ->assertSeeText('Política de Privacidade')
         ->assertSeeText('Direitos LGPD')
         ->assertSeeText('Retenção, exclusão e anonimização')
-        ->assertSeeText('Comunicações promocionais')
+        ->assertDontSeeText('Comunicações promocionais')
         ->assertSeeText('Saúde e suporte emergencial')
         ->assertSeeText('Vai se inscrever como PCD, 60+ ou Meia Social? Confira as dicas:')
         ->assertSeeText('Desconto já aplicado: Os valores dessas categorias já estão com o desconto incluso no app (e não é preciso anexar o laudo PCD na inscrição).')

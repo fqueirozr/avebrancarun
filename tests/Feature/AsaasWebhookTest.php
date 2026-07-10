@@ -7,6 +7,10 @@ use Illuminate\Support\Facades\Mail;
 
 uses(RefreshDatabase::class);
 
+beforeEach(function () {
+    config()->set('payments.asaas.webhook_token', 'test-webhook-token');
+});
+
 test('asaas payment confirmation marks the registration as paid', function () {
     Mail::fake();
 
@@ -17,7 +21,7 @@ test('asaas payment confirmation marks the registration as paid', function () {
         'payment_gateway_reference' => 'checkout_123',
     ]);
 
-    $this->postJson(route('webhooks.asaas'), [
+    $this->withHeader('asaas-access-token', 'test-webhook-token')->postJson(route('webhooks.asaas'), [
         'event' => 'PAYMENT_CONFIRMED',
         'payment' => [
             'id' => 'pay_123',
@@ -42,7 +46,7 @@ test('asaas payment confirmation can match by checkout reference', function () {
         'payment_gateway_reference' => 'checkout_123',
     ]);
 
-    $this->postJson(route('webhooks.asaas'), [
+    $this->withHeader('asaas-access-token', 'test-webhook-token')->postJson(route('webhooks.asaas'), [
         'event' => 'PAYMENT_RECEIVED',
         'payment' => [
             'id' => 'pay_123',
@@ -64,7 +68,7 @@ test('asaas repeated confirmation does not send another update email', function 
         'payment_gateway_reference' => 'checkout_123',
     ]);
 
-    $this->postJson(route('webhooks.asaas'), [
+    $this->withHeader('asaas-access-token', 'test-webhook-token')->postJson(route('webhooks.asaas'), [
         'event' => 'PAYMENT_CONFIRMED',
         'payment' => [
             'externalReference' => "participant-registration:{$registration->id}",
@@ -75,3 +79,32 @@ test('asaas repeated confirmation does not send another update email', function 
 
     Mail::assertNothingSent();
 });
+
+test('asaas webhook rejects requests without a valid token', function (?string $token) {
+    Mail::fake();
+
+    $registration = ParticipantRegistration::factory()->create([
+        'payment_status' => 'pending',
+        'payment_gateway' => 'asaas',
+    ]);
+
+    $request = $this;
+
+    if ($token !== null) {
+        $request = $request->withHeader('asaas-access-token', $token);
+    }
+
+    $request->postJson(route('webhooks.asaas'), [
+        'event' => 'PAYMENT_CONFIRMED',
+        'payment' => [
+            'externalReference' => "participant-registration:{$registration->id}",
+        ],
+    ])->assertUnauthorized();
+
+    expect($registration->refresh()->payment_status)->toBe('pending');
+
+    Mail::assertNothingSent();
+})->with([
+    'missing token' => null,
+    'invalid token' => 'invalid-webhook-token',
+]);

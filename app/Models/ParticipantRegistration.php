@@ -39,7 +39,6 @@ use Illuminate\Support\Str;
     'emergency_contact_name',
     'emergency_contact_phone',
     'health_notes',
-    'promotional_opt_in',
     'privacy_policy_accepted_at',
     'privacy_policy_version',
     'privacy_policy_acceptance_ip',
@@ -57,7 +56,7 @@ class ParticipantRegistration extends Model
     /** @use HasFactory<ParticipantRegistrationFactory> */
     use HasFactory;
 
-    public const PrivacyPolicyVersion = '2026-07-08';
+    public const PrivacyPolicyVersion = '2026-07-10';
 
     protected $hidden = [
         'registration_identity',
@@ -158,7 +157,6 @@ class ParticipantRegistration extends Model
         return [
             'birth_date' => 'date',
             'health_notes' => 'encrypted',
-            'promotional_opt_in' => 'boolean',
             'filled_by_legal_representative' => 'boolean',
             'privacy_policy_accepted_at' => 'datetime',
             'data_confirmation_accepted_at' => 'datetime',

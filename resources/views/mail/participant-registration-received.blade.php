@@ -31,7 +31,6 @@ A sua inscrição para a **Ave Branca Run** já está em análise pela organiza�
 | Contato de emergência | {{ $registration->emergency_contact_name ?: 'Não informado' }} |
 | Telefone de emergência | {{ $registration->emergency_contact_phone ?: 'Não informado' }} |
 | Saúde e emergência | {{ $registration->health_notes ?: 'Não informado' }} |
-| Comunicações promocionais | {{ $registration->promotional_opt_in ? 'Autorizadas' : 'Não autorizadas' }} |
 | Política de Privacidade aceita | {{ $registration->privacy_policy_version }} em {{ $registration->privacy_policy_accepted_at?->format('d/m/Y H:i') }} |
 </x-mail::table>
 

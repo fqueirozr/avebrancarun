@@ -425,13 +425,6 @@
                             <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
                         @enderror
 
-                        <label class="flex items-start gap-3 rounded-md border border-zinc-200 bg-white px-4 py-3 text-sm font-semibold text-zinc-800 transition has-checked:border-race-cyan has-checked:bg-amber-50">
-                            <input type="checkbox" name="promotional_opt_in" value="1" @checked(old('promotional_opt_in')) class="mt-1 size-4 accent-race-cyan">
-                            <span>Autorizo receber comunicações promocionais sobre futuras corridas e ações do organizador. Posso solicitar o descadastramento a qualquer momento.</span>
-                        </label>
-                        @error('promotional_opt_in')
-                            <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
-                        @enderror
                     </fieldset>
 
                     <div class="grid gap-3 rounded-md bg-zinc-50 p-5 sm:grid-cols-[1fr_auto] sm:items-center" data-registration-actions>
@@ -507,17 +500,14 @@
                     <h3>5. Resultados, imagens e divulgação pública</h3>
                     <p>Resultados, fotos e vídeos do evento podem divulgar dados compatíveis com a natureza pública da prova, como nome do atleta, número de peito, categoria, equipe, tempo, classificação, fotos e vídeos captados durante o evento.</p>
 
-                    <h3>6. Comunicações promocionais</h3>
-                    <p>Mensagens essenciais sobre inscrição, pagamento, segurança, suporte e alterações do evento não dependem de opt-in promocional. Comunicações promocionais sobre futuras corridas ou ações do organizador só serão enviadas quando você autorizar no formulário, e o descadastramento pode ser solicitado pelo canal indicado nesta política.</p>
-
-                    <h3>7. Retenção, exclusão e anonimização</h3>
+                    <h3>6. Retenção, exclusão e anonimização</h3>
                     <p>Os dados serão mantidos pelo tempo necessário para inscrição, pagamento, suporte, obrigações legais, fiscais, regulatórias e contratuais, prevenção a fraudes, defesa de direitos e histórico do evento. Após esse período, os dados poderão ser excluídos, anonimizados ou mantidos apenas quando houver base legal para retenção.</p>
 
-                    <h3>8. Direitos LGPD</h3>
+                    <h3>7. Direitos LGPD</h3>
                     <p>Você pode solicitar confirmação de tratamento, acesso, correção, anonimização, bloqueio ou eliminação quando aplicável, portabilidade quando cabível, informações sobre compartilhamento, revogação de consentimento e revisão de decisões automatizadas caso venham a ser adotadas.</p>
-                    <p>Para exercer direitos, pedir exclusão/anonimização após o prazo necessário ou solicitar opt-out promocional, entre em contato pelo e-mail oficial da organização informado nos canais do evento. Para segurança, poderemos pedir dados mínimos para confirmar a identidade do solicitante antes de atender o pedido.</p>
+                    <p>Para exercer direitos ou pedir exclusão/anonimização após o prazo necessário, entre em contato pelo e-mail oficial da organização informado nos canais do evento. Para segurança, poderemos pedir dados mínimos para confirmar a identidade do solicitante antes de atender o pedido.</p>
 
-                    <h3>9. Segurança</h3>
+                    <h3>8. Segurança</h3>
                     <p>Adotamos controles para reduzir acesso indevido e exposição desnecessária, incluindo validação dos formulários, proteção CSRF, acesso administrativo restrito e tratamento separado de informações de saúde e emergência.</p>
                 </div>
             </div>

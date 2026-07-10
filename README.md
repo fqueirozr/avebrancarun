@@ -1,58 +1,283 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Ave Branca Run
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Sistema de inscrições e gestão da **Ave Branca Run**, desenvolvido em Laravel. A aplicação disponibiliza páginas públicas do evento, inscrição de atletas, checkout pelo Asaas, acompanhamento de pagamento, página individual do atleta, contato e um painel administrativo para gerenciar inscrições, modalidades, kits, resultados e configurações do evento.
 
-## About Laravel
+## Tecnologias
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- PHP 8.3
+- Laravel 13
+- Filament 5 (painel administrativo)
+- Livewire 4
+- MySQL
+- Tailwind CSS 4 e Vite 8
+- Pest 4
+- Asaas (checkout e confirmação de pagamento)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Funcionalidades principais
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- Página pública com informações do evento, modalidades e kits;
+- inscrição de atletas adultos e menores, com aceite dos termos obrigatórios;
+- checkout Asaas via Pix e cartão de crédito;
+- atualização automática do pagamento por webhook;
+- e-mails de recebimento e atualização da inscrição;
+- página do atleta acessada por URL assinada;
+- painel administrativo em `/admin`;
+- gestão de inscrições, resultados, modalidades, kits, contatos e configurações;
+- exportação e impressão de inscrições.
 
-## Learning Laravel
+## Requisitos
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- PHP 8.3 ou superior, com as extensões exigidas pelo Laravel e pelo driver MySQL;
+- Composer 2;
+- Node.js e npm;
+- MySQL 8 ou compatível;
+- servidor web apontando o document root para `public/` em produção.
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Instalação local
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+1. Clone o repositório e entre na pasta do projeto.
 
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+2. Execute a configuração automatizada:
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+composer run setup
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Esse comando instala as dependências PHP, cria o `.env` a partir do `.env.example`, gera a chave da aplicação, executa as migrations, instala as dependências JavaScript e compila os assets.
 
-## Contributing
+3. Crie o banco MySQL e ajuste no `.env`:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```dotenv
+APP_NAME="Ave Branca Run"
+APP_ENV=local
+APP_DEBUG=true
+APP_URL=http://localhost:8000
+APP_LOCALE=pt_BR
+APP_FALLBACK_LOCALE=pt_BR
+APP_FAKER_LOCALE=pt_BR
 
-## Code of Conduct
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=runapp
+DB_USERNAME=root
+DB_PASSWORD=
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Se o banco ainda não existia quando `composer run setup` foi executado, crie-o e rode:
 
-## Security Vulnerabilities
+```bash
+php artisan migrate --seed
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+> O seeder cadastra as configurações iniciais do evento, modalidades, kit e gateway, além de dados de demonstração. Em produção, prefira `php artisan migrate --force` e cadastre os dados reais pelo painel.
 
-## License
+4. Crie o usuário administrador:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```bash
+php artisan make:filament-user
+```
+
+5. Crie o link para arquivos públicos:
+
+```bash
+php artisan storage:link
+```
+
+6. Inicie o ambiente de desenvolvimento:
+
+```bash
+composer run dev
+```
+
+Esse comando inicia o servidor Laravel, o worker da fila e o Vite. Acesse a URL definida em `APP_URL`; o painel fica em `APP_URL/admin`.
+
+## Configuração do ambiente
+
+### Banco, cache, sessão e fila
+
+Por padrão, o projeto utiliza o banco para sessão, cache e fila:
+
+```dotenv
+SESSION_DRIVER=database
+CACHE_STORE=database
+QUEUE_CONNECTION=database
+```
+
+As tabelas necessárias já fazem parte das migrations. Em produção, mantenha um worker ativo sob um gerenciador de processos:
+
+```bash
+php artisan queue:work --tries=3
+```
+
+Embora o webhook envie o e-mail de confirmação de forma síncrona atualmente, o worker é necessário para recursos enfileirados do Laravel/Filament e futuras notificações.
+
+### E-mail
+
+Em desenvolvimento, `MAIL_MAILER=log` grava os e-mails em `storage/logs/laravel.log`. Para envio real, configure um serviço SMTP, por exemplo:
+
+```dotenv
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.exemplo.com
+MAIL_PORT=587
+MAIL_USERNAME=usuario
+MAIL_PASSWORD=senha
+MAIL_SCHEME=tls
+MAIL_FROM_ADDRESS=contato@exemplo.com
+MAIL_FROM_NAME="${APP_NAME}"
+```
+
+### Asaas
+
+As URLs padrão já estão no `.env.example`:
+
+```dotenv
+PAYMENT_GATEWAY=asaas
+ASAAS_SANDBOX_BASE_URL=https://api-sandbox.asaas.com
+ASAAS_PRODUCTION_BASE_URL=https://api.asaas.com
+ASAAS_SANDBOX_CHECKOUT_URL=https://sandbox.asaas.com/checkoutSession/show
+ASAAS_PRODUCTION_CHECKOUT_URL=https://asaas.com/checkoutSession/show
+```
+
+A API key **não é configurada no `.env`**. Depois de criar o administrador:
+
+1. Acesse `/admin/payment-gateway-settings`;
+2. abra ou crie a configuração do gateway;
+3. selecione o ambiente `Sandbox` ou `Produção`;
+4. informe a API key gerada no Asaas em **Integrações > API Key**;
+5. escolha os meios de pagamento e o tempo de expiração;
+6. ative **Ativar checkout** e salve.
+
+A API key é armazenada com cast criptografado. Preserve a mesma `APP_KEY` após começar a utilizar o sistema; trocá-la sem um processo de rotação impedirá a leitura dos dados criptografados.
+
+## Webhook do Asaas
+
+### URL e método
+
+Cadastre no ambiente correspondente do Asaas uma URL HTTPS pública:
+
+```text
+POST https://seu-dominio.com/webhooks/asaas
+```
+
+Use exatamente o domínio configurado em `APP_URL`. Em desenvolvimento local, o Asaas precisa alcançar a aplicação; exponha-a temporariamente por um túnel HTTPS e cadastre a URL pública gerada.
+
+### Eventos
+
+Habilite os seguintes eventos de cobrança no Asaas:
+
+- `PAYMENT_CONFIRMED`
+- `PAYMENT_RECEIVED`
+- `PAYMENT_RECEIVED_IN_CASH`
+
+Outros eventos são aceitos pela rota, mas ignorados com resposta HTTP `204 No Content`.
+
+### Funcionamento
+
+O checkout envia ao Asaas a referência externa no formato:
+
+```text
+participant-registration:{id}
+```
+
+Ao receber um dos eventos de pagamento, a aplicação:
+
+1. identifica a inscrição por `payment.externalReference`;
+2. usa a referência da sessão de checkout como alternativa;
+3. altera `payment_status` para `paid`;
+4. envia o e-mail de atualização ao participante;
+5. responde com HTTP `204`.
+
+O processamento é idempotente: uma inscrição que já está paga não é atualizada novamente nem recebe outro e-mail.
+
+### Autenticação e segurança
+
+A rota está fora da validação CSRF, como é necessário para webhooks externos. **A implementação atual não valida o token de autenticação enviado pelo Asaas.** Portanto, não presuma que apenas o Asaas consegue chamar esse endpoint. Antes de uma operação real em produção, recomenda-se implementar e testar a validação do token configurado no Asaas, mantendo o segredo fora de logs e do controle de versão.
+
+Não registre payloads completos do webhook: eles podem conter dados pessoais e financeiros. O código atual registra somente referências mínimas quando não consegue associar o pagamento a uma inscrição.
+
+### Teste do webhook
+
+Com uma inscrição existente, um exemplo de payload é:
+
+```json
+{
+  "event": "PAYMENT_CONFIRMED",
+  "payment": {
+    "id": "pay_123",
+    "externalReference": "participant-registration:1"
+  }
+}
+```
+
+Envio manual para ambiente local:
+
+```bash
+curl -X POST http://localhost:8000/webhooks/asaas \
+  -H "Content-Type: application/json" \
+  -d '{"event":"PAYMENT_CONFIRMED","payment":{"id":"pay_123","externalReference":"participant-registration:1"}}'
+```
+
+O endpoint responde `204` inclusive para eventos ignorados ou referências desconhecidas. Para validar o fluxo automatizado:
+
+```bash
+php artisan test --compact tests/Feature/AsaasWebhookTest.php
+```
+
+## Testes e qualidade
+
+Execute toda a suíte:
+
+```bash
+composer test
+```
+
+Formate os arquivos PHP:
+
+```bash
+vendor/bin/pint --format agent
+```
+
+Compile os assets para produção:
+
+```bash
+npm run build
+```
+
+## Publicação em produção
+
+Checklist mínimo:
+
+- configure `APP_ENV=production`, `APP_DEBUG=false` e uma `APP_URL` HTTPS pública;
+- mantenha `APP_KEY` e credenciais somente em variáveis de ambiente/secret manager;
+- configure banco, SMTP e permissões de escrita em `storage/` e `bootstrap/cache/`;
+- execute `composer install --no-dev --optimize-autoloader` e `npm ci && npm run build`;
+- execute `php artisan migrate --force`;
+- execute `php artisan optimize` após configurar o ambiente;
+- mantenha `php artisan queue:work` sob Supervisor ou serviço equivalente;
+- configure o servidor web com raiz em `public/`;
+- configure e teste o webhook Asaas de produção;
+- monitore a rota de saúde `GET /up` e os logs da aplicação.
+
+Após cada publicação com alterações de código, reinicie os processos de longa duração:
+
+```bash
+php artisan reload
+```
+
+## Estrutura relevante
+
+```text
+app/Filament/                 Painel administrativo
+app/Http/Controllers/         Inscrição, contato e webhook
+app/Payments/                 Integração e checkout Asaas
+database/migrations/          Estrutura do banco
+database/seeders/             Dados iniciais e de demonstração
+resources/views/              Páginas públicas e e-mails
+routes/web.php                Rotas públicas e webhook
+tests/Feature/                Testes dos fluxos principais
+```
+
+## Privacidade
+
+O sistema trata dados pessoais de participantes e responsáveis, inclusive CPF, contato, endereço e informações relacionadas à saúde e segurança. Colete e exponha somente o necessário, restrinja o painel administrativo, proteja backups e credenciais e observe a Política de Privacidade e a LGPD. O Asaas deve receber apenas os dados necessários para criar e conciliar a cobrança.

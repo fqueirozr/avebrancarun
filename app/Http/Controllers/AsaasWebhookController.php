@@ -22,6 +22,13 @@ class AsaasWebhookController extends Controller
 
     public function __invoke(Request $request): Response
     {
+        $configuredToken = (string) config('payments.asaas.webhook_token');
+        $receivedToken = (string) $request->header('asaas-access-token');
+
+        if ($configuredToken === '' || $receivedToken === '' || ! hash_equals($configuredToken, $receivedToken)) {
+            return response()->noContent(Response::HTTP_UNAUTHORIZED);
+        }
+
         if (! in_array($request->string('event')->toString(), self::PAID_EVENTS, true)) {
             return response()->noContent();
         }
