@@ -1,0 +1,21 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Prevent clients from bypassing the application URL and accessing public directly.
+    RewriteCond %{THE_REQUEST} \s/+public(?:[/?\s]) [NC]
+    RewriteRule ^public(?:/.*)?$ - [F,L]
+
+    # Avoid rewriting the internally forwarded request more than once.
+    RewriteRule ^public(?:/|$) - [L]
+
+    # Keep the project root private and serve every request from public.
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>
+
+<IfModule !mod_rewrite.c>
+    Require all denied
+</IfModule>
+
+<IfModule mod_autoindex.c>
+    Options -Indexes
+</IfModule>
