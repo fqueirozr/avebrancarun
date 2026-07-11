@@ -71,6 +71,10 @@ class ParticipantRegistrationController extends Controller
 
                 $registration = ParticipantRegistration::create([
                     ...$validated,
+                    'regulation_accepted_at' => now(),
+                    'regulation_version' => hash('sha256', (string) $eventSetting?->regulation),
+                    'regulation_acceptance_ip' => $request->ip(),
+                    'regulation_acceptance_user_agent' => $request->userAgent(),
                     'privacy_policy_accepted_at' => now(),
                     'privacy_policy_version' => ParticipantRegistration::PrivacyPolicyVersion,
                     'privacy_policy_acceptance_ip' => $request->ip(),

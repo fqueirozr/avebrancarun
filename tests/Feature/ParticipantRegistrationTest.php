@@ -90,6 +90,28 @@ test('special kit acknowledgement is recorded for audit', function () {
         ->and($registration->special_kit_rules_acceptance_user_agent)->toBe('Registration audit test');
 });
 
+test('regulation acceptance is recorded for audit', function () {
+    Mail::fake();
+    EventSetting::factory()->create([
+        'regulation' => '<p>Regulamento oficial versão 2</p>',
+    ]);
+    $raceModality = RaceModality::factory()->create();
+    $kit = Kit::factory()->create(['price' => 0]);
+
+    $this->withServerVariables([
+        'REMOTE_ADDR' => '203.0.113.20',
+        'HTTP_USER_AGENT' => 'Regulation audit test',
+    ])->post(route('registration.store'), validRegistrationPayload($raceModality, $kit))
+        ->assertSessionDoesntHaveErrors();
+
+    $registration = ParticipantRegistration::query()->sole();
+
+    expect($registration->regulation_accepted_at)->not->toBeNull()
+        ->and($registration->regulation_version)->toBe(hash('sha256', '<p>Regulamento oficial versão 2</p>'))
+        ->and($registration->regulation_acceptance_ip)->toBe('203.0.113.20')
+        ->and($registration->regulation_acceptance_user_agent)->toBe('Regulation audit test');
+});
+
 test('registration submission rejects a reached event limit', function () {
     EventSetting::factory()->create([
         'max_registrations' => 1,
