@@ -307,6 +307,35 @@
                 </div>
             </section>
 
+            <section id="apoiadores" class="relative overflow-hidden bg-white">
+                <div class="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-race-blue/20 to-transparent"></div>
+                <div class="mx-auto max-w-7xl px-5 py-16 sm:px-8 lg:py-20">
+                    <div class="text-center reveal-on-scroll" data-reveal>
+                        <p class="section-kicker">Quem caminha conosco</p>
+                        <h2 class="mt-3 text-3xl font-black leading-tight text-race-night sm:text-5xl">Apoiadores</h2>
+                        <p class="mx-auto mt-4 max-w-2xl text-base font-semibold leading-7 text-zinc-600">Instituições que apoiam a missão, a educação e o desenvolvimento de crianças, jovens e famílias.</p>
+                    </div>
+
+                    <div class="mt-10 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+                        @php
+                            $supporters = [
+                                ['name' => 'Igreja Adventista do Sétimo Dia', 'url' => 'https://www.adventistas.org/pt/', 'logo' => 'images/supporters/adventistas.png', 'logoClass' => 'max-h-20 max-w-[9rem]'],
+                                ['name' => 'Educação Adventista', 'url' => 'https://www.educacaoadventista.org.br/', 'logo' => 'images/supporters/educacao-adventista.png', 'logoClass' => 'max-h-20 max-w-[10rem]'],
+                                ['name' => 'Clube de Desbravadores', 'url' => 'https://www.adventistas.org/pt/desbravadores/', 'logo' => 'images/supporters/desbravadores.webp', 'logoClass' => 'max-h-28 max-w-[8rem]'],
+                                ['name' => 'T7', 'url' => 'https://t7.org.br/', 'logo' => 'images/supporters/t7.png', 'logoClass' => 'max-h-16 max-w-[11rem]'],
+                            ];
+                        @endphp
+
+                        @foreach ($supporters as $supporter)
+                            <a href="{{ $supporter['url'] }}" target="_blank" rel="noopener noreferrer" aria-label="Visitar o site de {{ $supporter['name'] }}" class="group race-panel flex min-h-44 flex-col items-center justify-center gap-4 p-5 text-center transition hover:-translate-y-1 hover:border-race-cyan/60 hover:shadow-xl hover:shadow-race-night/10 focus:outline-none focus:ring-3 focus:ring-race-cyan/35 reveal-on-scroll" data-reveal>
+                                <img src="{{ asset($supporter['logo']) }}" alt="Logo {{ $supporter['name'] }}" class="h-auto w-auto object-contain transition duration-300 group-hover:scale-105 {{ $supporter['logoClass'] }}">
+                                <span class="text-sm font-black leading-5 text-race-night">{{ $supporter['name'] }}</span>
+                            </a>
+                        @endforeach
+                    </div>
+                </div>
+            </section>
+
             <section id="contato" class="bg-[linear-gradient(180deg,#eef7ff_0%,#ffffff_100%)]">
                 <div class="mx-auto max-w-7xl px-5 py-20 sm:px-8 lg:py-24">
                     <div class="grid grid-cols-1 gap-6 lg:grid-cols-[0.82fr_1.18fr] lg:items-start">
