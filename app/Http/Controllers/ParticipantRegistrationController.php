@@ -35,10 +35,11 @@ class ParticipantRegistrationController extends Controller
             $validated['accepted_privacy_policy'],
             $validated['accepted_fitness_declaration'],
             $validated['accepted_data_confirmation'],
+            $validated['accepted_special_kit_rules'],
         );
 
         try {
-            [$registration, $raceModality] = DB::transaction(function () use ($request, $validated): array {
+            [$registration, $raceModality] = DB::transaction(function () use ($kit, $request, $validated): array {
                 $eventSetting = EventSetting::query()->lockForUpdate()->first();
                 $raceModality = RaceModality::query()->lockForUpdate()->findOrFail($validated['race_modality_id']);
 
@@ -77,6 +78,10 @@ class ParticipantRegistrationController extends Controller
                     'data_confirmation_accepted_at' => now(),
                     'data_confirmation_acceptance_ip' => $request->ip(),
                     'data_confirmation_acceptance_user_agent' => $request->userAgent(),
+                    'special_kit_rules_accepted_at' => $kit->is_half_registration ? now() : null,
+                    'special_kit_rules_version' => $kit->is_half_registration ? ParticipantRegistration::SpecialKitRulesVersion : null,
+                    'special_kit_rules_acceptance_ip' => $kit->is_half_registration ? $request->ip() : null,
+                    'special_kit_rules_acceptance_user_agent' => $kit->is_half_registration ? $request->userAgent() : null,
                     'modality' => $raceModality->displayName(),
                 ]);
 

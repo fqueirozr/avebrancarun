@@ -104,7 +104,7 @@
                     </div>
                 @endif
 
-                <form action="{{ route('registration.store') }}" method="POST" class="mt-7 grid grid-cols-1 gap-5" data-registration-form>
+                <form id="registration-form" action="{{ route('registration.store') }}" method="POST" class="mt-7 grid grid-cols-1 gap-5" data-registration-form>
                     @csrf
 
                     <div class="grid gap-3 rounded-md border border-race-cyan/25 bg-[#f7fbff] p-4" data-registration-progress>
@@ -312,7 +312,7 @@
                             @forelse ($kits as $kit)
                                 <label class="rounded-md border border-zinc-200 text-sm transition has-checked:border-race-cyan has-checked:bg-amber-50">
                                     <span class="flex items-start gap-3 px-4 py-3">
-                                        <input type="radio" name="kit_id" value="{{ $kit->id }}" @checked((int) old('kit_id') === $kit->id) class="mt-1 size-4 accent-race-cyan" required>
+                                        <input type="radio" name="kit_id" value="{{ $kit->id }}" @checked((int) old('kit_id') === $kit->id) @if ($kit->is_half_registration) data-special-kit @endif class="mt-1 size-4 accent-race-cyan" required>
                                         <span class="grid gap-1">
                                             <span class="font-bold">{{ $kit->name }}</span>
                                             <span class="font-black text-race-blue">R$ {{ number_format((float) $kit->price, 2, ',', '.') }}</span>
@@ -332,6 +332,9 @@
                             @endforelse
                         </div>
                         @error('kit_id')
+                            <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
+                        @enderror
+                        @error('accepted_special_kit_rules')
                             <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
                         @enderror
                     </fieldset>
@@ -451,6 +454,28 @@
                 </form>
             </section>
         </main>
+
+        <dialog id="special-kit-rules-modal" class="m-auto w-[min(40rem,calc(100vw-2rem))] rounded-md border border-race-cyan/15 bg-white p-0 text-zinc-950 shadow-2xl shadow-amber-950/30 backdrop:bg-race-night/80">
+            <div class="grid gap-5 p-6 sm:p-8">
+                <div>
+                    <p class="text-sm font-black uppercase tracking-wide text-race-cyan">Inscrição especial</p>
+                    <h2 class="mt-1 text-2xl font-black leading-tight">Regras para PCD, 60+ e Meia Social</h2>
+                </div>
+                <div class="grid gap-3 text-sm leading-6 text-zinc-700">
+                    <p><strong>PCD:</strong> o desconto já está aplicado e não é necessário anexar laudo durante a inscrição. Na retirada do kit, apresente documento comprobatório.</p>
+                    <p><strong>60+:</strong> o desconto já está aplicado. Na retirada do kit, apresente documento oficial que comprove a idade.</p>
+                    <p><strong>Meia Social:</strong> o desconto já está aplicado. Na retirada do kit, entregue um alimento não perecível para doação.</p>
+                </div>
+                <label class="flex items-start gap-3 rounded-md border border-zinc-200 bg-amber-50 px-4 py-3 text-sm font-semibold text-zinc-800">
+                    <input type="checkbox" name="accepted_special_kit_rules" value="1" form="registration-form" @checked(old('accepted_special_kit_rules')) class="mt-1 size-4 accent-race-cyan" data-special-kit-acknowledgement>
+                    <span>Li e estou ciente das regras, inclusive da comprovação exigida na retirada do kit.</span>
+                </label>
+                <div class="flex justify-end gap-3">
+                    <button type="button" data-modal-close class="rounded-md border border-zinc-300 bg-white px-4 py-2 text-sm font-black text-zinc-800">Voltar</button>
+                    <button type="button" data-special-kit-confirm class="rounded-md bg-race-blue px-4 py-2 text-sm font-black text-white disabled:cursor-not-allowed disabled:bg-zinc-400">Confirmar ciência</button>
+                </div>
+            </div>
+        </dialog>
 
         <dialog id="registration-regulation-modal" class="m-auto w-[min(44rem,calc(100vw-2rem))] rounded-md border border-race-cyan/15 bg-white p-0 text-zinc-950 shadow-2xl shadow-amber-950/30 backdrop:bg-race-night/80">
             <div class="flex items-start justify-between gap-5 border-b border-race-cyan/20 bg-race-night p-5 text-white sm:p-6">

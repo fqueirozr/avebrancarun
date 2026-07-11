@@ -63,6 +63,10 @@ document.querySelectorAll('[data-registration-form]').forEach((form) => {
     const progressTitle = form.querySelector('[data-registration-progress-title]');
     const progressBar = form.querySelector('[data-registration-progress-bar]');
     const review = form.querySelector('[data-registration-review]');
+    const specialKitOptions = Array.from(form.querySelectorAll('[data-special-kit]'));
+    const specialKitModal = document.getElementById('special-kit-rules-modal');
+    const specialKitAcknowledgement = document.querySelector('[data-special-kit-acknowledgement]');
+    const specialKitConfirm = document.querySelector('[data-special-kit-confirm]');
     let currentStepIndex = 0;
 
     const fieldLabels = {
@@ -223,6 +227,14 @@ document.querySelectorAll('[data-registration-form]').forEach((form) => {
         const currentStep = visibleSteps()[currentStepIndex];
         const controls = Array.from(currentStep.querySelectorAll('input, textarea, select'));
 
+        if (currentStep.querySelector('input[name="kit_id"]')
+            && form.querySelector('[data-special-kit]:checked')
+            && !specialKitAcknowledgement?.checked) {
+            specialKitModal?.showModal();
+
+            return false;
+        }
+
         for (const control of controls) {
             if (!control.checkValidity()) {
                 control.reportValidity();
@@ -266,6 +278,28 @@ document.querySelectorAll('[data-registration-form]').forEach((form) => {
         renderStep();
     });
     legalRepresentativeCheckbox?.addEventListener('change', syncGuardianStep);
+
+    specialKitOptions.forEach((option) => {
+        option.addEventListener('change', () => {
+            if (option.checked && specialKitModal instanceof HTMLDialogElement) {
+                specialKitModal.showModal();
+            }
+        });
+    });
+
+    specialKitAcknowledgement?.addEventListener('change', () => {
+        specialKitConfirm.disabled = !specialKitAcknowledgement.checked;
+    });
+
+    specialKitConfirm?.addEventListener('click', () => {
+        if (specialKitAcknowledgement?.checked && specialKitModal instanceof HTMLDialogElement) {
+            specialKitModal.close();
+        }
+    });
+
+    if (specialKitConfirm) {
+        specialKitConfirm.disabled = !specialKitAcknowledgement?.checked;
+    }
 
     previousButton?.addEventListener('click', () => {
         currentStepIndex = Math.max(0, currentStepIndex - 1);

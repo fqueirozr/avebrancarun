@@ -54,6 +54,42 @@ test('registration submission rejects an expired deadline', function () {
     expect(ParticipantRegistration::query()->count())->toBe(0);
 });
 
+test('special kit requires acknowledgement of its rules', function () {
+    $raceModality = RaceModality::factory()->create();
+    $kit = Kit::factory()->create([
+        'price' => 0,
+        'is_half_registration' => true,
+    ]);
+
+    $this->post(route('registration.store'), validRegistrationPayload($raceModality, $kit))
+        ->assertSessionHasErrors('accepted_special_kit_rules');
+
+    expect(ParticipantRegistration::query()->count())->toBe(0);
+});
+
+test('special kit acknowledgement is recorded for audit', function () {
+    Mail::fake();
+    $raceModality = RaceModality::factory()->create();
+    $kit = Kit::factory()->create([
+        'price' => 0,
+        'is_half_registration' => true,
+    ]);
+
+    $this->withServerVariables([
+        'REMOTE_ADDR' => '203.0.113.10',
+        'HTTP_USER_AGENT' => 'Registration audit test',
+    ])->post(route('registration.store'), validRegistrationPayload($raceModality, $kit, [
+        'accepted_special_kit_rules' => '1',
+    ]))->assertSessionDoesntHaveErrors();
+
+    $registration = ParticipantRegistration::query()->sole();
+
+    expect($registration->special_kit_rules_accepted_at)->not->toBeNull()
+        ->and($registration->special_kit_rules_version)->toBe(ParticipantRegistration::SpecialKitRulesVersion)
+        ->and($registration->special_kit_rules_acceptance_ip)->toBe('203.0.113.10')
+        ->and($registration->special_kit_rules_acceptance_user_agent)->toBe('Registration audit test');
+});
+
 test('registration submission rejects a reached event limit', function () {
     EventSetting::factory()->create([
         'max_registrations' => 1,

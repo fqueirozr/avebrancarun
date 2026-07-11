@@ -46,6 +46,10 @@ use Illuminate\Support\Str;
     'data_confirmation_accepted_at',
     'data_confirmation_acceptance_ip',
     'data_confirmation_acceptance_user_agent',
+    'special_kit_rules_accepted_at',
+    'special_kit_rules_version',
+    'special_kit_rules_acceptance_ip',
+    'special_kit_rules_acceptance_user_agent',
     'payment_status',
     'payment_gateway',
     'payment_gateway_reference',
@@ -57,6 +61,8 @@ class ParticipantRegistration extends Model
     use HasFactory;
 
     public const PrivacyPolicyVersion = '2026-07-10';
+
+    public const SpecialKitRulesVersion = '2026-07-11';
 
     protected $hidden = [
         'registration_identity',
@@ -160,6 +166,7 @@ class ParticipantRegistration extends Model
             'filled_by_legal_representative' => 'boolean',
             'privacy_policy_accepted_at' => 'datetime',
             'data_confirmation_accepted_at' => 'datetime',
+            'special_kit_rules_accepted_at' => 'datetime',
             'overall_rank' => 'integer',
             'sex_rank' => 'integer',
             'category_rank' => 'integer',

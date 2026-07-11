@@ -55,6 +55,10 @@ class ParticipantRegistrationFactory extends Factory
             'data_confirmation_accepted_at' => now(),
             'data_confirmation_acceptance_ip' => fake()->ipv4(),
             'data_confirmation_acceptance_user_agent' => fake()->userAgent(),
+            'special_kit_rules_accepted_at' => null,
+            'special_kit_rules_version' => null,
+            'special_kit_rules_acceptance_ip' => null,
+            'special_kit_rules_acceptance_user_agent' => null,
             'payment_status' => 'pending',
         ];
     }

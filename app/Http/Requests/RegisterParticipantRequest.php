@@ -55,6 +55,7 @@ class RegisterParticipantRequest extends FormRequest
             'accepted_privacy_policy' => ['accepted'],
             'accepted_fitness_declaration' => ['accepted'],
             'accepted_data_confirmation' => ['accepted'],
+            'accepted_special_kit_rules' => ['nullable', 'boolean'],
         ];
     }
 
@@ -106,6 +107,7 @@ class RegisterParticipantRequest extends FormRequest
             'accepted_regulation' => 'o Regulamento',
             'accepted_privacy_policy' => 'a Política de Privacidade',
             'accepted_fitness_declaration' => 'a declaração de aptidão para participar da prova',
+            'accepted_special_kit_rules' => 'as regras para PCD, 60+ e Meia Social',
         ];
     }
 
@@ -158,6 +160,10 @@ class RegisterParticipantRequest extends FormRequest
                     if (blank($this->input('guardian_cpf'))) {
                         $validator->errors()->add('guardian_cpf', 'Informe o CPF do representante legal.');
                     }
+                }
+
+                if ($kit?->is_half_registration && ! $this->boolean('accepted_special_kit_rules')) {
+                    $validator->errors()->add('accepted_special_kit_rules', 'Você precisa ler e declarar ciência das regras para PCD, 60+ e Meia Social.');
                 }
 
                 if (! $this->requiresCheckoutData($kit)) {
