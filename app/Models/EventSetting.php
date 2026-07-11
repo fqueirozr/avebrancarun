@@ -6,6 +6,7 @@ use Database\Factories\EventSettingFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 #[Fillable([
     'event_date',
@@ -36,6 +37,19 @@ class EventSetting extends Model
     public function registrationDeadlineHasPassed(): bool
     {
         return $this->registration_deadline?->isPast() ?? false;
+    }
+
+    public function eventDateForAgeCalculation(): ?Carbon
+    {
+        if (blank($this->event_date)) {
+            return null;
+        }
+
+        try {
+            return Carbon::createFromFormat('d/m/Y', $this->event_date)->startOfDay();
+        } catch (\Throwable) {
+            return null;
+        }
     }
 
     public function registrationLimitHasBeenReached(): bool

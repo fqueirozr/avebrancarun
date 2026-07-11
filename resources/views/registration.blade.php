@@ -273,7 +273,7 @@
                         <div class="grid grid-cols-1 gap-3 md:grid-cols-2" data-modality-options>
                             @forelse ($modalities as $modality)
                                 @php($modalityIsFull = $modality->participantLimitHasBeenReached())
-                                <label class="flex min-h-20 items-start gap-3 rounded-md border border-zinc-200 px-4 py-3 text-sm transition has-checked:border-race-cyan has-checked:bg-amber-50 has-disabled:cursor-not-allowed has-disabled:bg-zinc-100 has-disabled:text-zinc-500" data-modality-option data-age-start="{{ $modality->age_start }}" data-age-end="{{ $modality->age_end }}" data-race-date="{{ ($modality->race_date ?? today())->toDateString() }}">
+                                <label class="flex min-h-20 items-start gap-3 rounded-md border border-zinc-200 px-4 py-3 text-sm transition has-checked:border-race-cyan has-checked:bg-amber-50 has-disabled:cursor-not-allowed has-disabled:bg-zinc-100 has-disabled:text-zinc-500" data-modality-option data-age-start="{{ $modality->age_start }}" data-age-end="{{ $modality->age_end }}" data-race-date="{{ $modality->ageReferenceDate($eventSetting->eventDateForAgeCalculation())->toDateString() }}">
                                     <input type="radio" name="race_modality_id" value="{{ $modality->id }}" @checked((int) old('race_modality_id') === $modality->id) @disabled($modalityIsFull) data-unavailable="{{ $modalityIsFull ? 'true' : 'false' }}" class="mt-1 size-4 accent-race-cyan" required>
                                     <span class="grid gap-1">
                                         <span class="font-bold">{{ $modality->displayName() }}</span>

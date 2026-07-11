@@ -139,7 +139,7 @@ class RegisterParticipantRequest extends FormRequest
                 if ($raceModality !== null && filled($this->input('birth_date')) && strtotime((string) $this->input('birth_date')) !== false) {
                     $birthDate = Carbon::parse((string) $this->input('birth_date'));
 
-                    if (! $raceModality->acceptsBirthDate($birthDate)) {
+                    if (! $raceModality->acceptsBirthDate($birthDate, $eventSetting->eventDateForAgeCalculation())) {
                         $validator->errors()->add('birth_date', "A idade do atleta na data da prova não atende à faixa etária: {$raceModality->ageRangeLabel()}.");
                     }
                 }

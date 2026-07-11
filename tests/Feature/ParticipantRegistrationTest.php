@@ -170,6 +170,31 @@ test('registration submission calculates the age range on the race date', functi
     'turns 18 on the race date' => ['2008-09-20', false],
 ]);
 
+test('registration submission uses the configured event date when the modality has no race date', function (string $birthDate, bool $isAccepted) {
+    Mail::fake();
+
+    EventSetting::factory()->create(['event_date' => '20/09/2026']);
+    $raceModality = RaceModality::factory()->create([
+        'age_start' => 16,
+        'age_end' => 17,
+        'race_date' => null,
+    ]);
+    $kit = Kit::factory()->create(['price' => 0]);
+
+    $response = $this->post(route('registration.store'), validRegistrationPayload($raceModality, $kit, [
+        'birth_date' => $birthDate,
+    ]));
+
+    if ($isAccepted) {
+        $response->assertSessionDoesntHaveErrors('birth_date');
+    } else {
+        $response->assertSessionHasErrors('birth_date');
+    }
+})->with([
+    'turns 16 on the event date' => ['2010-09-20', true],
+    'is still 15 on the event date' => ['2010-09-21', false],
+]);
+
 test('an athlete cannot register twice with the same cpf', function () {
     $raceModality = RaceModality::factory()->create();
     $kit = Kit::factory()->create(['price' => 0]);

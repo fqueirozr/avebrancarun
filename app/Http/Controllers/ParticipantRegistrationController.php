@@ -47,7 +47,7 @@ class ParticipantRegistrationController extends Controller
                     throw ValidationException::withMessages(['race_modality_id' => 'Escolha uma prova ativa.']);
                 }
 
-                if (! $raceModality->acceptsBirthDate(Carbon::parse($validated['birth_date']))) {
+                if (! $raceModality->acceptsBirthDate(Carbon::parse($validated['birth_date']), $eventSetting?->eventDateForAgeCalculation())) {
                     throw ValidationException::withMessages([
                         'birth_date' => "A idade do atleta na data da prova não atende à faixa etária: {$raceModality->ageRangeLabel()}.",
                     ]);

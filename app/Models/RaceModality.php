@@ -64,9 +64,14 @@ class RaceModality extends Model
         return 'Todas as idades';
     }
 
-    public function acceptsBirthDate(Carbon $birthDate): bool
+    public function ageReferenceDate(?Carbon $eventDate = null): Carbon
     {
-        $referenceDate = $this->race_date ?? today();
+        return $this->race_date ?? $eventDate ?? today();
+    }
+
+    public function acceptsBirthDate(Carbon $birthDate, ?Carbon $eventDate = null): bool
+    {
+        $referenceDate = $this->ageReferenceDate($eventDate);
         $age = $referenceDate->year - $birthDate->year;
 
         if ($referenceDate->format('md') < $birthDate->format('md')) {
