@@ -16,6 +16,10 @@ use Illuminate\Database\Eloquent\Model;
 ])]
 class PaymentGatewaySetting extends Model
 {
+    protected $hidden = [
+        'api_key',
+    ];
+
     public static function current(): self
     {
         return self::query()->first() ?? new self([

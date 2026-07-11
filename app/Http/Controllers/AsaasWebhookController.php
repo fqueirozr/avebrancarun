@@ -63,7 +63,9 @@ class AsaasWebhookController extends Controller
         );
 
         if ($registrationId !== null) {
-            return ParticipantRegistration::query()->find($registrationId);
+            return ParticipantRegistration::query()
+                ->where('payment_gateway', 'asaas')
+                ->find($registrationId);
         }
 
         $gatewayReferences = collect([
