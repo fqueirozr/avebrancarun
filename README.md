@@ -25,6 +25,18 @@ Sistema de inscrições e gestão da **Ave Branca Run**, desenvolvido em Laravel
 - gestão de inscrições, resultados, modalidades, kits, contatos e configurações;
 - exportação e impressão de inscrições.
 
+## Guia do painel administrativo
+
+Depois de criar o primeiro usuário com `php artisan make:filament-user`, acesse `/admin`. Para colocar um evento em operação, configure o painel nesta ordem:
+
+1. dados do evento;
+2. provas e faixas etárias;
+3. kits e preços;
+4. gateway de pagamento;
+5. usuários administrativos.
+
+As inscrições dependem de uma prova e de um kit já cadastrados. O passo a passo de cada formulário, incluindo formatos aceitos, campos obrigatórios e cuidados com dados pessoais, está em [Tutorial dos formulários administrativos](docs/tutorial-formularios-admin.md).
+
 ## Requisitos
 
 - PHP 8.3 ou superior, com as extensões exigidas pelo Laravel e pelo driver MySQL;
