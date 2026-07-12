@@ -27,8 +27,8 @@ it('cria um usuário administrativo com senha protegida', function () {
         ->fillForm([
             'name' => 'Administradora',
             'email' => 'admin@example.com',
-            'password' => 'senha-segura',
-            'password_confirmation' => 'senha-segura',
+            'password' => 'Senha-Segura1!',
+            'password_confirmation' => 'Senha-Segura1!',
         ])
         ->call('create')
         ->assertHasNoFormErrors()
@@ -37,7 +37,7 @@ it('cria um usuário administrativo com senha protegida', function () {
     $user = User::query()->where('email', 'admin@example.com')->firstOrFail();
 
     expect($user->name)->toBe('Administradora')
-        ->and(Hash::check('senha-segura', $user->password))->toBeTrue();
+        ->and(Hash::check('Senha-Segura1!', $user->password))->toBeTrue();
 });
 
 it('mantém a senha atual quando ela não é informada na edição', function () {
@@ -65,8 +65,8 @@ it('exige confirmação da senha e e-mail único', function () {
         ->fillForm([
             'name' => 'Outro administrador',
             'email' => $existingUser->email,
-            'password' => 'senha-segura',
-            'password_confirmation' => 'senha-diferente',
+            'password' => 'Senha-Segura1!',
+            'password_confirmation' => 'Senha-Diferente1!',
         ])
         ->call('create')
         ->assertHasFormErrors([
@@ -74,3 +74,21 @@ it('exige confirmação da senha e e-mail único', function () {
             'password' => 'confirmed',
         ]);
 });
+
+it('exige senha forte para usuários administrativos', function (string $password) {
+    Livewire::test(CreateUser::class)
+        ->fillForm([
+            'name' => 'Nova administradora',
+            'email' => 'nova-admin@example.com',
+            'password' => $password,
+            'password_confirmation' => $password,
+        ])
+        ->call('create')
+        ->assertHasFormErrors(['password']);
+})->with([
+    'menos de 12 caracteres' => 'Senha1!',
+    'sem letra maiúscula' => 'senha-segura1!',
+    'sem letra minúscula' => 'SENHA-SEGURA1!',
+    'sem número' => 'Senha-Segura!',
+    'sem símbolo' => 'SenhaSegura123',
+]);

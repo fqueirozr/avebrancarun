@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Users\Schemas;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Pages\CreateRecord;
 use Filament\Schemas\Schema;
+use Illuminate\Validation\Rules\Password;
 
 class UserForm
 {
@@ -28,7 +29,7 @@ class UserForm
                     ->revealable()
                     ->required(fn ($livewire): bool => $livewire instanceof CreateRecord)
                     ->confirmed()
-                    ->minLength(8)
+                    ->rule(Password::min(12)->mixedCase()->numbers()->symbols())
                     ->maxLength(255)
                     ->dehydrated(fn (?string $state): bool => filled($state)),
                 TextInput::make('password_confirmation')
