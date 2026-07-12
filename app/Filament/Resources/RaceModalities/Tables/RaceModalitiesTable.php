@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\RaceModalities\Tables;
 
+use App\Models\RaceModality;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -69,10 +70,7 @@ class RaceModalitiesTable
             ->filters([
                 SelectFilter::make('type')
                     ->label('Tipo')
-                    ->options([
-                        'Infantil' => 'Infantil',
-                        'Adulto' => 'Adulto',
-                    ]),
+                    ->options(RaceModality::typeOptions()),
                 TernaryFilter::make('is_active')
                     ->label('Ativa'),
             ])

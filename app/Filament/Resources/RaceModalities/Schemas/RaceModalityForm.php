@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\RaceModalities\Schemas;
 
+use App\Models\RaceModality;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\RichEditor;
@@ -25,10 +26,7 @@ class RaceModalityForm
                     ->maxLength(255),
                 Select::make('type')
                     ->label('Tipo')
-                    ->options([
-                        'Infantil' => 'Infantil',
-                        'Adulto' => 'Adulto',
-                    ])
+                    ->options(RaceModality::typeOptions())
                     ->required()
                     ->native(false),
                 TextInput::make('age_start')

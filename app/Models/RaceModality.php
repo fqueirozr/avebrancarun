@@ -31,6 +31,20 @@ class RaceModality extends Model
     use HasFactory;
 
     /**
+     * @return array<string, string>
+     */
+    public static function typeOptions(): array
+    {
+        return [
+            'Infantil' => 'Infantil',
+            'Juvenil' => 'Juvenil',
+            'Adulto' => 'Adulto',
+            'Master' => 'Master',
+            'PCD' => 'PCD',
+        ];
+    }
+
+    /**
      * @return HasMany<ParticipantRegistration, $this>
      */
     public function participantRegistrations(): HasMany

@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="description" content="Corrida de rua do Clube de Desbravadores Ave Branca, com provas infantis e percursos adultos de 3 km e 6 km.">
+        <meta name="description" content="Corrida de rua do Clube de Desbravadores Ave Branca, com provas para diferentes categorias e percursos de 3 km e 6 km.">
 
         <title>Ave Branca Run</title>
 
@@ -70,7 +70,7 @@
                 <div class="mx-auto grid max-w-7xl grid-cols-1 gap-3 md:grid-cols-3">
                     <div class="race-panel p-5 reveal-on-scroll" data-reveal>
                         <p class="text-sm font-black uppercase tracking-normal text-race-blue">Público</p>
-                        <p class="mt-2 text-2xl font-black">Infantil e adulto</p>
+                        <p class="mt-2 text-2xl font-black">Para todas as categorias</p>
                         <p class="mt-2 text-sm font-semibold leading-6 text-zinc-600">Categorias por idade e distâncias para diferentes ritmos.</p>
                     </div>
                     <div class="race-panel p-5 reveal-on-scroll" data-reveal>
@@ -438,9 +438,19 @@
         </main>
 
         <footer class="border-t border-race-blue/10 bg-white">
-            <div class="mx-auto flex max-w-7xl flex-col gap-3 px-5 py-8 text-sm font-semibold text-zinc-600 sm:px-8 md:flex-row md:items-center md:justify-between">
-                <p class="font-black text-race-night">Ave Branca Run</p>
-                <p>Corrida de rua com inscrições, provas e pagamento por Crédito/PIX via ASAAS Gestão Financeira Instituição de Pagamento S.A.</p>
+            <div class="mx-auto grid max-w-7xl gap-3 px-5 py-8 text-center text-sm font-semibold text-zinc-600 sm:px-8 md:items-center">
+                <div class="grid gap-1">
+                    <p class="font-black text-race-night">Ave Branca Run - 2026</p>
+                    @if ($eventSetting->organizer_legal_name || $eventSetting->organizer_cnpj)
+                        <p>
+                            <span class="font-bold text-zinc-700">Responsável:</span>
+                            {{ $eventSetting->organizer_legal_name ?: 'Organização do evento' }}
+                            @if ($eventSetting->organizer_cnpj)
+                                <span class="whitespace-nowrap">— CNPJ {{ $eventSetting->organizer_cnpj }}</span>
+                            @endif
+                        </p>
+                    @endif
+                </div>
             </div>
         </footer>
 

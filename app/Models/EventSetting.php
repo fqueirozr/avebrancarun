@@ -13,6 +13,8 @@ use Illuminate\Support\Carbon;
     'event_location',
     'registration_deadline',
     'max_registrations',
+    'organizer_legal_name',
+    'organizer_cnpj',
     'contact_email',
     'contact_phone',
     'contact_whatsapp',

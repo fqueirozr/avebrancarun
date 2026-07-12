@@ -34,6 +34,20 @@ class EventSettingForm
                             ->integer()
                             ->minValue(1)
                             ->helperText('Deixe vazio para não aplicar um limite geral.'),
+                        TextInput::make('organizer_legal_name')
+                            ->label('Razão social do organizador')
+                            ->placeholder('Nome empresarial responsável pelo evento')
+                            ->maxLength(255),
+                        TextInput::make('organizer_cnpj')
+                            ->label('CNPJ do organizador')
+                            ->placeholder('00.000.000/0000-00')
+                            ->mask('99.999.999/9999-99')
+                            ->regex('/^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/')
+                            ->validationMessages([
+                                'regex' => 'Informe o CNPJ no formato 00.000.000/0000-00.',
+                            ])
+                            ->maxLength(18)
+                            ->helperText('Este dado será exibido no rodapé público para identificar o responsável pelo evento.'),
                         TextInput::make('contact_email')
                             ->label('E-mail de contato')
                             ->placeholder('contato@evento.com.br')

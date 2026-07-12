@@ -22,6 +22,8 @@ class EventSettingFactory extends Factory
             'event_location' => 'Taguaparque - Taguatinga/DF',
             'registration_deadline' => '2026-08-31 23:59:00',
             'max_registrations' => 600,
+            'organizer_legal_name' => 'Clube de Desbravadores Ave Branca',
+            'organizer_cnpj' => '12.345.678/0001-95',
             'contact_email' => fake()->safeEmail(),
             'contact_phone' => fake()->numerify('###########'),
             'contact_whatsapp' => fake()->numerify('###########'),

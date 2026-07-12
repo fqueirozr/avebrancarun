@@ -15,6 +15,8 @@ class EventSettingSeeder extends Seeder
         EventSetting::query()->firstOrCreate([], [
             'event_date' => 'A confirmar',
             'event_location' => 'A confirmar',
+            'organizer_legal_name' => null,
+            'organizer_cnpj' => null,
             'contact_email' => 'contato@corridaavebranca.com.br',
             'contact_phone' => null,
             'contact_whatsapp' => null,

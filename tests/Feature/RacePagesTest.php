@@ -11,6 +11,8 @@ test('race landing page is available', function () {
     EventSetting::factory()->create([
         'event_date' => '12/10/2026',
         'event_location' => 'Parque Municipal',
+        'organizer_legal_name' => 'Instituto Esportivo Ave Branca',
+        'organizer_cnpj' => '12.345.678/0001-95',
         'kit_information' => '<p><strong>Camiseta</strong>, número de peito e medalha</p><ul><li>Retirada no local</li></ul>',
         'regulation' => '<blockquote><p>Documento oficial em revisão</p></blockquote>',
     ]);
@@ -52,7 +54,8 @@ test('race landing page is available', function () {
         ->assertSeeText('6 km')
         ->assertSee('src="'.asset('storage/kits/kit-corrida.jpg').'"', false)
         ->assertSee('alt="Foto do Kit Corrida"', false)
-        ->assertSeeText('Pagamento');
+        ->assertSeeText('Pagamento')
+        ->assertSeeText('Responsável: Instituto Esportivo Ave Branca — CNPJ 12.345.678/0001-95');
 });
 
 test('registration page is available', function () {
