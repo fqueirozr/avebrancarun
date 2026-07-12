@@ -109,5 +109,8 @@ test('registration page is available', function () {
         ->assertSeeText('PCD e 60+: Basta apresentar seu documento de comprovação.')
         ->assertSeeText('Meia Social: Pedimos a gentileza de levar o alimento não perecível para doação.')
         ->assertSeeText('Enviar inscrição')
-        ->assertSeeText('O número de protocolo será gerado automaticamente ao salvar os dados da inscrição no banco de dados.');
+        ->assertDontSeeText('Confirmação pendente')
+        ->assertDontSeeText('A inscrição será registrada e o valor do kit selecionado será usado no pagamento.')
+        ->assertDontSeeText('Continuar')
+        ->assertDontSeeText('O número de protocolo será gerado automaticamente ao salvar os dados da inscrição no banco de dados.');
 });

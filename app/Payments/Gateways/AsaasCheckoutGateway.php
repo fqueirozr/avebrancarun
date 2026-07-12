@@ -107,7 +107,7 @@ class AsaasCheckoutGateway
                 'address' => $request->registration->billing_address,
                 'addressNumber' => $request->registration->billing_address_number,
                 'province' => $request->registration->billing_province,
-                'postalCode' => $request->registration->billing_postal_code,
+                'postalCode' => preg_replace('/\D+/', '', $request->registration->billing_postal_code),
             ],
         ];
     }

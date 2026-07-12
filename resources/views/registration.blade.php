@@ -218,7 +218,7 @@
                         <div class="grid min-w-0 grid-cols-1 gap-5 md:grid-cols-2">
                             <label class="grid min-w-0 gap-2">
                                 <span class="text-sm font-bold leading-5 text-zinc-800">Nome completo do pagador</span>
-                                <input type="text" name="billing_name" value="{{ old('billing_name') }}" class="min-w-0 rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-race-cyan focus:ring-3 focus:ring-amber-100" placeholder="Nome completo">
+                                <input type="text" name="billing_name" value="{{ old('billing_name') }}" class="min-w-0 rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-race-cyan focus:ring-3 focus:ring-amber-100" placeholder="Nome completo" required>
                                 @error('billing_name')
                                     <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
                                 @enderror
@@ -226,7 +226,7 @@
 
                             <label class="grid min-w-0 gap-2">
                                 <span class="text-sm font-bold leading-5 text-zinc-800">CPF/CNPJ do pagador</span>
-                                <input type="text" name="billing_document" value="{{ old('billing_document') }}" inputmode="numeric" data-mask="cpfCnpj" class="min-w-0 rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-race-cyan focus:ring-3 focus:ring-amber-100" placeholder="000.000.000-00">
+                                <input type="text" name="billing_document" value="{{ old('billing_document') }}" inputmode="numeric" data-mask="cpfCnpj" class="min-w-0 rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-race-cyan focus:ring-3 focus:ring-amber-100" placeholder="000.000.000-00" required>
                                 @error('billing_document')
                                     <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
                                 @enderror
@@ -234,7 +234,7 @@
 
                             <label class="grid min-w-0 gap-2 md:col-span-2 lg:col-span-1">
                                 <span class="text-sm font-bold leading-5 text-zinc-800">Endereço</span>
-                                <input type="text" name="billing_address" value="{{ old('billing_address') }}" class="min-w-0 rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-race-cyan focus:ring-3 focus:ring-amber-100" placeholder="Rua, avenida ou travessa">
+                                <input type="text" name="billing_address" value="{{ old('billing_address') }}" class="min-w-0 rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-race-cyan focus:ring-3 focus:ring-amber-100" placeholder="Rua, avenida ou travessa" required>
                                 @error('billing_address')
                                     <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
                                 @enderror
@@ -243,7 +243,7 @@
                             <div class="grid min-w-0 grid-cols-1 gap-5 sm:grid-cols-[minmax(0,1fr)_8rem]">
                                 <label class="grid min-w-0 gap-2">
                                     <span class="text-sm font-bold leading-5 text-zinc-800">Bairro</span>
-                                    <input type="text" name="billing_province" value="{{ old('billing_province') }}" class="min-w-0 rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-race-cyan focus:ring-3 focus:ring-amber-100" placeholder="Bairro">
+                                    <input type="text" name="billing_province" value="{{ old('billing_province') }}" class="min-w-0 rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-race-cyan focus:ring-3 focus:ring-amber-100" placeholder="Bairro" required>
                                     @error('billing_province')
                                         <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
                                     @enderror
@@ -251,7 +251,7 @@
 
                                 <label class="grid min-w-0 gap-2">
                                     <span class="text-sm font-bold leading-5 text-zinc-800">Número</span>
-                                    <input type="text" name="billing_address_number" value="{{ old('billing_address_number') }}" class="min-w-0 rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-race-cyan focus:ring-3 focus:ring-amber-100" placeholder="123">
+                                    <input type="text" name="billing_address_number" value="{{ old('billing_address_number') }}" class="min-w-0 rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-race-cyan focus:ring-3 focus:ring-amber-100" placeholder="123" required>
                                     @error('billing_address_number')
                                         <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
                                     @enderror
@@ -260,7 +260,7 @@
 
                             <label class="grid min-w-0 gap-2">
                                 <span class="text-sm font-bold leading-5 text-zinc-800">CEP</span>
-                                <input type="text" name="billing_postal_code" value="{{ old('billing_postal_code') }}" inputmode="numeric" class="min-w-0 rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-race-cyan focus:ring-3 focus:ring-amber-100" placeholder="Somente números">
+                                <input type="text" name="billing_postal_code" value="{{ old('billing_postal_code') }}" inputmode="numeric" autocomplete="postal-code" data-mask="cep" maxlength="9" class="min-w-0 rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-race-cyan focus:ring-3 focus:ring-amber-100" placeholder="00000-000" required>
                                 @error('billing_postal_code')
                                     <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
                                 @enderror
@@ -430,26 +430,18 @@
 
                     </fieldset>
 
-                    <div class="grid gap-3 rounded-md bg-zinc-50 p-5 sm:grid-cols-[1fr_auto] sm:items-center" data-registration-actions>
-                        <div>
-                            <p class="font-black">Confirmação pendente</p>
-                            <p class="mt-1 text-sm leading-6 text-zinc-600">A inscrição será registrada e o valor do kit selecionado será usado no pagamento.</p>
-                        </div>
-
+                    <div class="flex flex-wrap justify-end gap-3 rounded-md bg-zinc-50 p-5" data-registration-actions>
                         <div class="flex flex-wrap gap-3 sm:justify-end">
                             <button type="button" class="rounded-md border border-zinc-300 bg-white px-5 py-3 text-sm font-black text-zinc-800 transition hover:bg-zinc-50" data-registration-prev>
                                 Voltar
                             </button>
                             <button type="button" class="rounded-md bg-race-blue px-5 py-3 text-sm font-black text-white transition hover:bg-race-ink" data-registration-next>
-                                Continuar
+                                Próximo
                             </button>
                             <button type="submit" @disabled($modalities->isEmpty() || $kits->isEmpty() || $eventSetting->registrationDeadlineHasPassed() || $eventSetting->registrationLimitHasBeenReached()) class="rounded-md bg-race-blue px-5 py-3 text-sm font-black text-white transition hover:bg-race-ink disabled:cursor-not-allowed disabled:bg-zinc-400" data-registration-submit>
                                 Enviar inscrição
                             </button>
                         </div>
-                        <p class="text-xs font-semibold leading-5 text-zinc-500">
-                            O número de protocolo será gerado automaticamente ao salvar os dados da inscrição no banco de dados.
-                        </p>
                     </div>
                 </form>
             </section>

@@ -34,7 +34,12 @@ const maskPhone = (value) => {
         .replace(/(\d{5})(\d{1,4})$/, '$1-$2');
 };
 
+const maskCep = (value) => onlyDigits(value)
+    .slice(0, 8)
+    .replace(/(\d{5})(\d{1,3})$/, '$1-$2');
+
 const masks = {
+    cep: maskCep,
     cpf: maskCpf,
     cpfCnpj: maskCpfCnpj,
     phone: maskPhone,

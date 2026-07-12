@@ -32,6 +32,12 @@ function validRegistrationPayload(RaceModality $raceModality, Kit $kit, array $o
         'guardian_cpf' => '153.509.460-56',
         'phone' => '(11) 99999-9999',
         'email' => 'maria@example.com',
+        'billing_document' => '529.982.247-25',
+        'billing_name' => 'Maria Silva',
+        'billing_address' => 'Rua das Flores',
+        'billing_address_number' => '123',
+        'billing_province' => 'Centro',
+        'billing_postal_code' => '70000000',
         'race_modality_id' => $raceModality->id,
         'kit_id' => $kit->id,
         'accepted_regulation' => '1',
@@ -40,6 +46,41 @@ function validRegistrationPayload(RaceModality $raceModality, Kit $kit, array $o
         'accepted_data_confirmation' => '1',
     ], $overrides);
 }
+
+test('billing postal code is normalized before validation', function () {
+    Mail::fake();
+    $raceModality = RaceModality::factory()->create();
+    $kit = Kit::factory()->create(['price' => 0]);
+
+    $this->post(route('registration.store'), validRegistrationPayload($raceModality, $kit, [
+        'billing_postal_code' => '70.000-000',
+    ]))->assertSessionDoesntHaveErrors('billing_postal_code');
+
+    $this->assertDatabaseHas(ParticipantRegistration::class, [
+        'billing_postal_code' => '70000000',
+    ]);
+});
+
+test('payer data is required even for a free registration', function () {
+    $raceModality = RaceModality::factory()->create();
+    $kit = Kit::factory()->create(['price' => 0]);
+
+    $this->post(route('registration.store'), validRegistrationPayload($raceModality, $kit, [
+        'billing_document' => null,
+        'billing_name' => null,
+        'billing_address' => null,
+        'billing_address_number' => null,
+        'billing_province' => null,
+        'billing_postal_code' => null,
+    ]))->assertSessionHasErrors([
+        'billing_document',
+        'billing_name',
+        'billing_address',
+        'billing_address_number',
+        'billing_province',
+        'billing_postal_code',
+    ]);
+});
 
 test('registration submission rejects an expired deadline', function () {
     EventSetting::factory()->create([
@@ -239,6 +280,11 @@ test('a participant can submit a registration', function () {
         'phone' => '(11) 99999-9999',
         'email' => $registration->email,
         'billing_document' => $registration->billing_document,
+        'billing_name' => 'Maria Silva',
+        'billing_address' => 'Rua das Flores',
+        'billing_address_number' => '123',
+        'billing_province' => 'Centro',
+        'billing_postal_code' => '70000000',
         'race_modality_id' => $raceModality->id,
         'kit_id' => $kit->id,
         'notes' => $registration->notes,

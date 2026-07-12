@@ -39,12 +39,12 @@ class RegisterParticipantRequest extends FormRequest
             'filled_by_legal_representative' => ['required', 'boolean'],
             'phone' => ['required', 'string', 'regex:/^\d{10,11}$/'],
             'email' => ['required', 'email', 'max:255'],
-            'billing_document' => ['nullable', 'string', 'regex:/^\d{11}(\d{3})?$/'],
-            'billing_name' => ['nullable', 'string', 'max:255'],
-            'billing_address' => ['nullable', 'string', 'max:255'],
-            'billing_address_number' => ['nullable', 'string', 'max:20'],
-            'billing_province' => ['nullable', 'string', 'max:255'],
-            'billing_postal_code' => ['nullable', 'string', 'regex:/^\d{8}$/'],
+            'billing_document' => ['required', 'string', 'regex:/^\d{11}(\d{3})?$/'],
+            'billing_name' => ['required', 'string', 'max:255'],
+            'billing_address' => ['required', 'string', 'max:255'],
+            'billing_address_number' => ['required', 'string', 'max:20'],
+            'billing_province' => ['required', 'string', 'max:255'],
+            'billing_postal_code' => ['required', 'string', 'regex:/^\d{8}$/'],
             'race_modality_id' => ['required', Rule::exists('race_modalities', 'id')->where('is_active', true)],
             'kit_id' => ['required', Rule::exists('kits', 'id')->where('is_active', true)],
             'notes' => ['nullable', 'string', 'max:1000'],
@@ -166,16 +166,6 @@ class RegisterParticipantRequest extends FormRequest
                     $validator->errors()->add('accepted_special_kit_rules', 'Você precisa ler e declarar ciência das regras para PCD, 60+ e Meia Social.');
                 }
 
-                if (! $this->requiresCheckoutData($kit)) {
-                    return;
-                }
-
-                foreach ($this->requiredCheckoutFields() as $field => $message) {
-                    if (blank($this->input($field))) {
-                        $validator->errors()->add($field, $message);
-                    }
-                }
-
                 if (filled($this->input('billing_name')) && ! preg_match('/\pL+\s+\pL+/u', (string) $this->input('billing_name'))) {
                     $validator->errors()->add('billing_name', 'Informe o nome completo do pagador.');
                 }
@@ -210,11 +200,6 @@ class RegisterParticipantRequest extends FormRequest
         ]);
     }
 
-    private function requiresCheckoutData(?Kit $kit): bool
-    {
-        return $kit !== null && (float) $kit->price > 0;
-    }
-
     private function isMinorParticipant(): bool
     {
         if (blank($this->input('birth_date'))) {
@@ -235,21 +220,6 @@ class RegisterParticipantRequest extends FormRequest
     private function requiresLegalRepresentative(): bool
     {
         return $this->isMinorParticipant() || $this->boolean('filled_by_legal_representative');
-    }
-
-    /**
-     * @return array<string, string>
-     */
-    private function requiredCheckoutFields(): array
-    {
-        return [
-            'billing_document' => 'Informe o CPF ou CNPJ para seguir ao checkout.',
-            'billing_name' => 'Informe o nome completo do pagador para seguir ao checkout.',
-            'billing_address' => 'Informe o endereço do pagador para seguir ao checkout.',
-            'billing_address_number' => 'Informe o número do endereço para seguir ao checkout.',
-            'billing_province' => 'Informe o bairro do pagador para seguir ao checkout.',
-            'billing_postal_code' => 'Informe o CEP do pagador para seguir ao checkout.',
-        ];
     }
 
     private function hasValidBillingDocument(string $document): bool

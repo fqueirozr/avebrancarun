@@ -47,7 +47,7 @@ test('asaas checkout gateway creates a checkout session', function () {
         'billing_address' => 'Rua das Flores',
         'billing_address_number' => '123',
         'billing_province' => 'Centro',
-        'billing_postal_code' => '70000000',
+        'billing_postal_code' => '70000-000',
         'phone' => '(11) 99999-9999',
         'race_modality_id' => $raceModality->id,
     ]);
