@@ -94,9 +94,11 @@ class RaceResultsTable
                             ->options(ParticipantRegistration::resultStatusOptions())
                             ->required()
                             ->live(),
-                        TextInput::make('result_category')
+                        Select::make('result_category')
                             ->label('Categoria')
-                            ->maxLength(255),
+                            ->options(ParticipantRegistration::resultCategoryOptions())
+                            ->searchable()
+                            ->preload(),
                     ])
                     ->action(function (ParticipantRegistration $record, array $data): void {
                         $record->update($data);

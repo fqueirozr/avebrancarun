@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
 #[Fillable([
@@ -122,6 +123,48 @@ class ParticipantRegistration extends Model
             'male' => 'Masculino',
             'female' => 'Feminino',
         ];
+    }
+
+    /** @return array<string, string> */
+    public static function resultCategoryOptions(): array
+    {
+        return collect(['6–7', '8–9', '10–11', '12–13', '14–19', '20–29', '30–39', '40–49', '50–59', '60+'])
+            ->flatMap(fn (string $ageRange): array => [
+                "Masculino {$ageRange}" => "Masculino {$ageRange}",
+                "Feminino {$ageRange}" => "Feminino {$ageRange}",
+            ])
+            ->all();
+    }
+
+    public static function resultCategoryFor(string $sex, Carbon $birthDate, Carbon $referenceDate): ?string
+    {
+        $age = $birthDate->diff($referenceDate)->y;
+
+        if ($age < 6) {
+            return null;
+        }
+
+        $ageRange = match (true) {
+            $age >= 6 && $age <= 7 => '6–7',
+            $age <= 9 => '8–9',
+            $age <= 11 => '10–11',
+            $age <= 13 => '12–13',
+            $age <= 19 => '14–19',
+            $age <= 29 => '20–29',
+            $age <= 39 => '30–39',
+            $age <= 49 => '40–49',
+            $age <= 59 => '50–59',
+            $age >= 60 => '60+',
+            default => null,
+        };
+
+        $sexLabel = self::sexOptions()[$sex] ?? null;
+
+        if ($ageRange === null || $sexLabel === null) {
+            return null;
+        }
+
+        return "{$sexLabel} {$ageRange}";
     }
 
     public function sexLabel(): string

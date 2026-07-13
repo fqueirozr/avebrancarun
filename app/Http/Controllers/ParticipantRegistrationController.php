@@ -104,6 +104,11 @@ class ParticipantRegistrationController extends Controller
                     'special_kit_rules_acceptance_ip' => $kit->requiresRulesAcknowledgement() ? $request->ip() : null,
                     'special_kit_rules_acceptance_user_agent' => $kit->requiresRulesAcknowledgement() ? $request->userAgent() : null,
                     'modality' => $raceModality->displayName(),
+                    'result_category' => ParticipantRegistration::resultCategoryFor(
+                        $validated['sex'],
+                        Carbon::parse($validated['birth_date']),
+                        $raceModality->ageReferenceDate($eventSetting?->eventDateForAgeCalculation()),
+                    ),
                 ]);
 
                 if ($registration->referred_by_pathfinder_id !== null) {

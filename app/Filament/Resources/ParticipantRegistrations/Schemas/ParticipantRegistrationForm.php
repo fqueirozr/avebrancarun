@@ -125,9 +125,11 @@ class ParticipantRegistrationForm
                     ->placeholder('00:42:18')
                     ->regex('/^\d{2}:\d{2}:\d{2}$/')
                     ->helperText('Use o formato HH:MM:SS.'),
-                TextInput::make('result_category')
+                Select::make('result_category')
                     ->label('Categoria do resultado')
-                    ->maxLength(100),
+                    ->options(ParticipantRegistration::resultCategoryOptions())
+                    ->searchable()
+                    ->preload(),
                 TextInput::make('overall_rank')
                     ->label('Classificação geral')
                     ->numeric()

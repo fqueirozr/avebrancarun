@@ -280,6 +280,7 @@ test('a participant can submit a registration', function () {
 
     $registration = ParticipantRegistration::factory()->make([
         'athlete_name' => 'Maria Silva',
+        'birth_date' => '1990-05-10',
         'email' => 'maria@example.com',
         'race_modality_id' => $raceModality->id,
         'kit_id' => $kit->id,
@@ -326,6 +327,7 @@ test('a participant can submit a registration', function () {
         'race_modality_id' => $raceModality->id,
         'kit_id' => $kit->id,
         'modality' => 'Adulto a partir de 16 anos - 6 km',
+        'result_category' => 'Feminino 30–39',
         'notes' => $registration->notes,
         'emergency_contact_name' => 'Ana Silva',
         'emergency_contact_phone' => '11988887777',
