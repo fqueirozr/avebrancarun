@@ -781,22 +781,43 @@ test('registration update email shows cancelled status', function () {
     $mail->assertSeeInHtml('Esta inscrição foi cancelada');
 });
 
-test('an authenticated admin can print the registration list', function () {
+test('an authenticated admin can print the paid kit delivery list with a signature field', function () {
     config(['app.env' => 'local']);
 
     $user = User::factory()->create();
+
+    $kit = Kit::factory()->create([
+        'name' => 'Kit Desbravador',
+        'type' => Kit::TypePathfinder,
+        'upgrade_1_contents' => 'Camiseta exclusiva',
+        'upgrade_2_contents' => 'Boné do evento',
+        'upgrade_3_contents' => 'Mochila premium',
+    ]);
 
     ParticipantRegistration::factory()->create([
         'athlete_name' => 'Maria Silva',
         'email' => 'maria@example.com',
         'payment_status' => 'paid',
+        'kit_id' => $kit->id,
+        'pathfinder_upgrade_level' => 2,
+    ]);
+
+    ParticipantRegistration::factory()->create([
+        'athlete_name' => 'João Pendente',
+        'payment_status' => 'pending',
     ]);
 
     $this->actingAs($user)
         ->get(ParticipantRegistrationResource::getUrl('print'))
         ->assertSuccessful()
-        ->assertSee('Lista de inscrições')
+        ->assertSee('Lista de entrega de kits')
         ->assertSee('Maria Silva')
-        ->assertSee('maria@example.com')
-        ->assertSee('Pago');
+        ->assertSee('Kit Desbravador')
+        ->assertSee('Upgrades alcançados:')
+        ->assertSee('Camiseta exclusiva')
+        ->assertSee('Boné do evento')
+        ->assertDontSee('Mochila premium')
+        ->assertSee('Assinatura do recebedor')
+        ->assertDontSee('maria@example.com')
+        ->assertDontSee('João Pendente');
 });

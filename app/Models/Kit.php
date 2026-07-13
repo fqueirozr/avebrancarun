@@ -68,6 +68,18 @@ class Kit extends Model
     }
 
     /**
+     * @return array<int, string>
+     */
+    public function upgradeContentsThroughLevel(int $level): array
+    {
+        return collect(range(1, min(max($level, 0), 3)))
+            ->map(fn (int $upgradeLevel): ?string => $this->{"upgrade_{$upgradeLevel}_contents"})
+            ->filter(fn (?string $contents): bool => filled($contents))
+            ->values()
+            ->all();
+    }
+
+    /**
      * @return HasMany<ParticipantRegistration, $this>
      */
     public function participantRegistrations(): HasMany

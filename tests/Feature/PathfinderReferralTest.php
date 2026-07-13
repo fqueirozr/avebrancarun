@@ -1,9 +1,12 @@
 <?php
 
+use App\Filament\Resources\ParticipantRegistrations\Pages\EditParticipantRegistration;
 use App\Models\Kit;
 use App\Models\ParticipantRegistration;
 use App\Models\Pathfinder;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
 
 uses(RefreshDatabase::class);
 
@@ -38,6 +41,28 @@ it('stores what each pathfinder kit upgrade adds', function () {
         ->upgrade_1_contents->toBe('Camiseta premium')
         ->upgrade_2_contents->toBe('Boné exclusivo')
         ->upgrade_3_contents->toBe('Mochila personalizada');
+});
+
+it('shows the kit additions acquired by a pathfinder in the admin registration panel', function () {
+    $kit = Kit::factory()->create([
+        'type' => Kit::TypePathfinder,
+        'upgrade_1_contents' => 'Camiseta premium',
+        'upgrade_2_contents' => 'Boné exclusivo',
+        'upgrade_3_contents' => 'Mochila personalizada',
+    ]);
+    $registration = ParticipantRegistration::factory()->create([
+        'kit_id' => $kit->id,
+        'pathfinder_upgrade_level' => 2,
+    ]);
+
+    $this->actingAs(User::factory()->create());
+
+    Livewire::test(EditParticipantRegistration::class, ['record' => $registration->getRouteKey()])
+        ->assertOk()
+        ->assertSee('Acréscimos do kit adquiridos pelas indicações')
+        ->assertSee('Camiseta premium')
+        ->assertSee('Boné exclusivo')
+        ->assertDontSee('Mochila personalizada');
 });
 
 it('relates normal registrations to their referring pathfinder', function () {

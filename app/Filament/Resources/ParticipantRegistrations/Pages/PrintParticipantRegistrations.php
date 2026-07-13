@@ -17,7 +17,7 @@ class PrintParticipantRegistrations extends Page
 
     public function getTitle(): string
     {
-        return 'Imprimir inscrições';
+        return 'Lista de entrega de kits';
     }
 
     /**
@@ -26,6 +26,9 @@ class PrintParticipantRegistrations extends Page
     public function getRegistrations(): Collection
     {
         return ParticipantRegistration::query()
+            ->with('kit:id,name,type,upgrade_1_contents,upgrade_2_contents,upgrade_3_contents')
+            ->where('payment_status', 'paid')
+            ->orderBy('kit_id')
             ->orderBy('modality')
             ->orderBy('athlete_name')
             ->get();

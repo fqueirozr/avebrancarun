@@ -146,24 +146,29 @@
             .print-list__table tr {
                 break-inside: avoid;
             }
+
+            .print-list__signature {
+                height: 18mm;
+                min-width: 55mm;
+            }
         }
     </style>
 
     <section class="print-list">
         <header class="print-list__header">
             <div>
-                <h2 class="print-list__title">Lista de inscrições</h2>
+                <h2 class="print-list__title">Lista de entrega de kits</h2>
                 <p class="print-list__meta">Gerada em {{ now()->format('d/m/Y H:i') }}</p>
             </div>
 
             <div class="print-list__count">
-                {{ $registrations->count() }} inscrições
+                {{ $registrations->count() }} kits
             </div>
         </header>
 
         @if ($registrations->isEmpty())
             <div class="print-list__empty">
-                Nenhuma inscrição encontrada.
+                Nenhum kit com pagamento confirmado para entrega.
             </div>
         @else
             <table class="print-list__table">
@@ -171,15 +176,9 @@
                     <tr>
                         <th>Protocolo</th>
                         <th>Atleta</th>
-                        <th>Nascimento</th>
-                        <th>Sexo</th>
-                        <th>CPF atleta</th>
-                        <th>Responsável Legal</th>
-                        <th>Telefone</th>
-                        <th>E-mail</th>
                         <th>Prova</th>
-                        <th>Pagamento</th>
-                        <th>Inscrito em</th>
+                        <th>Kit</th>
+                        <th>Assinatura do recebedor</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -187,15 +186,21 @@
                         <tr>
                             <td>{{ $registration->protocol_number }}</td>
                             <td>{{ $registration->athlete_name }}</td>
-                            <td>{{ $registration->birth_date?->format('d/m/Y') }}</td>
-                            <td>{{ $registration->sexLabel() }}</td>
-                            <td>{{ $registration->participant_cpf }}</td>
-                            <td>{{ $registration->guardian_name ?: '-' }}</td>
-                            <td>{{ $registration->phone }}</td>
-                            <td>{{ $registration->email }}</td>
                             <td>{{ $registration->modality }}</td>
-                            <td>{{ $registration->paymentStatusLabel() }}</td>
-                            <td>{{ $registration->created_at?->format('d/m/Y H:i') }}</td>
+                            <td>
+                                {{ $registration->kit?->name ?? 'Não informado' }}
+                                @if ($registration->kit?->type === \App\Models\Kit::TypePathfinder && $registration->pathfinder_upgrade_level > 0)
+                                    <div>
+                                        <strong>Upgrades alcançados:</strong>
+                                        <ul>
+                                            @foreach ($registration->kit->upgradeContentsThroughLevel($registration->pathfinder_upgrade_level) as $upgradeContents)
+                                                <li>{{ $upgradeContents }}</li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                @endif
+                            </td>
+                            <td class="print-list__signature"></td>
                         </tr>
                     @endforeach
                 </tbody>
