@@ -299,28 +299,22 @@
 
                     <fieldset class="grid min-w-0 gap-3 border-b border-zinc-200 pb-6" data-registration-step data-step-title="Kit">
                         <legend class="mb-4 text-base font-black text-zinc-950">Kit</legend>
-                        <div class="grid gap-3 rounded-md border border-race-cyan/30 bg-amber-50 px-4 py-3 text-sm leading-6 text-race-ink">
-                            <p class="font-bold">Vai se inscrever como PCD, 60+ ou Meia Social? Confira as dicas:</p>
-                            <p><strong>Desconto já aplicado:</strong> Os valores dessas categorias já estão com o desconto incluso no app (e não é preciso anexar o laudo PCD na inscrição).</p>
-                            <p class="font-bold">No dia da retirada do kit:</p>
-                            <ul class="list-disc space-y-2 pl-5">
-                                <li><strong>PCD e 60+:</strong> Basta apresentar seu documento de comprovação.</li>
-                                <li><strong>Meia Social:</strong> Pedimos a gentileza de levar o alimento não perecível para doação.</li>
-                            </ul>
-                        </div>
                         <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
                             @forelse ($kits as $kit)
                                 <label class="rounded-md border border-zinc-200 text-sm transition has-checked:border-race-cyan has-checked:bg-amber-50">
                                     <span class="flex items-start gap-3 px-4 py-3">
-                                        <input type="radio" name="kit_id" value="{{ $kit->id }}" @checked((int) old('kit_id') === $kit->id) @if ($kit->is_half_registration) data-special-kit @endif class="mt-1 size-4 accent-race-cyan" required>
+                                        <input type="radio" name="kit_id" value="{{ $kit->id }}" @checked((int) old('kit_id') === $kit->id) @if ($kit->requiresRulesAcknowledgement()) data-special-kit @endif data-allows-referral="{{ $kit->allowsReferralCode() ? 'true' : 'false' }}" data-kit-type="{{ $kit->type }}" class="mt-1 size-4 accent-race-cyan" required>
                                         <span class="grid gap-1">
                                             <span class="font-bold">{{ $kit->name }}</span>
                                             <span class="font-black text-race-blue">R$ {{ number_format((float) $kit->price, 2, ',', '.') }}</span>
-                                            @if ($kit->is_half_registration)
-                                                <span class="font-semibold text-race-blue">Kit específico para PCD, pessoas com 60 anos ou mais e Meia Social. O preço exibido já inclui o desconto.</span>
+                                            @if (in_array($kit->type, [\App\Models\Kit::TypePcd60, \App\Models\Kit::TypeSocial], true))
+                                                <span class="font-semibold text-race-blue">Kit com desconto especial. O preço exibido já inclui o desconto.</span>
                                             @endif
                                             @if ($kit->description)
                                                 <span class="line-clamp-2 text-zinc-600">{{ $kit->description }}</span>
+                                            @endif
+                                            @if ($kit->requiresRulesAcknowledgement())
+                                                <span hidden data-kit-rules-template>{{ \Filament\Forms\Components\RichEditor\RichContentRenderer::make($kit->rules ?: 'Regras em definição.') }}</span>
                                             @endif
                                         </span>
                                     </span>
@@ -337,6 +331,14 @@
                         @error('accepted_special_kit_rules')
                             <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
                         @enderror
+                        <label class="grid gap-2" data-referral-code-field hidden>
+                            <span class="text-sm font-bold text-zinc-800" data-referral-code-label>Código de indicação</span>
+                            <input type="text" name="referral_code" value="{{ old('referral_code') }}" inputmode="numeric" maxlength="4" pattern="\d{4}" class="rounded-md border border-zinc-300 px-4 py-3" placeholder="0000">
+                            <span class="text-xs text-zinc-600" data-referral-code-help>Use o código de um desbravador para registrar a indicação.</span>
+                            @error('referral_code')
+                                <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
+                            @enderror
+                        </label>
                     </fieldset>
 
                     <fieldset class="grid min-w-0 gap-5" data-registration-step data-step-title="Observacoes">
@@ -451,12 +453,11 @@
             <div class="grid gap-5 p-6 sm:p-8">
                 <div>
                     <p class="text-sm font-black uppercase tracking-wide text-race-cyan">Inscrição especial</p>
-                    <h2 class="mt-1 text-2xl font-black leading-tight">Regras para PCD, 60+ e Meia Social</h2>
+                    <h2 class="mt-1 text-2xl font-black leading-tight">Regras para PCD e 60+</h2>
                 </div>
-                <div class="grid gap-3 text-sm leading-6 text-zinc-700">
+                <div class="grid gap-3 text-sm leading-6 text-zinc-700" data-special-kit-rules-content>
                     <p><strong>PCD:</strong> o desconto já está aplicado e não é necessário anexar laudo durante a inscrição. Na retirada do kit, apresente documento comprobatório.</p>
                     <p><strong>60+:</strong> o desconto já está aplicado. Na retirada do kit, apresente documento oficial que comprove a idade.</p>
-                    <p><strong>Meia Social:</strong> o desconto já está aplicado. Na retirada do kit, entregue um alimento não perecível para doação.</p>
                 </div>
                 <label class="flex items-start gap-3 rounded-md border border-zinc-200 bg-amber-50 px-4 py-3 text-sm font-semibold text-zinc-800">
                     <input type="checkbox" name="accepted_special_kit_rules" value="1" form="registration-form" @checked(old('accepted_special_kit_rules')) class="mt-1 size-4 accent-race-cyan" data-special-kit-acknowledgement>

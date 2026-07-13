@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Kits\Tables;
 
+use App\Models\Kit;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -28,6 +29,7 @@ class KitsTable
                     ->label('Nome')
                     ->searchable()
                     ->sortable(),
+                TextColumn::make('type')->label('Tipo')->badge()->formatStateUsing(fn (string $state): string => Kit::typeOptions()[$state] ?? $state),
                 TextColumn::make('price')
                     ->label('Valor')
                     ->formatStateUsing(fn (string $state): string => Number::currency((float) $state, 'BRL', 'pt_BR'))

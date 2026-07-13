@@ -72,6 +72,8 @@ document.querySelectorAll('[data-registration-form]').forEach((form) => {
     const specialKitModal = document.getElementById('special-kit-rules-modal');
     const specialKitAcknowledgement = document.querySelector('[data-special-kit-acknowledgement]');
     const specialKitConfirm = document.querySelector('[data-special-kit-confirm]');
+    const specialKitRulesContent = document.querySelector('[data-special-kit-rules-content]');
+    const referralCodeField = form.querySelector('[data-referral-code-field]');
     let currentStepIndex = 0;
 
     const fieldLabels = {
@@ -287,10 +289,34 @@ document.querySelectorAll('[data-registration-form]').forEach((form) => {
     specialKitOptions.forEach((option) => {
         option.addEventListener('change', () => {
             if (option.checked && specialKitModal instanceof HTMLDialogElement) {
+                const rules = option.closest('label')?.querySelector('[data-kit-rules-template]');
+
+                if (rules && specialKitRulesContent) {
+                    specialKitRulesContent.innerHTML = rules.innerHTML;
+                }
                 specialKitModal.showModal();
             }
         });
     });
+
+    form.querySelectorAll('input[name="kit_id"]').forEach((option) => {
+        option.addEventListener('change', () => {
+            if (referralCodeField) {
+                const identifiesPathfinder = option.dataset.kitType === 'pathfinder';
+
+                referralCodeField.hidden = option.dataset.allowsReferral !== 'true';
+                referralCodeField.querySelector('input').disabled = referralCodeField.hidden;
+                referralCodeField.querySelector('[data-referral-code-label]').textContent = identifiesPathfinder
+                    ? 'Código de identificação do desbravador'
+                    : 'Código de indicação';
+                referralCodeField.querySelector('[data-referral-code-help]').textContent = identifiesPathfinder
+                    ? 'Obrigatório para identificar o desbravador desta inscrição. Não conta como indicação.'
+                    : 'Use o código de um desbravador para registrar a indicação.';
+            }
+        });
+    });
+
+    form.querySelector('input[name="kit_id"]:checked')?.dispatchEvent(new Event('change'));
 
     specialKitAcknowledgement?.addEventListener('change', () => {
         specialKitConfirm.disabled = !specialKitAcknowledgement.checked;

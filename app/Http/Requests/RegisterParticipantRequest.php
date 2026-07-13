@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use App\Models\EventSetting;
 use App\Models\Kit;
 use App\Models\ParticipantRegistration;
+use App\Models\Pathfinder;
 use App\Models\RaceModality;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -56,6 +57,7 @@ class RegisterParticipantRequest extends FormRequest
             'accepted_fitness_declaration' => ['accepted'],
             'accepted_data_confirmation' => ['accepted'],
             'accepted_special_kit_rules' => ['nullable', 'boolean'],
+            'referral_code' => ['nullable', 'digits:4'],
         ];
     }
 
@@ -162,8 +164,27 @@ class RegisterParticipantRequest extends FormRequest
                     }
                 }
 
-                if ($kit?->is_half_registration && ! $this->boolean('accepted_special_kit_rules')) {
-                    $validator->errors()->add('accepted_special_kit_rules', 'Você precisa ler e declarar ciência das regras para PCD, 60+ e Meia Social.');
+                if ($kit?->requiresRulesAcknowledgement() && ! $this->boolean('accepted_special_kit_rules')) {
+                    $validator->errors()->add('accepted_special_kit_rules', 'Você precisa ler e declarar ciência das regras deste kit.');
+                }
+
+                if ($kit !== null && ! $kit->allowsReferralCode() && filled($this->input('referral_code'))) {
+                    $validator->errors()->add('referral_code', 'Este tipo de inscrição não aceita código de indicação.');
+                }
+
+                $pathfinder = filled($this->input('referral_code'))
+                    ? Pathfinder::query()
+                        ->where('code', $this->input('referral_code'))
+                        ->where('is_active', true)
+                        ->first()
+                    : null;
+
+                if ($kit?->type === Kit::TypePathfinder && $pathfinder === null) {
+                    $validator->errors()->add('referral_code', 'Informe o código ativo do desbravador.');
+                } elseif ($kit?->type === Kit::TypeStandard && filled($this->input('referral_code')) && $pathfinder === null) {
+                    $validator->errors()->add('referral_code', 'Código de indicação inválido.');
+                } elseif ($kit?->type === Kit::TypePathfinder && $pathfinder?->registration()->exists()) {
+                    $validator->errors()->add('referral_code', 'Este desbravador já possui uma inscrição.');
                 }
 
                 if (filled($this->input('billing_name')) && ! preg_match('/\pL+\s+\pL+/u', (string) $this->input('billing_name'))) {

@@ -99,7 +99,7 @@ test('special kit requires acknowledgement of its rules', function () {
     $raceModality = RaceModality::factory()->create();
     $kit = Kit::factory()->create([
         'price' => 0,
-        'is_half_registration' => true,
+        'type' => Kit::TypePcd60,
     ]);
 
     $this->post(route('registration.store'), validRegistrationPayload($raceModality, $kit))
@@ -113,7 +113,7 @@ test('special kit acknowledgement is recorded for audit', function () {
     $raceModality = RaceModality::factory()->create();
     $kit = Kit::factory()->create([
         'price' => 0,
-        'is_half_registration' => true,
+        'type' => Kit::TypePcd60,
     ]);
 
     $this->withServerVariables([

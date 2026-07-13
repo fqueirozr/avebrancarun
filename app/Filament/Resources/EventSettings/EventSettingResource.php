@@ -27,7 +27,7 @@ class EventSettingResource extends Resource
 
     protected static ?string $navigationLabel = 'Evento';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Configurações';
+    protected static string|UnitEnum|null $navigationGroup = 'Configuração';
 
     protected static ?int $navigationSort = 1;
 

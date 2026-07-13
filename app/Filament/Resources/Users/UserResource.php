@@ -27,9 +27,9 @@ class UserResource extends Resource
 
     protected static ?string $navigationLabel = 'Usuários administrativos';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Configurações';
+    protected static string|UnitEnum|null $navigationGroup = 'Administração';
 
-    protected static ?int $navigationSort = 10;
+    protected static ?int $navigationSort = 1;
 
     public static function form(Schema $schema): Schema
     {

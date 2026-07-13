@@ -27,6 +27,9 @@ use Illuminate\Support\Str;
     'billing_postal_code',
     'race_modality_id',
     'kit_id',
+    'pathfinder_id',
+    'referred_by_pathfinder_id',
+    'pathfinder_upgrade_level',
     'modality',
     'bib_number',
     'result_status',
@@ -86,6 +89,16 @@ class ParticipantRegistration extends Model
     public function kit(): BelongsTo
     {
         return $this->belongsTo(Kit::class);
+    }
+
+    public function pathfinder(): BelongsTo
+    {
+        return $this->belongsTo(Pathfinder::class);
+    }
+
+    public function referredByPathfinder(): BelongsTo
+    {
+        return $this->belongsTo(Pathfinder::class, 'referred_by_pathfinder_id');
     }
 
     /**
@@ -175,6 +188,7 @@ class ParticipantRegistration extends Model
             'overall_rank' => 'integer',
             'sex_rank' => 'integer',
             'category_rank' => 'integer',
+            'pathfinder_upgrade_level' => 'integer',
         ];
     }
 }

@@ -27,9 +27,9 @@ class RaceModalityResource extends Resource
 
     protected static ?string $navigationLabel = 'Provas';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Configuracoes';
+    protected static string|UnitEnum|null $navigationGroup = 'Configuração';
 
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 3;
 
     public static function form(Schema $schema): Schema
     {

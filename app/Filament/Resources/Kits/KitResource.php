@@ -27,9 +27,9 @@ class KitResource extends Resource
 
     protected static ?string $navigationLabel = 'Kits';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Configuracoes';
+    protected static string|UnitEnum|null $navigationGroup = 'Configuração';
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 4;
 
     public static function form(Schema $schema): Schema
     {

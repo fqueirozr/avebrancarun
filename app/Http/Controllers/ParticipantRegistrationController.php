@@ -8,6 +8,7 @@ use App\Mail\ParticipantRegistrationUpdated;
 use App\Models\EventSetting;
 use App\Models\Kit;
 use App\Models\ParticipantRegistration;
+use App\Models\Pathfinder;
 use App\Models\PaymentGatewaySetting;
 use App\Models\RaceModality;
 use App\Payments\CheckoutRequest;
@@ -29,7 +30,6 @@ class ParticipantRegistrationController extends Controller
     public function store(RegisterParticipantRequest $request): RedirectResponse
     {
         $validated = $request->validated();
-        $kit = Kit::query()->findOrFail($validated['kit_id']);
         unset(
             $validated['accepted_regulation'],
             $validated['accepted_privacy_policy'],
@@ -37,14 +37,21 @@ class ParticipantRegistrationController extends Controller
             $validated['accepted_data_confirmation'],
             $validated['accepted_special_kit_rules'],
         );
+        $referralCode = $validated['referral_code'] ?? null;
+        unset($validated['referral_code']);
 
         try {
-            [$registration, $raceModality] = DB::transaction(function () use ($kit, $request, $validated): array {
+            [$registration, $raceModality, $kit] = DB::transaction(function () use ($request, $validated, $referralCode): array {
                 $eventSetting = EventSetting::query()->lockForUpdate()->first();
                 $raceModality = RaceModality::query()->lockForUpdate()->findOrFail($validated['race_modality_id']);
+                $kit = Kit::query()->lockForUpdate()->findOrFail($validated['kit_id']);
 
                 if (! $raceModality->is_active) {
                     throw ValidationException::withMessages(['race_modality_id' => 'Escolha uma prova ativa.']);
+                }
+
+                if (! $kit->is_active) {
+                    throw ValidationException::withMessages(['kit_id' => 'Escolha um kit ativo.']);
                 }
 
                 if (! $raceModality->acceptsBirthDate(Carbon::parse($validated['birth_date']), $eventSetting?->eventDateForAgeCalculation())) {
@@ -69,8 +76,16 @@ class ParticipantRegistrationController extends Controller
                     throw ValidationException::withMessages(['participant_cpf' => 'Este atleta já possui uma inscrição.']);
                 }
 
+                $pathfinder = filled($referralCode) ? Pathfinder::query()->lockForUpdate()->where('code', $referralCode)->where('is_active', true)->first() : null;
+
+                if ($kit->type === Kit::TypePathfinder && ($pathfinder === null || $pathfinder->registration()->exists())) {
+                    throw ValidationException::withMessages(['referral_code' => 'O código do desbravador é inválido ou já está vinculado.']);
+                }
+
                 $registration = ParticipantRegistration::create([
                     ...$validated,
+                    'pathfinder_id' => $kit->type === Kit::TypePathfinder ? $pathfinder?->id : null,
+                    'referred_by_pathfinder_id' => $kit->type === Kit::TypeStandard ? $pathfinder?->id : null,
                     'regulation_accepted_at' => now(),
                     'regulation_version' => hash('sha256', (string) $eventSetting?->regulation),
                     'regulation_acceptance_ip' => $request->ip(),
@@ -82,14 +97,21 @@ class ParticipantRegistrationController extends Controller
                     'data_confirmation_accepted_at' => now(),
                     'data_confirmation_acceptance_ip' => $request->ip(),
                     'data_confirmation_acceptance_user_agent' => $request->userAgent(),
-                    'special_kit_rules_accepted_at' => $kit->is_half_registration ? now() : null,
-                    'special_kit_rules_version' => $kit->is_half_registration ? ParticipantRegistration::SpecialKitRulesVersion : null,
-                    'special_kit_rules_acceptance_ip' => $kit->is_half_registration ? $request->ip() : null,
-                    'special_kit_rules_acceptance_user_agent' => $kit->is_half_registration ? $request->userAgent() : null,
+                    'special_kit_rules_accepted_at' => $kit->requiresRulesAcknowledgement() ? now() : null,
+                    'special_kit_rules_version' => $kit->requiresRulesAcknowledgement()
+                        ? (filled($kit->rules) ? hash('sha256', (string) $kit->rules) : ParticipantRegistration::SpecialKitRulesVersion)
+                        : null,
+                    'special_kit_rules_acceptance_ip' => $kit->requiresRulesAcknowledgement() ? $request->ip() : null,
+                    'special_kit_rules_acceptance_user_agent' => $kit->requiresRulesAcknowledgement() ? $request->userAgent() : null,
                     'modality' => $raceModality->displayName(),
                 ]);
 
-                return [$registration, $raceModality];
+                if ($registration->referred_by_pathfinder_id !== null) {
+                    $pathfinderRegistration = $pathfinder?->registration()->with('kit')->first();
+                    $pathfinderRegistration?->update(['pathfinder_upgrade_level' => $pathfinderRegistration->kit?->upgradeLevelFor($pathfinder->referrals()->count()) ?? 0]);
+                }
+
+                return [$registration, $raceModality, $kit];
             }, attempts: 3);
         } catch (QueryException $exception) {
             if ($exception->getCode() === '23000' && str_contains($exception->getMessage(), 'registration_identity')) {

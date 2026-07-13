@@ -153,7 +153,7 @@ test('asaas checkout gateway uses the registered package price without additiona
     $raceModality = RaceModality::factory()->create();
     $kit = Kit::factory()->create([
         'price' => 80,
-        'is_half_registration' => true,
+        'type' => Kit::TypePcd60,
     ]);
 
     $registration = ParticipantRegistration::factory()->create([

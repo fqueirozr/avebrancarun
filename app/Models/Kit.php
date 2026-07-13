@@ -13,7 +13,14 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'photo_path',
     'description',
     'price',
-    'is_half_registration',
+    'type',
+    'rules',
+    'upgrade_1_referrals',
+    'upgrade_1_contents',
+    'upgrade_2_referrals',
+    'upgrade_2_contents',
+    'upgrade_3_referrals',
+    'upgrade_3_contents',
     'is_active',
     'sort_order',
 ])]
@@ -21,6 +28,44 @@ class Kit extends Model
 {
     /** @use HasFactory<KitFactory> */
     use HasFactory;
+
+    public const TypeStandard = 'standard';
+
+    public const TypePcd60 = 'pcd_60';
+
+    public const TypeSocial = 'social';
+
+    public const TypePathfinder = 'pathfinder';
+
+    protected $attributes = [
+        'type' => self::TypeStandard,
+    ];
+
+    public static function typeOptions(): array
+    {
+        return [self::TypeStandard => 'Normal', self::TypePcd60 => 'PCD / 60+', self::TypeSocial => 'Kit Social', self::TypePathfinder => 'Desbravador'];
+    }
+
+    public function requiresRulesAcknowledgement(): bool
+    {
+        return in_array($this->type, [self::TypePcd60, self::TypeSocial], true);
+    }
+
+    public function allowsReferralCode(): bool
+    {
+        return in_array($this->type, [self::TypeStandard, self::TypePathfinder], true);
+    }
+
+    public function upgradeLevelFor(int $referrals): int
+    {
+        if ($this->type !== self::TypePathfinder) {
+            return 0;
+        }
+
+        return collect([$this->upgrade_1_referrals, $this->upgrade_2_referrals, $this->upgrade_3_referrals])
+            ->filter(fn ($threshold): bool => $threshold !== null && $referrals >= (int) $threshold)
+            ->count();
+    }
 
     /**
      * @return HasMany<ParticipantRegistration, $this>
@@ -68,7 +113,9 @@ class Kit extends Model
     {
         return [
             'price' => 'decimal:2',
-            'is_half_registration' => 'boolean',
+            'upgrade_1_referrals' => 'integer',
+            'upgrade_2_referrals' => 'integer',
+            'upgrade_3_referrals' => 'integer',
             'is_active' => 'boolean',
         ];
     }

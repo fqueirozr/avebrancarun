@@ -9,6 +9,7 @@ use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use UnitEnum;
 
 class RaceResultResource extends Resource
 {
@@ -22,9 +23,11 @@ class RaceResultResource extends Resource
 
     protected static ?string $navigationLabel = 'Resultados e rankings';
 
+    protected static string|UnitEnum|null $navigationGroup = 'Secretaria';
+
     protected static ?string $slug = 'resultados';
 
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 4;
 
     public static function table(Table $table): Table
     {

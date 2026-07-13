@@ -2,7 +2,10 @@
 
 namespace App\Filament\Resources\Kits\Schemas;
 
+use App\Models\Kit;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -32,10 +35,14 @@ class KitForm
                     ->prefix('R$')
                     ->required()
                     ->minValue(0),
-                Toggle::make('is_half_registration')
-                    ->label('Pacote para PCD e idosos 60+')
-                    ->helperText('Informe no campo Valor o preço final deste pacote; nenhum desconto será calculado no checkout.')
-                    ->default(false),
+                Select::make('type')->label('Tipo')->options(Kit::typeOptions())->required()->default(Kit::TypeStandard),
+                RichEditor::make('rules')->label('Regras exibidas no modal')->columnSpanFull(),
+                TextInput::make('upgrade_1_referrals')->label('Indicações para upgrade 1')->integer()->minValue(1),
+                Textarea::make('upgrade_1_contents')->label('O que será acrescentado no upgrade 1')->rows(3)->maxLength(2000),
+                TextInput::make('upgrade_2_referrals')->label('Indicações para upgrade 2')->integer()->minValue(1),
+                Textarea::make('upgrade_2_contents')->label('O que será acrescentado no upgrade 2')->rows(3)->maxLength(2000),
+                TextInput::make('upgrade_3_referrals')->label('Indicações para upgrade 3')->integer()->minValue(1),
+                Textarea::make('upgrade_3_contents')->label('O que será acrescentado no upgrade 3')->rows(3)->maxLength(2000),
                 TextInput::make('sort_order')
                     ->label('Ordem')
                     ->integer()

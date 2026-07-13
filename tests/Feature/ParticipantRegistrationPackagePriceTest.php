@@ -3,15 +3,15 @@
 use App\Models\Kit;
 use App\Models\ParticipantRegistration;
 
-test('the registered package price is final', function (bool $isHalfRegistration) {
+test('the registered package price is final', function (string $type) {
     $registration = new ParticipantRegistration;
     $kit = new Kit([
         'price' => 80,
-        'is_half_registration' => $isHalfRegistration,
+        'type' => $type,
     ]);
 
     expect($registration->priceFor($kit))->toBe(80.0);
 })->with([
-    'package for PCD and elderly people' => [true],
-    'regular package' => [false],
+    'package for PCD and elderly people' => [Kit::TypePcd60],
+    'regular package' => [Kit::TypeStandard],
 ]);

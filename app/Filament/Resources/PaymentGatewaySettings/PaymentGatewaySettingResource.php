@@ -27,7 +27,7 @@ class PaymentGatewaySettingResource extends Resource
 
     protected static ?string $navigationLabel = 'Pagamento';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Configuracoes';
+    protected static string|UnitEnum|null $navigationGroup = 'Configuração';
 
     protected static ?int $navigationSort = 2;
 

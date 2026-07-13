@@ -12,6 +12,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use UnitEnum;
 
 class ContactMessageResource extends Resource
 {
@@ -24,6 +25,8 @@ class ContactMessageResource extends Resource
     protected static ?string $pluralModelLabel = 'mensagens de contato';
 
     protected static ?string $navigationLabel = 'Contatos';
+
+    protected static string|UnitEnum|null $navigationGroup = 'Secretaria';
 
     protected static ?int $navigationSort = 2;
 
