@@ -99,6 +99,7 @@ class RaceModalityForm
                 ['paragraph', 'h2', 'h3'],
                 ['alignStart', 'alignCenter', 'alignEnd'],
                 ['blockquote', 'bulletList', 'orderedList'],
+                ['table'],
                 ['undo', 'redo'],
             ])
             ->columnSpanFull();

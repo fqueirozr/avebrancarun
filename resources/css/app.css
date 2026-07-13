@@ -87,7 +87,33 @@
     }
 
     .event-rich-content a {
-        @apply font-bold text-race-blue underline underline-offset-2 transition hover:text-race-ink;
+        @apply cursor-pointer break-words font-bold text-race-blue underline decoration-2 underline-offset-2 transition hover:text-race-ink;
+    }
+
+    .event-rich-content table {
+        @apply my-4 block w-full max-w-full overflow-x-auto rounded-md border border-zinc-200 bg-white text-left text-sm;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    .event-rich-content :where(th, td) {
+        @apply min-w-32 border-b border-r border-zinc-200 px-3 py-2 align-top;
+    }
+
+    .event-rich-content th {
+        @apply bg-race-mist font-black text-race-ink;
+    }
+
+    .event-rich-content tr:last-child td {
+        @apply border-b-0;
+    }
+
+    .event-rich-content :where(th, td):last-child {
+        @apply border-r-0;
+    }
+
+    .event-rich-content :where(th, td) p {
+        @apply m-0;
     }
 
     .event-rich-content ul {
@@ -140,6 +166,10 @@
 
     .event-rich-content--modal a {
         @apply text-race-blue decoration-2;
+    }
+
+    .event-rich-content--modal table {
+        @apply text-base;
     }
 }
 
