@@ -328,6 +328,19 @@
                         @error('kit_id')
                             <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
                         @enderror
+                        <label class="grid gap-2">
+                            <span class="text-sm font-bold text-zinc-800">Tamanho da camisa</span>
+                            <select name="shirt_size" class="rounded-md border border-zinc-300 bg-white px-4 py-3 text-base outline-none transition focus:border-race-cyan focus:ring-3 focus:ring-amber-100" required>
+                                <option value="">Selecione o tamanho</option>
+                                @foreach (\App\Models\ParticipantRegistration::shirtSizeOptions() as $value => $label)
+                                    <option value="{{ $value }}" @selected(old('shirt_size') === $value)>{{ $label }}</option>
+                                @endforeach
+                            </select>
+                            <span class="text-xs text-zinc-600">Usado exclusivamente para a separação e entrega do kit.</span>
+                            @error('shirt_size')
+                                <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
+                            @enderror
+                        </label>
                         @error('accepted_special_kit_rules')
                             <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
                         @enderror

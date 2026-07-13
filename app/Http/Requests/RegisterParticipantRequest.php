@@ -32,6 +32,7 @@ class RegisterParticipantRequest extends FormRequest
     {
         return [
             'athlete_name' => ['required', 'string', 'max:255'],
+            'shirt_size' => ['required', Rule::in(array_keys(ParticipantRegistration::shirtSizeOptions()))],
             'birth_date' => ['required', 'date', 'before:today'],
             'sex' => ['required', Rule::in(array_keys(ParticipantRegistration::sexOptions()))],
             'participant_cpf' => ['required', 'string', 'regex:/^\d{11}$/'],
@@ -87,6 +88,7 @@ class RegisterParticipantRequest extends FormRequest
     {
         return [
             'athlete_name' => 'o nome do atleta',
+            'shirt_size' => 'o tamanho da camisa',
             'birth_date' => 'a data de nascimento',
             'sex' => 'o sexo',
             'participant_cpf' => 'o CPF do atleta',

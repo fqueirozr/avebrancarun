@@ -15,9 +15,14 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('type');
-            $table->string('age_range')->nullable();
+            $table->unsignedSmallInteger('age_start')->nullable();
+            $table->unsignedSmallInteger('age_end')->nullable();
             $table->string('distance')->nullable();
-            $table->decimal('price', 10, 2)->nullable();
+            $table->date('race_date')->nullable();
+            $table->time('race_time')->nullable();
+            $table->string('google_maps_embed_url', 2048)->nullable();
+            $table->longText('course_information')->nullable();
+            $table->json('course_images')->nullable();
             $table->unsignedInteger('max_participants')->nullable();
             $table->boolean('is_active')->default(true);
             $table->unsignedInteger('sort_order')->default(0);

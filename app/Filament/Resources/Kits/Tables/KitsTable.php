@@ -34,6 +34,10 @@ class KitsTable
                     ->label('Valor')
                     ->formatStateUsing(fn (string $state): string => Number::currency((float) $state, 'BRL', 'pt_BR'))
                     ->sortable(),
+                TextColumn::make('max_quantity')
+                    ->label('Limite')
+                    ->placeholder('Sem limite')
+                    ->sortable(),
                 IconColumn::make('is_active')
                     ->label('Ativo')
                     ->boolean()

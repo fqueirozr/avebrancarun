@@ -21,6 +21,8 @@ class ParticipantRegistrationExporter extends Exporter
             ExportColumn::make('athlete_name')
                 ->label('Atleta')
                 ->formatStateUsing(fn (?string $state): string => self::safeSpreadsheetText($state)),
+            ExportColumn::make('shirt_size')
+                ->label('Tamanho da camisa'),
             ExportColumn::make('birth_date')
                 ->label('Data de nascimento'),
             ExportColumn::make('sex')

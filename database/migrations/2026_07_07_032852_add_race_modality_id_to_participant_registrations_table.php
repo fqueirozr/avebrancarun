@@ -17,6 +17,10 @@ return new class extends Migration
                 ->after('email')
                 ->constrained()
                 ->nullOnDelete();
+            $table->index(
+                ['race_modality_id', 'result_status', 'overall_rank'],
+                'registrations_race_result_rank_index',
+            );
         });
     }
 
@@ -26,6 +30,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('participant_registrations', function (Blueprint $table) {
+            $table->dropIndex('registrations_race_result_rank_index');
             $table->dropConstrainedForeignId('race_modality_id');
         });
     }

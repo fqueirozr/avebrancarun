@@ -164,7 +164,6 @@
                                 ['titulo' => 'Informações gerais', 'valor' => $eventSetting->general_information, 'modal' => null, 'tipo' => 'general'],
                                 ['titulo' => 'Retirada de kit', 'valor' => $eventSetting->kit_information ?: 'Confira camiseta, número de peito e demais itens definidos pela organização.', 'modal' => null],
                                 ['titulo' => 'Guarda-volumes', 'valor' => $eventSetting->baggage_storage_information ?: 'Serviço e orientações serão confirmados pela organização antes do evento.', 'modal' => null],
-                                ['titulo' => 'Pelotões de largada', 'valor' => $eventSetting->start_groups_information ?: 'A organização vai orientar os atletas por categoria, idade e distância no dia da prova.', 'modal' => null],
                                 ['titulo' => 'Cronometragem', 'valor' => $eventSetting->timing_information ?: 'As informações de apuração e resultados serão divulgadas nos canais oficiais do evento.', 'modal' => null],
                                 ['titulo' => 'Inscrições especiais', 'valor' => $eventSetting->special_registrations_information ?: 'Entre em contato com a organização para necessidades específicas ou orientações adicionais.', 'modal' => null],
                             ] as $item)

@@ -54,6 +54,10 @@ class ParticipantRegistrationController extends Controller
                     throw ValidationException::withMessages(['kit_id' => 'Escolha um kit ativo.']);
                 }
 
+                if ($kit->quantityLimitHasBeenReached()) {
+                    throw ValidationException::withMessages(['kit_id' => 'A quantidade disponível deste kit foi esgotada.']);
+                }
+
                 if (! $raceModality->acceptsBirthDate(Carbon::parse($validated['birth_date']), $eventSetting?->eventDateForAgeCalculation())) {
                     throw ValidationException::withMessages([
                         'birth_date' => "A idade do atleta na data da prova não atende à faixa etária: {$raceModality->ageRangeLabel()}.",

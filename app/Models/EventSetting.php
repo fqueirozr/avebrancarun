@@ -21,7 +21,6 @@ use Illuminate\Support\Carbon;
     'general_information',
     'kit_information',
     'baggage_storage_information',
-    'start_groups_information',
     'timing_information',
     'special_registrations_information',
     'regulation',

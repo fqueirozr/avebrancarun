@@ -25,6 +25,7 @@ function validRegistrationPayload(RaceModality $raceModality, Kit $kit, array $o
 {
     return array_replace([
         'athlete_name' => 'Maria Silva',
+        'shirt_size' => 'M',
         'birth_date' => '1990-05-10',
         'sex' => 'female',
         'participant_cpf' => '529.982.247-25',
@@ -200,6 +201,45 @@ test('registration submission rejects a reached modality limit', function () {
     ]))->assertSessionHasErrors('race_modality_id');
 });
 
+test('registration submission rejects a reached kit quantity limit', function () {
+    $raceModality = RaceModality::factory()->create();
+    $kit = Kit::factory()->create([
+        'price' => 0,
+        'max_quantity' => 1,
+    ]);
+    ParticipantRegistration::factory()->create([
+        'race_modality_id' => $raceModality->id,
+        'kit_id' => $kit->id,
+    ]);
+
+    $this->post(route('registration.store'), validRegistrationPayload($raceModality, $kit, [
+        'participant_cpf' => '153.509.460-56',
+    ]))->assertSessionHasErrors('kit_id');
+
+    expect(ParticipantRegistration::query()->count())->toBe(1);
+});
+
+test('cancelled registrations do not consume the kit quantity limit', function () {
+    Mail::fake();
+
+    $raceModality = RaceModality::factory()->create();
+    $kit = Kit::factory()->create([
+        'price' => 0,
+        'max_quantity' => 1,
+    ]);
+    ParticipantRegistration::factory()->create([
+        'race_modality_id' => $raceModality->id,
+        'kit_id' => $kit->id,
+        'payment_status' => 'cancelled',
+    ]);
+
+    $this->post(route('registration.store'), validRegistrationPayload($raceModality, $kit, [
+        'participant_cpf' => '153.509.460-56',
+    ]))->assertSessionDoesntHaveErrors('kit_id');
+
+    expect(ParticipantRegistration::query()->count())->toBe(2);
+});
+
 test('registration submission calculates the age range on the race date', function (string $birthDate, bool $isAccepted) {
     Mail::fake();
 
@@ -289,6 +329,7 @@ test('a participant can submit a registration', function () {
 
     $this->post(route('registration.store'), [
         'athlete_name' => $registration->athlete_name,
+        'shirt_size' => 'M',
         'birth_date' => $registration->birth_date->format('Y-m-d'),
         'sex' => 'female',
         'participant_cpf' => '529.982.247-25',
@@ -318,6 +359,7 @@ test('a participant can submit a registration', function () {
 
     $this->assertDatabaseHas(ParticipantRegistration::class, [
         'athlete_name' => 'Maria Silva',
+        'shirt_size' => 'M',
         'email' => 'maria@example.com',
         'sex' => 'female',
         'participant_cpf' => '52998224725',
@@ -498,6 +540,7 @@ test('a participant is redirected to checkout when payment gateway is configured
 
     $this->post(route('registration.store'), [
         'athlete_name' => $registration->athlete_name,
+        'shirt_size' => 'M',
         'birth_date' => $registration->birth_date->format('Y-m-d'),
         'sex' => $registration->sex,
         'participant_cpf' => $registration->participant_cpf,
@@ -680,6 +723,7 @@ test('checkout gateway failure returns the participant to the form with the gate
 
     $this->post(route('registration.store'), [
         'athlete_name' => $registration->athlete_name,
+        'shirt_size' => 'M',
         'birth_date' => $registration->birth_date->format('Y-m-d'),
         'sex' => $registration->sex,
         'participant_cpf' => $registration->participant_cpf,
@@ -710,6 +754,7 @@ test('registration submission validates required fields', function () {
     $this->post(route('registration.store'), [])
         ->assertSessionHasErrors([
             'athlete_name',
+            'shirt_size',
             'birth_date',
             'sex',
             'participant_cpf',
@@ -798,6 +843,7 @@ test('an authenticated admin can print the paid kit delivery list with a signatu
 
     ParticipantRegistration::factory()->create([
         'athlete_name' => 'Maria Silva',
+        'shirt_size' => 'GG',
         'email' => 'maria@example.com',
         'payment_status' => 'paid',
         'kit_id' => $kit->id,
@@ -815,6 +861,7 @@ test('an authenticated admin can print the paid kit delivery list with a signatu
         ->assertSee('Lista de entrega de kits')
         ->assertSee('Maria Silva')
         ->assertSee('Kit Desbravador')
+        ->assertSee('GG')
         ->assertSee('Upgrades alcançados:')
         ->assertSee('Camiseta exclusiva')
         ->assertSee('Boné do evento')

@@ -26,6 +26,7 @@ class ParticipantRegistrationFactory extends Factory
         return [
             'protocol_number' => 'AVR-'.Str::ulid(),
             'athlete_name' => fake()->name(),
+            'shirt_size' => fake()->randomElement(array_keys(ParticipantRegistration::shirtSizeOptions())),
             'birth_date' => fake()->dateTimeBetween('1980-01-01', '2000-09-20')->format('Y-m-d'),
             'sex' => fake()->randomElement(array_keys(ParticipantRegistration::sexOptions())),
             'participant_cpf' => $participantCpf,

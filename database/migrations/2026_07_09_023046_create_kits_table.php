@@ -17,6 +17,14 @@ return new class extends Migration
             $table->string('photo_path')->nullable();
             $table->text('description')->nullable();
             $table->decimal('price', 10, 2);
+            $table->string('type')->default('standard')->index();
+            $table->text('rules')->nullable();
+            $table->unsignedInteger('upgrade_1_referrals')->nullable();
+            $table->text('upgrade_1_contents')->nullable();
+            $table->unsignedInteger('upgrade_2_referrals')->nullable();
+            $table->text('upgrade_2_contents')->nullable();
+            $table->unsignedInteger('upgrade_3_referrals')->nullable();
+            $table->text('upgrade_3_contents')->nullable();
             $table->boolean('is_active')->default(true);
             $table->unsignedInteger('sort_order')->default(0);
             $table->timestamps();

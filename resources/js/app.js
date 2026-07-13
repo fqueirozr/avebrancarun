@@ -79,6 +79,7 @@ document.querySelectorAll('[data-registration-form]').forEach((form) => {
 
     const fieldLabels = {
         athlete_name: 'Nome do atleta',
+        shirt_size: 'Tamanho da camisa',
         participant_cpf: 'CPF do atleta',
         birth_date: 'Data de nascimento',
         sex: 'Sexo',

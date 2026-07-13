@@ -12,6 +12,7 @@ test('participant export contains only the approved operational columns', functi
     expect($columnNames)->toBe([
         'protocol_number',
         'athlete_name',
+        'shirt_size',
         'birth_date',
         'sex',
         'modality',

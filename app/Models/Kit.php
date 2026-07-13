@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'price',
     'type',
     'rules',
+    'max_quantity',
     'upgrade_1_referrals',
     'upgrade_1_contents',
     'upgrade_2_referrals',
@@ -54,6 +55,17 @@ class Kit extends Model
     public function allowsReferralCode(): bool
     {
         return in_array($this->type, [self::TypeStandard, self::TypePathfinder], true);
+    }
+
+    public function quantityLimitHasBeenReached(): bool
+    {
+        if ($this->max_quantity === null) {
+            return false;
+        }
+
+        return $this->participantRegistrations()
+            ->where('payment_status', '!=', 'cancelled')
+            ->count() >= $this->max_quantity;
     }
 
     public function upgradeLevelFor(int $referrals): int
@@ -125,6 +137,7 @@ class Kit extends Model
     {
         return [
             'price' => 'decimal:2',
+            'max_quantity' => 'integer',
             'upgrade_1_referrals' => 'integer',
             'upgrade_2_referrals' => 'integer',
             'upgrade_3_referrals' => 'integer',

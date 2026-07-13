@@ -12,6 +12,7 @@ use Illuminate\Support\Str;
 
 #[Fillable([
     'athlete_name',
+    'shirt_size',
     'birth_date',
     'sex',
     'participant_cpf',
@@ -123,6 +124,15 @@ class ParticipantRegistration extends Model
             'male' => 'Masculino',
             'female' => 'Feminino',
         ];
+    }
+
+    /** @return array<string, string> */
+    public static function shirtSizeOptions(): array
+    {
+        return array_combine(
+            ['PP', 'P', 'M', 'G', 'GG', 'XGG'],
+            ['PP', 'P', 'M', 'G', 'GG', 'XGG'],
+        );
     }
 
     /** @return array<string, string> */

@@ -178,6 +178,7 @@
                         <th>Atleta</th>
                         <th>Prova</th>
                         <th>Kit</th>
+                        <th>Camisa</th>
                         <th>Assinatura do recebedor</th>
                     </tr>
                 </thead>
@@ -200,6 +201,7 @@
                                     </div>
                                 @endif
                             </td>
+                            <td>{{ $registration->shirt_size }}</td>
                             <td class="print-list__signature"></td>
                         </tr>
                     @endforeach

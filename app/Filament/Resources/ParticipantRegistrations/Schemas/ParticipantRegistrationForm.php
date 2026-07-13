@@ -28,6 +28,10 @@ class ParticipantRegistrationForm
                     ->label('Nome do atleta')
                     ->required()
                     ->maxLength(255),
+                Select::make('shirt_size')
+                    ->label('Tamanho da camisa')
+                    ->options(ParticipantRegistration::shirtSizeOptions())
+                    ->required(),
                 DatePicker::make('birth_date')
                     ->label('Data de nascimento')
                     ->required(),

@@ -23,7 +23,6 @@ class EventSettingSeeder extends Seeder
             'general_information' => 'Data e local serão confirmados pela organização.',
             'kit_information' => 'Em definição',
             'baggage_storage_information' => 'Serviço e orientações serão confirmados pela organização antes do evento.',
-            'start_groups_information' => 'A organização vai orientar os atletas por categoria, idade e distância no dia da prova.',
             'timing_information' => 'As informações de apuração e resultados serão divulgadas nos canais oficiais do evento.',
             'special_registrations_information' => 'Entre em contato com a organização para necessidades específicas ou orientações adicionais.',
             'regulation' => 'Em revisão',
