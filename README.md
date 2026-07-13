@@ -17,13 +17,16 @@ Sistema de inscrições e gestão da **Ave Branca Run**, desenvolvido em Laravel
 
 - Página pública com informações do evento, modalidades e kits;
 - inscrição de atletas adultos e menores, com aceite dos termos obrigatórios;
+- escolha de tamanho de camisa e controle de limite por evento, prova e kit;
 - checkout Asaas via Pix e cartão de crédito;
-- atualização automática do pagamento por webhook;
+- atualização automática do pagamento por webhook autenticado;
 - e-mails de recebimento e atualização da inscrição;
 - página do atleta acessada por URL assinada;
+- categorias etárias e rankings geral, por sexo e por categoria;
+- programa de indicação de desbravadores, com código individual e até três níveis de upgrade do kit;
 - painel administrativo em `/admin`;
-- gestão de inscrições, resultados, modalidades, kits, contatos e configurações;
-- exportação e impressão de inscrições.
+- gestão de inscrições, resultados, modalidades, kits, desbravadores, contatos e configurações;
+- exportação das inscrições e impressão da lista de entrega de kits pagos, com campo de assinatura.
 
 ## Guia do painel administrativo
 
@@ -32,8 +35,9 @@ Depois de criar o primeiro usuário com `php artisan make:filament-user`, acesse
 1. dados do evento;
 2. provas e faixas etárias;
 3. kits e preços;
-4. gateway de pagamento;
-5. usuários administrativos.
+4. desbravadores, quando o programa de indicação for utilizado;
+5. gateway de pagamento;
+6. usuários administrativos.
 
 As inscrições dependem de uma prova e de um kit já cadastrados. O passo a passo de cada formulário, incluindo formatos aceitos, campos obrigatórios e cuidados com dados pessoais, está em [Tutorial dos formulários administrativos](docs/tutorial-formularios-admin.md).
 
@@ -49,15 +53,17 @@ As inscrições dependem de uma prova e de um kit já cadastrados. O passo a pas
 
 1. Clone o repositório e entre na pasta do projeto.
 
-2. Execute a configuração automatizada:
+2. Instale as dependências PHP e crie o arquivo de ambiente:
 
 ```bash
-composer run setup
+composer install
+copy .env.example .env
+php artisan key:generate
 ```
 
-Esse comando instala as dependências PHP, cria o `.env` a partir do `.env.example`, gera a chave da aplicação, executa as migrations, instala as dependências JavaScript e compila os assets.
+No Linux ou macOS, substitua `copy` por `cp`.
 
-3. Crie o banco MySQL e ajuste no `.env`:
+3. Crie o banco MySQL e ajuste o `.env` antes de executar as migrations:
 
 ```dotenv
 APP_NAME="Ave Branca Run"
@@ -76,27 +82,29 @@ DB_USERNAME=root
 DB_PASSWORD=
 ```
 
-Se o banco ainda não existia quando `composer run setup` foi executado, crie-o e rode:
+4. Prepare o banco e os assets:
 
 ```bash
 php artisan migrate --seed
+npm install
+npm run build
 ```
 
-> O seeder cadastra as configurações iniciais do evento, modalidades, kit e gateway, além de dados de demonstração. Em produção, prefira `php artisan migrate --force` e cadastre os dados reais pelo painel.
+> Os seeders criam configurações iniciais e dados de demonstração, inclusive usuários, inscrições, contatos e indicações. Use `php artisan migrate` sem `--seed` quando não quiser dados fictícios e cadastre os dados reais pelo painel. O comando `composer run setup` continua disponível como atalho quando o `.env` e o banco já estiverem preparados.
 
-4. Crie o usuário administrador:
+5. Crie o usuário administrador:
 
 ```bash
 php artisan make:filament-user
 ```
 
-5. Crie o link para arquivos públicos:
+6. Crie o link para arquivos públicos:
 
 ```bash
 php artisan storage:link
 ```
 
-6. Inicie o ambiente de desenvolvimento:
+7. Inicie o ambiente de desenvolvimento:
 
 ```bash
 composer run dev
@@ -145,6 +153,7 @@ As URLs padrão já estão no `.env.example`:
 
 ```dotenv
 PAYMENT_GATEWAY=asaas
+ASAAS_WEBHOOK_TOKEN=gere-um-segredo-longo-e-aleatorio
 ASAAS_SANDBOX_BASE_URL=https://api-sandbox.asaas.com
 ASAAS_PRODUCTION_BASE_URL=https://api.asaas.com
 ASAAS_SANDBOX_CHECKOUT_URL=https://sandbox.asaas.com/checkoutSession/show
@@ -166,7 +175,7 @@ A API key é armazenada com cast criptografado. Preserve a mesma `APP_KEY` após
 
 ### URL e método
 
-Cadastre no ambiente correspondente do Asaas uma URL HTTPS pública:
+Defina um segredo longo e aleatório em `ASAAS_WEBHOOK_TOKEN`. Cadastre o mesmo valor como token de autenticação do webhook no ambiente correspondente do Asaas e use uma URL HTTPS pública:
 
 ```text
 POST https://seu-dominio.com/webhooks/asaas
@@ -204,7 +213,7 @@ O processamento é idempotente: uma inscrição que já está paga não é atual
 
 ### Autenticação e segurança
 
-A rota está fora da validação CSRF, como é necessário para webhooks externos. **A implementação atual não valida o token de autenticação enviado pelo Asaas.** Portanto, não presuma que apenas o Asaas consegue chamar esse endpoint. Antes de uma operação real em produção, recomenda-se implementar e testar a validação do token configurado no Asaas, mantendo o segredo fora de logs e do controle de versão.
+A rota está fora da validação CSRF, como é necessário para webhooks externos, mas exige que o cabeçalho `asaas-access-token` corresponda a `ASAAS_WEBHOOK_TOKEN`. Token ausente, vazio ou inválido recebe HTTP `401 Unauthorized`; mantenha o segredo fora de logs e do controle de versão.
 
 Não registre payloads completos do webhook: eles podem conter dados pessoais e financeiros. O código atual registra somente referências mínimas quando não consegue associar o pagamento a uma inscrição.
 
@@ -227,6 +236,7 @@ Envio manual para ambiente local:
 ```bash
 curl -X POST http://localhost:8000/webhooks/asaas \
   -H "Content-Type: application/json" \
+  -H "asaas-access-token: valor-de-ASAAS_WEBHOOK_TOKEN" \
   -d '{"event":"PAYMENT_CONFIRMED","payment":{"id":"pay_123","externalReference":"participant-registration:1"}}'
 ```
 
