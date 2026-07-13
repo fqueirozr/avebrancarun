@@ -2,8 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\ParticipantRegistration;
-use App\Models\User;
+use App\Models\Kit;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -16,13 +15,18 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call(EventSettingSeeder::class);
-        $this->call(RaceModalitySeeder::class);
-        $this->call(KitSeeder::class);
-        $this->call(PaymentGatewaySettingSeeder::class);
 
-        User::factory(10)->create();
+        //kitfactory form each
 
-        ParticipantRegistration::factory(15)->create();
+        Kit::factory()->forEachType()->create();
+        $this->call([
+            EventSettingSeeder::class,
+            RaceModalitySeeder::class,
+            PaymentGatewaySettingSeeder::class,
+            UserSeeder::class,
+            ContactMessageSeeder::class,
+            PathfinderSeeder::class,
+            ParticipantRegistrationSeeder::class,
+        ]);
     }
 }

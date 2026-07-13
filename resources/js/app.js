@@ -73,6 +73,7 @@ document.querySelectorAll('[data-registration-form]').forEach((form) => {
     const specialKitAcknowledgement = document.querySelector('[data-special-kit-acknowledgement]');
     const specialKitConfirm = document.querySelector('[data-special-kit-confirm]');
     const specialKitRulesContent = document.querySelector('[data-special-kit-rules-content]');
+    const specialKitRulesTitle = document.querySelector('[data-special-kit-rules-title]');
     const referralCodeField = form.querySelector('[data-referral-code-field]');
     let currentStepIndex = 0;
 
@@ -212,6 +213,7 @@ document.querySelectorAll('[data-registration-form]').forEach((form) => {
         const fields = Array.from(form.querySelectorAll('input[name], textarea[name], select[name]'))
             .filter((field) => !field.closest('[data-registration-step]')?.dataset.skipStep)
             .filter((field) => field.name in fieldLabels)
+            .filter((field) => field.type !== 'hidden')
             .filter((field, index, fieldsList) => field.type !== 'radio' || fieldsList.findIndex((item) => item.name === field.name) === index);
 
         fields.forEach((field) => {
@@ -294,6 +296,16 @@ document.querySelectorAll('[data-registration-form]').forEach((form) => {
                 if (rules && specialKitRulesContent) {
                     specialKitRulesContent.innerHTML = rules.innerHTML;
                 }
+
+                if (specialKitRulesTitle) {
+                    specialKitRulesTitle.textContent = `Regras do ${option.dataset.kitName}`;
+                }
+
+                if (specialKitAcknowledgement) {
+                    specialKitAcknowledgement.checked = false;
+                    specialKitConfirm.disabled = true;
+                }
+
                 specialKitModal.showModal();
             }
         });
@@ -301,6 +313,11 @@ document.querySelectorAll('[data-registration-form]').forEach((form) => {
 
     form.querySelectorAll('input[name="kit_id"]').forEach((option) => {
         option.addEventListener('change', () => {
+            if (!option.matches('[data-special-kit]') && specialKitAcknowledgement) {
+                specialKitAcknowledgement.checked = false;
+                specialKitConfirm.disabled = true;
+            }
+
             if (referralCodeField) {
                 const identifiesPathfinder = option.dataset.kitType === 'pathfinder';
 

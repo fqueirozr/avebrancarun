@@ -108,6 +108,22 @@ test('special kit requires acknowledgement of its rules', function () {
     expect(ParticipantRegistration::query()->count())->toBe(0);
 });
 
+test('every non-standard kit requires acknowledgement of its rules', function (string $type) {
+    $raceModality = RaceModality::factory()->create();
+    $kit = Kit::factory()->create([
+        'price' => 0,
+        'type' => $type,
+    ]);
+
+    $this->post(route('registration.store'), validRegistrationPayload($raceModality, $kit))
+        ->assertSessionHasErrors('accepted_special_kit_rules');
+
+    expect(ParticipantRegistration::query()->count())->toBe(0);
+})->with([
+    'social' => Kit::TypeSocial,
+    'pathfinder' => Kit::TypePathfinder,
+]);
+
 test('special kit acknowledgement is recorded for audit', function () {
     Mail::fake();
     $raceModality = RaceModality::factory()->create();

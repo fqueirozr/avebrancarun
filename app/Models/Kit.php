@@ -48,7 +48,7 @@ class Kit extends Model
 
     public function requiresRulesAcknowledgement(): bool
     {
-        return in_array($this->type, [self::TypePcd60, self::TypeSocial], true);
+        return $this->type !== self::TypeStandard;
     }
 
     public function allowsReferralCode(): bool

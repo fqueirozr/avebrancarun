@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use Database\Factories\PaymentGatewaySettingFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 #[Fillable([
@@ -16,6 +18,9 @@ use Illuminate\Database\Eloquent\Model;
 ])]
 class PaymentGatewaySetting extends Model
 {
+    /** @use HasFactory<PaymentGatewaySettingFactory> */
+    use HasFactory;
+
     protected $hidden = [
         'api_key',
     ];

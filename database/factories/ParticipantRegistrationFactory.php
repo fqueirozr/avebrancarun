@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Kit;
 use App\Models\ParticipantRegistration;
+use App\Models\Pathfinder;
 use App\Models\RaceModality;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
@@ -65,6 +66,28 @@ class ParticipantRegistrationFactory extends Factory
             'special_kit_rules_acceptance_user_agent' => null,
             'payment_status' => 'pending',
         ];
+    }
+
+    public function paid(): static
+    {
+        return $this->state(fn (array $attributes): array => [
+            'payment_status' => 'paid',
+            'payment_gateway' => 'asaas',
+            'payment_gateway_reference' => 'seed_'.Str::lower(Str::random(16)),
+            'payment_checkout_url' => null,
+        ]);
+    }
+
+    public function cancelled(): static
+    {
+        return $this->state(fn (array $attributes): array => ['payment_status' => 'cancelled']);
+    }
+
+    public function referred(): static
+    {
+        return $this->state(fn (array $attributes): array => [
+            'referred_by_pathfinder_id' => Pathfinder::factory(),
+        ]);
     }
 
     private function validCpf(): string

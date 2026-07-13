@@ -25,4 +25,9 @@ class ContactMessageFactory extends Factory
             'message' => fake()->paragraph(),
         ];
     }
+
+    public function read(): static
+    {
+        return $this->state(fn (array $attributes): array => ['read_at' => now()]);
+    }
 }
