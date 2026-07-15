@@ -6,11 +6,13 @@ use App\Models\Kit;
 use App\Models\ParticipantRegistration;
 use App\Models\RaceModality;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 
 class ParticipantRegistrationForm
@@ -31,7 +33,9 @@ class ParticipantRegistrationForm
                 Select::make('shirt_size')
                     ->label('Tamanho da camisa')
                     ->options(ParticipantRegistration::shirtSizeOptions())
-                    ->required(),
+                    ->visible(fn (Get $get): bool => (bool) Kit::query()->whereKey($get('kit_id'))->value('has_shirt'))
+                    ->required(fn (Get $get): bool => (bool) Kit::query()->whereKey($get('kit_id'))->value('has_shirt'))
+                    ->dehydrated(fn (Get $get): bool => (bool) Kit::query()->whereKey($get('kit_id'))->value('has_shirt')),
                 DatePicker::make('birth_date')
                     ->label('Data de nascimento')
                     ->required(),
@@ -99,6 +103,7 @@ class ParticipantRegistrationForm
                     ->options(fn (): array => Kit::options())
                     ->searchable()
                     ->preload()
+                    ->live()
                     ->required(),
                 Placeholder::make('pathfinder_kit_additions')
                     ->label('Acréscimos do kit adquiridos pelas indicações')
@@ -117,6 +122,15 @@ class ParticipantRegistrationForm
                     ->label('Status do pagamento')
                     ->options(ParticipantRegistration::paymentStatusOptions())
                     ->required(),
+                FileUpload::make('pix_receipt_path')
+                    ->label('Comprovante do Pix')
+                    ->disk('local')
+                    ->visibility('private')
+                    ->downloadable()
+                    ->openable()
+                    ->disabled()
+                    ->dehydrated(false)
+                    ->columnSpanFull(),
                 TextInput::make('bib_number')
                     ->label('Número de peito')
                     ->maxLength(50),

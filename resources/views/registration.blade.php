@@ -58,15 +58,15 @@
                         <p class="text-sm font-semibold text-race-cyan">Inscrição da corrida</p>
                         <h1 class="mt-3 text-3xl font-black leading-tight">Ave Branca Run</h1>
                         <p class="mt-4 text-sm leading-6 text-white/78">
-                            Preencha os dados do atleta, escolha a prova e siga para o checkout seguro com pagamento por Crédito/PIX.
+                            Preencha os dados do atleta, escolha a prova e conclua o pagamento por Pix.
                         </p>
                     </div>
                 </div>
 
                 <div class="mt-5 rounded-md border border-amber-200 bg-amber-50 p-5 text-amber-950">
-                    <p class="font-black">Pagamento por Crédito/PIX</p>
+                    <p class="font-black">Pagamento por Pix</p>
                     <p class="mt-2 text-sm leading-6">
-                        O pagamento é processado pela ASAAS Gestão Financeira Instituição de Pagamento S.A.
+                        Após a inscrição, você verá a chave Pix e poderá enviar o comprovante para análise.
                     </p>
                 </div>
             </aside>
@@ -212,6 +212,7 @@
                         </div>
                     </fieldset>
 
+                    @if (\App\Models\PaymentGatewaySetting::current()->isConfigured() && ! \App\Models\PaymentGatewaySetting::current()->hasManualPix())
                     <fieldset class="grid min-w-0 gap-5 border-b border-zinc-200 pb-6" data-registration-step data-step-title="Pagador">
                         <legend class="mb-4 text-base font-black text-zinc-950">Pagador</legend>
 
@@ -267,6 +268,7 @@
                             </label>
                         </div>
                     </fieldset>
+                    @endif
 
                     <fieldset class="grid min-w-0 gap-3 border-b border-zinc-200 pb-6" data-registration-step data-step-title="Prova">
                         <legend class="mb-4 text-base font-black text-zinc-950">Prova</legend>
@@ -303,7 +305,7 @@
                             @forelse ($kits as $kit)
                                 <label class="rounded-md border border-zinc-200 text-sm transition has-checked:border-race-cyan has-checked:bg-amber-50">
                                     <span class="flex items-start gap-3 px-4 py-3">
-                                        <input type="radio" name="kit_id" value="{{ $kit->id }}" @checked((int) old('kit_id') === $kit->id) @if ($kit->requiresRulesAcknowledgement()) data-special-kit data-kit-name="{{ $kit->name }}" @endif data-allows-referral="{{ $kit->allowsReferralCode() ? 'true' : 'false' }}" data-kit-type="{{ $kit->type }}" class="mt-1 size-4 accent-race-cyan" required>
+                                        <input type="radio" name="kit_id" value="{{ $kit->id }}" @checked((int) old('kit_id') === $kit->id) @if ($kit->requiresRulesAcknowledgement()) data-special-kit data-kit-name="{{ $kit->name }}" @endif data-allows-referral="{{ $kit->allowsReferralCode() ? 'true' : 'false' }}" data-has-shirt="{{ $kit->has_shirt ? 'true' : 'false' }}" data-kit-type="{{ $kit->type }}" class="mt-1 size-4 accent-race-cyan" required>
                                         <span class="grid gap-1">
                                             <span class="font-bold">{{ $kit->name }}</span>
                                             <span class="font-black text-race-blue">R$ {{ number_format((float) $kit->price, 2, ',', '.') }}</span>
@@ -328,7 +330,7 @@
                         @error('kit_id')
                             <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
                         @enderror
-                        <label class="grid gap-2">
+                        <label class="grid gap-2" data-shirt-size-field hidden>
                             <span class="text-sm font-bold text-zinc-800">Tamanho da camisa</span>
                             <select name="shirt_size" class="rounded-md border border-zinc-300 bg-white px-4 py-3 text-base outline-none transition focus:border-race-cyan focus:ring-3 focus:ring-amber-100" required>
                                 <option value="">Selecione o tamanho</option>
@@ -515,7 +517,7 @@
                     <p><strong>Versão {{ \App\Models\ParticipantRegistration::PrivacyPolicyVersion }}.</strong> Esta Política de Privacidade descreve como a organização da Ave Branca Run trata dados pessoais no fluxo de inscrição, pagamento e operação do evento.</p>
 
                     <h3>1. Dados coletados</h3>
-                    <p>Coletamos dados de identificação e contato do atleta, como nome, data de nascimento, CPF, telefone, e-mail, prova escolhida e dados do responsável legal quando o atleta for menor de idade. O app não coleta nem valida laudo de PCD. Quando houver pagamento, coletamos os dados do pagador necessários ao checkout, como nome, CPF ou CNPJ, endereço, número, bairro e CEP.</p>
+                    <p>Coletamos dados de identificação e contato do atleta, como nome, data de nascimento, CPF, telefone, e-mail, prova escolhida e dados do responsável legal quando o atleta for menor de idade. O app não coleta nem valida laudo de PCD. Quando houver pagamento por Pix, coletamos o comprovante necessário para conferência.</p>
                     <p>Campos de observações gerais devem ser usados para informações operacionais não sensíveis. Informações de saúde, alergias, medicamentos, restrições médicas, contato de emergência e dados semelhantes devem ser informados apenas nos campos próprios de saúde e emergência.</p>
 
                     <h3>2. Finalidades e bases de tratamento</h3>
@@ -523,7 +525,7 @@
                     <p>Dados de saúde e emergência são usados somente para segurança do atleta e eventual suporte emergencial durante o evento.</p>
 
                     <h3>3. Pagamentos</h3>
-                    <p>O checkout de Crédito/PIX é processado pela ASAAS Gestão Financeira Instituição de Pagamento S.A. Enviamos ao processador apenas os dados necessários para criar e reconciliar cobranças. Esta aplicação não armazena cartão completo, chave Pix, boleto integral ou outro instrumento financeiro completo.</p>
+                    <p>O pagamento é realizado por Pix. O comprovante enviado é armazenado em área restrita e utilizado somente para conferência e confirmação da inscrição.</p>
 
                     <h3>4. Compartilhamento</h3>
                     <p>Podemos compartilhar dados, no limite necessário, com organizadores, prestadores de tecnologia e suporte, processadores de pagamento, equipe de cronometragem e resultados, logística de kit, comunicação operacional, equipes médicas ou emergenciais, seguradoras quando aplicável, autoridades públicas quando exigido e parceiros necessários à execução do evento. Não vendemos dados pessoais.</p>

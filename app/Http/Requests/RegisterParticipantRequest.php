@@ -6,6 +6,7 @@ use App\Models\EventSetting;
 use App\Models\Kit;
 use App\Models\ParticipantRegistration;
 use App\Models\Pathfinder;
+use App\Models\PaymentGatewaySetting;
 use App\Models\RaceModality;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -30,9 +31,18 @@ class RegisterParticipantRequest extends FormRequest
      */
     public function rules(): array
     {
+        $kitHasShirt = (bool) Kit::query()
+            ->whereKey($this->input('kit_id'))
+            ->value('has_shirt');
+        $requiresCheckoutData = PaymentGatewaySetting::current()->isConfigured();
+
         return [
             'athlete_name' => ['required', 'string', 'max:255'],
-            'shirt_size' => ['required', Rule::in(array_keys(ParticipantRegistration::shirtSizeOptions()))],
+            'shirt_size' => [
+                Rule::excludeIf(! $kitHasShirt),
+                'required',
+                Rule::in(array_keys(ParticipantRegistration::shirtSizeOptions())),
+            ],
             'birth_date' => ['required', 'date', 'before:today'],
             'sex' => ['required', Rule::in(array_keys(ParticipantRegistration::sexOptions()))],
             'participant_cpf' => ['required', 'string', 'regex:/^\d{11}$/'],
@@ -41,12 +51,12 @@ class RegisterParticipantRequest extends FormRequest
             'filled_by_legal_representative' => ['required', 'boolean'],
             'phone' => ['required', 'string', 'regex:/^\d{10,11}$/'],
             'email' => ['required', 'email', 'max:255'],
-            'billing_document' => ['required', 'string', 'regex:/^\d{11}(\d{3})?$/'],
-            'billing_name' => ['required', 'string', 'max:255'],
-            'billing_address' => ['required', 'string', 'max:255'],
-            'billing_address_number' => ['required', 'string', 'max:20'],
-            'billing_province' => ['required', 'string', 'max:255'],
-            'billing_postal_code' => ['required', 'string', 'regex:/^\d{8}$/'],
+            'billing_document' => [Rule::requiredIf($requiresCheckoutData), 'nullable', 'string', 'regex:/^\d{11}(\d{3})?$/'],
+            'billing_name' => [Rule::requiredIf($requiresCheckoutData), 'nullable', 'string', 'max:255'],
+            'billing_address' => [Rule::requiredIf($requiresCheckoutData), 'nullable', 'string', 'max:255'],
+            'billing_address_number' => [Rule::requiredIf($requiresCheckoutData), 'nullable', 'string', 'max:20'],
+            'billing_province' => [Rule::requiredIf($requiresCheckoutData), 'nullable', 'string', 'max:255'],
+            'billing_postal_code' => [Rule::requiredIf($requiresCheckoutData), 'nullable', 'string', 'regex:/^\d{8}$/'],
             'race_modality_id' => ['required', Rule::exists('race_modalities', 'id')->where('is_active', true)],
             'kit_id' => ['required', Rule::exists('kits', 'id')->where('is_active', true)],
             'notes' => ['nullable', 'string', 'max:1000'],

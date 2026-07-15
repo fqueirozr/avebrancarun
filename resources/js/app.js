@@ -331,6 +331,20 @@ document.querySelectorAll('[data-registration-form]').forEach((form) => {
                     ? 'Obrigatório para identificar o desbravador desta inscrição. Não conta como indicação.'
                     : 'Use o código de um desbravador para registrar a indicação.';
             }
+
+            const shirtSizeField = form.querySelector('[data-shirt-size-field]');
+
+            if (shirtSizeField) {
+                const shirtSizeSelect = shirtSizeField.querySelector('select');
+
+                shirtSizeField.hidden = option.dataset.hasShirt !== 'true';
+                shirtSizeSelect.disabled = shirtSizeField.hidden;
+                shirtSizeSelect.required = !shirtSizeField.hidden;
+
+                if (shirtSizeField.hidden) {
+                    shirtSizeSelect.value = '';
+                }
+            }
         });
     });
 

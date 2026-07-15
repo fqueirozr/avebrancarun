@@ -8,7 +8,7 @@ Recebemos sua inscrição para a **Ave Branca Run**. Agora ela está em análise
 <x-mail::panel>
 **Status da inscrição:** Recebida<br>
 **Protocolo:** {{ $registration->protocol_number }}<br>
-**Status do pagamento:** Pendente
+**Status do pagamento:** {{ $registration->paymentStatusLabel() }}
 </x-mail::panel>
 
 <x-mail::table>
@@ -17,7 +17,7 @@ Recebemos sua inscrição para a **Ave Branca Run**. Agora ela está em análise
 | Protocolo | {{ $registration->protocol_number }} |
 | Atleta | {{ $registration->athlete_name }} |
 | Prova | {{ $registration->modality }} |
-| Pagamento | Pendente |
+| Pagamento | {{ $registration->paymentStatusLabel() }} |
 </x-mail::table>
 
 A confirmação final será enviada assim que o pagamento for definido. Por segurança, dados pessoais e informações de saúde não são exibidos neste e-mail.

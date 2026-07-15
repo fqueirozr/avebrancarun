@@ -13,7 +13,9 @@ use App\Payments\CheckoutRequest;
 use App\Payments\CheckoutResponse;
 use App\Payments\PaymentGateway;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 
 uses(RefreshDatabase::class);
@@ -62,7 +64,31 @@ test('billing postal code is normalized before validation', function () {
     ]);
 });
 
-test('payer data is required even for a free registration', function () {
+test('shirt size is required when the selected kit includes a shirt', function () {
+    $raceModality = RaceModality::factory()->create();
+    $kit = Kit::factory()->create(['price' => 0, 'has_shirt' => true]);
+
+    $this->post(route('registration.store'), validRegistrationPayload($raceModality, $kit, [
+        'shirt_size' => null,
+    ]))->assertSessionHasErrors('shirt_size');
+});
+
+test('shirt size is discarded when the selected kit does not include a shirt', function () {
+    Mail::fake();
+    $raceModality = RaceModality::factory()->create();
+    $kit = Kit::factory()->create(['price' => 0, 'has_shirt' => false]);
+
+    $this->post(route('registration.store'), validRegistrationPayload($raceModality, $kit, [
+        'shirt_size' => 'M',
+    ]))->assertSessionDoesntHaveErrors('shirt_size');
+
+    $this->assertDatabaseHas(ParticipantRegistration::class, [
+        'kit_id' => $kit->id,
+        'shirt_size' => null,
+    ]);
+});
+
+test('payer data is optional when checkout is not active', function () {
     $raceModality = RaceModality::factory()->create();
     $kit = Kit::factory()->create(['price' => 0]);
 
@@ -73,7 +99,7 @@ test('payer data is required even for a free registration', function () {
         'billing_address_number' => null,
         'billing_province' => null,
         'billing_postal_code' => null,
-    ]))->assertSessionHasErrors([
+    ]))->assertSessionDoesntHaveErrors([
         'billing_document',
         'billing_name',
         'billing_address',
@@ -488,6 +514,7 @@ test('every registration receives a unique protocol shown in its receipt', funct
 
     expect($firstRegistration->protocol_number)
         ->toStartWith('AVR-')
+        ->toMatch('/^AVR-\d{6}$/')
         ->not->toBe('PROTOCOLO-INFORMADO-EXTERNAMENTE')
         ->not->toBe($secondRegistration->protocol_number);
 
@@ -503,7 +530,77 @@ test('the registration factory generates unique protocols without model events',
     $protocolNumbers = $registrations->pluck('protocol_number');
 
     expect($protocolNumbers)->each->toStartWith('AVR-');
+    expect($protocolNumbers)->each->toMatch('/^AVR-\d{6}$/');
     expect($protocolNumbers->unique())->toHaveCount(10);
+});
+
+test('a paid registration uses the manual pix screen when configured', function () {
+    Mail::fake();
+
+    PaymentGatewaySetting::factory()->create([
+        'manual_pix_enabled' => true,
+        'pix_key' => 'financeiro@example.com',
+    ]);
+
+    $raceModality = RaceModality::factory()->create();
+    $kit = Kit::factory()->create(['price' => 25]);
+
+    $response = $this->post(route('registration.store'), validRegistrationPayload($raceModality, $kit));
+    $registration = ParticipantRegistration::query()->sole();
+
+    $response->assertRedirectContains("/inscricao/{$registration->id}/pix");
+    expect($registration->payment_status)->toBe('pending');
+
+    $this->get($response->headers->get('Location'))
+        ->assertSuccessful()
+        ->assertSee('financeiro@example.com')
+        ->assertSee($registration->protocol_number);
+});
+
+test('a pix receipt is stored privately and puts the registration under review', function () {
+    Storage::fake('local');
+
+    PaymentGatewaySetting::factory()->create([
+        'manual_pix_enabled' => true,
+        'pix_key' => 'financeiro@example.com',
+    ]);
+
+    $registration = ParticipantRegistration::factory()->create(['payment_status' => 'pending']);
+    $url = URL::temporarySignedRoute('registration.pix.store', now()->addHour(), ['registration' => $registration]);
+
+    $this->post($url, [
+        'billing_name' => 'Maria Silva',
+        'billing_document' => '529.982.247-25',
+        'pix_receipt' => UploadedFile::fake()->image('comprovante.png'),
+    ])->assertSessionHas('status');
+
+    $registration->refresh();
+
+    expect($registration->payment_status)->toBe('under_review')
+        ->and($registration->billing_name)->toBe('Maria Silva')
+        ->and($registration->billing_document)->toBe('52998224725')
+        ->and($registration->pix_receipt_submitted_at)->not->toBeNull();
+    Storage::disk('local')->assertExists($registration->pix_receipt_path);
+});
+
+test('payer name and cpf are required when submitting a pix receipt', function () {
+    Storage::fake('local');
+
+    PaymentGatewaySetting::factory()->create([
+        'manual_pix_enabled' => true,
+        'pix_key' => 'financeiro@example.com',
+    ]);
+
+    $registration = ParticipantRegistration::factory()->create(['payment_status' => 'pending']);
+    $url = URL::temporarySignedRoute('registration.pix.store', now()->addHour(), ['registration' => $registration]);
+
+    $this->post($url, [
+        'billing_name' => '',
+        'billing_document' => '111.111.111-11',
+        'pix_receipt' => UploadedFile::fake()->image('comprovante.png'),
+    ])->assertSessionHasErrors(['billing_name', 'billing_document']);
+
+    expect($registration->fresh()->payment_status)->toBe('pending');
 });
 
 test('a participant is redirected to checkout when payment gateway is configured', function () {
@@ -599,6 +696,8 @@ test('checkout success return marks the registration as paid', function () {
 });
 
 test('paid registration requires a billing document for checkout', function () {
+    PaymentGatewaySetting::factory()->create(['is_enabled' => true, 'api_key' => 'test-key']);
+
     $raceModality = RaceModality::factory()->create();
     $kit = Kit::factory()->create(['price' => 25]);
 
@@ -632,6 +731,8 @@ test('paid registration requires a billing document for checkout', function () {
 });
 
 test('paid registration requires billing address data for checkout', function () {
+    PaymentGatewaySetting::factory()->create(['is_enabled' => true, 'api_key' => 'test-key']);
+
     $raceModality = RaceModality::factory()->create();
     $kit = Kit::factory()->create(['price' => 25]);
 
@@ -754,7 +855,6 @@ test('registration submission validates required fields', function () {
     $this->post(route('registration.store'), [])
         ->assertSessionHasErrors([
             'athlete_name',
-            'shirt_size',
             'birth_date',
             'sex',
             'participant_cpf',
@@ -862,7 +962,8 @@ test('an authenticated admin can print the paid kit delivery list with a signatu
         ->assertSee('Maria Silva')
         ->assertSee('Kit Desbravador')
         ->assertSee('GG')
-        ->assertSee('Upgrades alcançados:')
+        ->assertSee('Upgrade do Desbravador')
+        ->assertSee('Nível 2')
         ->assertSee('Camiseta exclusiva')
         ->assertSee('Boné do evento')
         ->assertDontSee('Mochila premium')

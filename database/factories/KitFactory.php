@@ -24,6 +24,7 @@ class KitFactory extends Factory
             'price' => 139.90,
             'type' => Kit::TypeStandard,
             'rules' => null,
+            'has_shirt' => true,
             'is_active' => true,
             'sort_order' => 10,
         ];

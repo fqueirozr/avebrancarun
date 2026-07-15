@@ -20,6 +20,8 @@ class PaymentGatewaySettingFactory extends Factory
         return [
             'gateway' => 'asaas',
             'is_enabled' => false,
+            'manual_pix_enabled' => false,
+            'pix_key' => null,
             'environment' => 'sandbox',
             'api_key' => null,
             'checkout_minutes_to_expire' => 60,

@@ -41,6 +41,12 @@ Route::get('/inscricao', function () {
     ]);
 })->name('registration');
 Route::post('/inscricao', [ParticipantRegistrationController::class, 'store'])->name('registration.store');
+Route::get('/inscricao/{registration}/pix', [ParticipantRegistrationController::class, 'showPix'])
+    ->middleware('signed')
+    ->name('registration.pix.show');
+Route::post('/inscricao/{registration}/pix', [ParticipantRegistrationController::class, 'storePixReceipt'])
+    ->middleware('signed')
+    ->name('registration.pix.store');
 Route::get('/atleta/{registration}', AthletePageController::class)
     ->middleware('signed')
     ->name('athlete.show');

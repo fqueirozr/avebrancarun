@@ -10,6 +10,8 @@ use Illuminate\Database\Eloquent\Model;
 #[Fillable([
     'gateway',
     'is_enabled',
+    'manual_pix_enabled',
+    'pix_key',
     'environment',
     'api_key',
     'checkout_minutes_to_expire',
@@ -41,6 +43,11 @@ class PaymentGatewaySetting extends Model
         return $this->is_enabled && filled($this->api_key);
     }
 
+    public function hasManualPix(): bool
+    {
+        return $this->manual_pix_enabled && filled($this->pix_key);
+    }
+
     /**
      * @return array<string, string>
      */
@@ -48,6 +55,7 @@ class PaymentGatewaySetting extends Model
     {
         return [
             'is_enabled' => 'boolean',
+            'manual_pix_enabled' => 'boolean',
             'api_key' => 'encrypted',
             'billing_types' => 'array',
             'charge_types' => 'array',

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\RegisterParticipantRequest;
+use App\Http\Requests\StorePixReceiptRequest;
 use App\Mail\ParticipantRegistrationReceived;
 use App\Mail\ParticipantRegistrationUpdated;
 use App\Models\EventSetting;
@@ -21,6 +22,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Validation\ValidationException;
+use Illuminate\View\View;
 use Throwable;
 
 class ParticipantRegistrationController extends Controller
@@ -88,6 +90,7 @@ class ParticipantRegistrationController extends Controller
 
                 $registration = ParticipantRegistration::create([
                     ...$validated,
+                    'shirt_size' => $kit->has_shirt ? ($validated['shirt_size'] ?? null) : null,
                     'pathfinder_id' => $kit->type === Kit::TypePathfinder ? $pathfinder?->id : null,
                     'referred_by_pathfinder_id' => $kit->type === Kit::TypeStandard ? $pathfinder?->id : null,
                     'regulation_accepted_at' => now(),
@@ -115,11 +118,6 @@ class ParticipantRegistrationController extends Controller
                     ),
                 ]);
 
-                if ($registration->referred_by_pathfinder_id !== null) {
-                    $pathfinderRegistration = $pathfinder?->registration()->with('kit')->first();
-                    $pathfinderRegistration?->update(['pathfinder_upgrade_level' => $pathfinderRegistration->kit?->upgradeLevelFor($pathfinder->referrals()->count()) ?? 0]);
-                }
-
                 return [$registration, $raceModality, $kit];
             }, attempts: 3);
         } catch (QueryException $exception) {
@@ -128,6 +126,16 @@ class ParticipantRegistrationController extends Controller
             }
 
             throw $exception;
+        }
+
+        if ((float) $kit->price > 0 && PaymentGatewaySetting::current()->hasManualPix()) {
+            Mail::to($registration->email)->send(new ParticipantRegistrationReceived($registration));
+
+            return redirect()->to(URL::temporarySignedRoute(
+                'registration.pix.show',
+                now()->addDays(7),
+                ['registration' => $registration],
+            ));
         }
 
         if ($this->shouldCreateCheckout($kit)) {
@@ -165,6 +173,33 @@ class ParticipantRegistrationController extends Controller
 
         return to_route('registration')
             ->with('status', "Inscrição enviada com sucesso. Protocolo: {$registration->protocol_number}. A confirmação de pagamento continua pendente.");
+    }
+
+    public function showPix(ParticipantRegistration $registration): View
+    {
+        abort_unless(PaymentGatewaySetting::current()->hasManualPix(), 404);
+
+        return view('registration-pix', [
+            'registration' => $registration,
+            'pixKey' => PaymentGatewaySetting::current()->pix_key,
+        ]);
+    }
+
+    public function storePixReceipt(StorePixReceiptRequest $request, ParticipantRegistration $registration): RedirectResponse
+    {
+        abort_unless(PaymentGatewaySetting::current()->hasManualPix(), 404);
+
+        $path = $request->file('pix_receipt')->store('pix-receipts', 'local');
+
+        $registration->update([
+            'billing_name' => $request->string('billing_name')->toString(),
+            'billing_document' => $request->string('billing_document')->toString(),
+            'pix_receipt_path' => $path,
+            'pix_receipt_submitted_at' => now(),
+            'payment_status' => 'under_review',
+        ]);
+
+        return back()->with('status', 'Comprovante enviado. Sua inscrição está em análise.');
     }
 
     public function paymentSuccess(ParticipantRegistration $registration): RedirectResponse
@@ -205,7 +240,9 @@ class ParticipantRegistrationController extends Controller
             return false;
         }
 
-        return PaymentGatewaySetting::current()->isConfigured();
+        $settings = PaymentGatewaySetting::current();
+
+        return ! $settings->hasManualPix() && $settings->isConfigured();
     }
 
     private function paymentSuccessUrl(ParticipantRegistration $registration): string

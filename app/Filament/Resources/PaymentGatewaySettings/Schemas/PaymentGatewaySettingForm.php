@@ -7,6 +7,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 
 class PaymentGatewaySettingForm
@@ -15,6 +16,18 @@ class PaymentGatewaySettingForm
     {
         return $schema
             ->components([
+                Section::make('Pix manual')
+                    ->description('Exiba a chave Pix ao participante e receba o comprovante para análise.')
+                    ->schema([
+                        Toggle::make('manual_pix_enabled')
+                            ->label('Ativar Pix manual')
+                            ->default(false),
+                        TextInput::make('pix_key')
+                            ->label('Chave Pix')
+                            ->maxLength(255)
+                            ->required(fn (Get $get): bool => (bool) $get('manual_pix_enabled')),
+                    ])
+                    ->columns(2),
                 Section::make('Gateway')
                     ->schema([
                         Toggle::make('is_enabled')

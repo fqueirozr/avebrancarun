@@ -42,6 +42,10 @@ class KitForm
                     ->helperText('Deixe em branco para não limitar este kit.')
                     ->integer()
                     ->minValue(1),
+                Toggle::make('has_shirt')
+                    ->label('Inclui camiseta')
+                    ->default(true)
+                    ->required(),
                 TextInput::make('upgrade_1_referrals')->label('Indicações para upgrade 1')->integer()->minValue(1),
                 Textarea::make('upgrade_1_contents')->label('O que será acrescentado no upgrade 1')->rows(3)->maxLength(2000),
                 TextInput::make('upgrade_2_referrals')->label('Indicações para upgrade 2')->integer()->minValue(1),

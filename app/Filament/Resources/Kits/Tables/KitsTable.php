@@ -38,6 +38,10 @@ class KitsTable
                     ->label('Limite')
                     ->placeholder('Sem limite')
                     ->sortable(),
+                IconColumn::make('has_shirt')
+                    ->label('Camiseta')
+                    ->boolean()
+                    ->sortable(),
                 IconColumn::make('is_active')
                     ->label('Ativo')
                     ->boolean()

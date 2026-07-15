@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Str;
 
 #[Fillable([
     'athlete_name',
@@ -63,6 +62,8 @@ use Illuminate\Support\Str;
     'payment_gateway',
     'payment_gateway_reference',
     'payment_checkout_url',
+    'pix_receipt_path',
+    'pix_receipt_submitted_at',
 ])]
 class ParticipantRegistration extends Model
 {
@@ -110,6 +111,7 @@ class ParticipantRegistration extends Model
     {
         return [
             'pending' => 'Pendente',
+            'under_review' => 'Em análise',
             'paid' => 'Pago',
             'cancelled' => 'Cancelado',
         ];
@@ -212,7 +214,11 @@ class ParticipantRegistration extends Model
     protected static function booted(): void
     {
         static::creating(function (ParticipantRegistration $registration): void {
-            $registration->protocol_number = 'AVR-'.Str::ulid();
+            do {
+                $protocolNumber = 'AVR-'.str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+            } while (self::query()->where('protocol_number', $protocolNumber)->exists());
+
+            $registration->protocol_number = $protocolNumber;
             $registration->registration_identity = $registration->participant_cpf;
         });
 
@@ -220,6 +226,45 @@ class ParticipantRegistration extends Model
             if ($registration->registration_identity !== null) {
                 $registration->registration_identity = $registration->participant_cpf;
             }
+
+            if ($registration->isDirty('kit_id')) {
+                $kit = Kit::query()->find($registration->kit_id);
+
+                if ($kit?->type !== Kit::TypeStandard) {
+                    $registration->referred_by_pathfinder_id = null;
+                }
+
+                if ($kit?->type !== Kit::TypePathfinder) {
+                    $registration->pathfinder_id = null;
+                    $registration->pathfinder_upgrade_level = 0;
+                }
+            }
+        });
+
+        static::saved(function (ParticipantRegistration $registration): void {
+            $pathfinderIds = [
+                $registration->getOriginal('referred_by_pathfinder_id'),
+                $registration->referred_by_pathfinder_id,
+            ];
+
+            if ($registration->wasRecentlyCreated || $registration->wasChanged('pathfinder_id')) {
+                $pathfinderIds[] = $registration->getOriginal('pathfinder_id');
+                $pathfinderIds[] = $registration->pathfinder_id;
+            }
+
+            Pathfinder::query()
+                ->whereKey(collect($pathfinderIds)->filter()->unique())
+                ->each(fn (Pathfinder $pathfinder) => $pathfinder->recalculateRegistrationUpgrade());
+        });
+
+        static::deleted(function (ParticipantRegistration $registration): void {
+            if ($registration->referred_by_pathfinder_id === null) {
+                return;
+            }
+
+            Pathfinder::query()
+                ->find($registration->referred_by_pathfinder_id)
+                ?->recalculateRegistrationUpgrade();
         });
     }
 
@@ -242,6 +287,7 @@ class ParticipantRegistration extends Model
             'sex_rank' => 'integer',
             'category_rank' => 'integer',
             'pathfinder_upgrade_level' => 'integer',
+            'pix_receipt_submitted_at' => 'datetime',
         ];
     }
 }
