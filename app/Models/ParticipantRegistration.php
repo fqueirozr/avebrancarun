@@ -211,6 +211,15 @@ class ParticipantRegistration extends Model
         return (float) $kit->price;
     }
 
+    public static function generateUniqueBibNumber(): string
+    {
+        do {
+            $bibNumber = (string) random_int(1000, 9999);
+        } while (self::query()->where('bib_number', $bibNumber)->exists());
+
+        return $bibNumber;
+    }
+
     protected static function booted(): void
     {
         static::creating(function (ParticipantRegistration $registration): void {
@@ -219,6 +228,11 @@ class ParticipantRegistration extends Model
             } while (self::query()->where('protocol_number', $protocolNumber)->exists());
 
             $registration->protocol_number = $protocolNumber;
+
+            if (blank($registration->bib_number)) {
+                $registration->bib_number = self::generateUniqueBibNumber();
+            }
+
             $registration->registration_identity = $registration->participant_cpf;
         });
 

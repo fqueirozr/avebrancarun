@@ -14,6 +14,7 @@ use App\Models\PaymentGatewaySetting;
 use App\Models\RaceModality;
 use App\Payments\CheckoutRequest;
 use App\Payments\PaymentGateway;
+use App\Support\PixPayload;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\RedirectResponse;
@@ -175,13 +176,34 @@ class ParticipantRegistrationController extends Controller
             ->with('status', "Inscrição enviada com sucesso. Protocolo: {$registration->protocol_number}. A confirmação de pagamento continua pendente.");
     }
 
-    public function showPix(ParticipantRegistration $registration): View
+    public function showPix(ParticipantRegistration $registration, PixPayload $pixPayload): View
     {
-        abort_unless(PaymentGatewaySetting::current()->hasManualPix(), 404);
+        $settings = PaymentGatewaySetting::current();
+        abort_unless($settings->hasManualPix(), 404);
+
+        $registration->loadMissing('kit');
+        abort_if($registration->kit === null, 404);
+
+        $amount = $registration->priceFor($registration->kit);
+        $eventSettings = EventSetting::current();
+        $payload = $pixPayload->generate(
+            key: $settings->pix_key,
+            amount: $amount,
+            receiverName: $settings->pix_account_holder ?: $settings->pix_receiver_name ?: $eventSettings->organizer_legal_name ?: config('app.name'),
+            receiverCity: $settings->pix_receiver_city ?: $eventSettings->event_location ?: 'Brasil',
+            transactionId: $registration->protocol_number,
+        );
 
         return view('registration-pix', [
             'registration' => $registration,
-            'pixKey' => PaymentGatewaySetting::current()->pix_key,
+            'pixKey' => $settings->pix_key,
+            'amount' => $amount,
+            'pixPayload' => $payload,
+            'pixQrCode' => $pixPayload->qrCodeDataUri($payload),
+            'pixBank' => $settings->pix_bank,
+            'pixAgency' => $settings->pix_agency,
+            'pixAccount' => $settings->pix_account,
+            'pixAccountHolder' => $settings->pix_account_holder,
         ]);
     }
 
@@ -197,9 +219,14 @@ class ParticipantRegistrationController extends Controller
             'pix_receipt_path' => $path,
             'pix_receipt_submitted_at' => now(),
             'payment_status' => 'under_review',
+            'bib_number' => $registration->bib_number ?? ParticipantRegistration::generateUniqueBibNumber(),
         ]);
 
-        return back()->with('status', 'Comprovante enviado. Sua inscrição está em análise.');
+        return redirect()->to(URL::temporarySignedRoute(
+            'athlete.show',
+            now()->addDays(7),
+            ['registration' => $registration],
+        ))->with('status', 'Comprovante enviado. Sua inscrição está em análise.');
     }
 
     public function paymentSuccess(ParticipantRegistration $registration): RedirectResponse

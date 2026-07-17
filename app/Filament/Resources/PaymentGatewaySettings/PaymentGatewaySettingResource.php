@@ -21,9 +21,9 @@ class PaymentGatewaySettingResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCreditCard;
 
-    protected static ?string $modelLabel = 'gateway de pagamento';
+    protected static ?string $modelLabel = 'configuração de pagamento';
 
-    protected static ?string $pluralModelLabel = 'gateways de pagamento';
+    protected static ?string $pluralModelLabel = 'configurações de pagamento';
 
     protected static ?string $navigationLabel = 'Pagamento';
 

@@ -534,12 +534,26 @@ test('the registration factory generates unique protocols without model events',
     expect($protocolNumbers->unique())->toHaveCount(10);
 });
 
+test('registrations receive unique random four digit bib numbers', function () {
+    $registrations = ParticipantRegistration::factory()->count(25)->create();
+    $bibNumbers = $registrations->pluck('bib_number');
+
+    expect($bibNumbers)->each->toMatch('/^\d{4}$/');
+    expect($bibNumbers->unique())->toHaveCount(25);
+});
+
 test('a paid registration uses the manual pix screen when configured', function () {
     Mail::fake();
 
     PaymentGatewaySetting::factory()->create([
         'manual_pix_enabled' => true,
         'pix_key' => 'financeiro@example.com',
+        'pix_receiver_name' => 'Ave Branca Run',
+        'pix_receiver_city' => 'Sao Paulo',
+        'pix_bank' => 'Banco do Brasil',
+        'pix_agency' => '1234-5',
+        'pix_account' => '98765-4',
+        'pix_account_holder' => 'Associação Ave Branca',
     ]);
 
     $raceModality = RaceModality::factory()->create();
@@ -554,6 +568,15 @@ test('a paid registration uses the manual pix screen when configured', function 
     $this->get($response->headers->get('Location'))
         ->assertSuccessful()
         ->assertSee('financeiro@example.com')
+        ->assertSee('R$ 25,00')
+        ->assertSee('Pix copia e cola')
+        ->assertSee('Banco do Brasil')
+        ->assertSee('1234-5')
+        ->assertSee('98765-4')
+        ->assertSee('Associação Ave Branca')
+        ->assertSee('5921ASSOCIACAO AVE BRANCA')
+        ->assertSee('confirme no aplicativo do seu banco')
+        ->assertSee('Confira também o nome e o CPF do pagador')
         ->assertSee($registration->protocol_number);
 });
 
@@ -565,18 +588,26 @@ test('a pix receipt is stored privately and puts the registration under review',
         'pix_key' => 'financeiro@example.com',
     ]);
 
-    $registration = ParticipantRegistration::factory()->create(['payment_status' => 'pending']);
+    $registration = ParticipantRegistration::withoutEvents(fn () => ParticipantRegistration::factory()->create([
+        'payment_status' => 'pending',
+        'bib_number' => null,
+    ]));
     $url = URL::temporarySignedRoute('registration.pix.store', now()->addHour(), ['registration' => $registration]);
 
-    $this->post($url, [
+    $response = $this->post($url, [
         'billing_name' => 'Maria Silva',
         'billing_document' => '529.982.247-25',
         'pix_receipt' => UploadedFile::fake()->image('comprovante.png'),
+        'payer_data_confirmed' => '1',
     ])->assertSessionHas('status');
 
     $registration->refresh();
 
+    $response->assertRedirectContains("/atleta/{$registration->id}");
+    $this->get($response->headers->get('Location'))->assertSuccessful();
+
     expect($registration->payment_status)->toBe('under_review')
+        ->and($registration->bib_number)->toMatch('/^\d{4}$/')
         ->and($registration->billing_name)->toBe('Maria Silva')
         ->and($registration->billing_document)->toBe('52998224725')
         ->and($registration->pix_receipt_submitted_at)->not->toBeNull();
@@ -599,6 +630,26 @@ test('payer name and cpf are required when submitting a pix receipt', function (
         'billing_document' => '111.111.111-11',
         'pix_receipt' => UploadedFile::fake()->image('comprovante.png'),
     ])->assertSessionHasErrors(['billing_name', 'billing_document']);
+
+    expect($registration->fresh()->payment_status)->toBe('pending');
+});
+
+test('payer data confirmation is required when submitting a pix receipt', function () {
+    Storage::fake('local');
+
+    PaymentGatewaySetting::factory()->create([
+        'manual_pix_enabled' => true,
+        'pix_key' => 'financeiro@example.com',
+    ]);
+
+    $registration = ParticipantRegistration::factory()->create(['payment_status' => 'pending']);
+    $url = URL::temporarySignedRoute('registration.pix.store', now()->addHour(), ['registration' => $registration]);
+
+    $this->post($url, [
+        'billing_name' => 'Maria Silva',
+        'billing_document' => '529.982.247-25',
+        'pix_receipt' => UploadedFile::fake()->image('comprovante.png'),
+    ])->assertSessionHasErrors('payer_data_confirmed');
 
     expect($registration->fresh()->payment_status)->toBe('pending');
 });

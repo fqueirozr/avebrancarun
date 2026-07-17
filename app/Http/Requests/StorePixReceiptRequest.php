@@ -27,6 +27,7 @@ class StorePixReceiptRequest extends FormRequest
             'billing_name' => ['required', 'string', 'max:255'],
             'billing_document' => ['required', 'string', 'regex:/^\d{11}$/'],
             'pix_receipt' => ['required', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:5120'],
+            'payer_data_confirmed' => ['accepted'],
         ];
     }
 
@@ -59,6 +60,7 @@ class StorePixReceiptRequest extends FormRequest
             'pix_receipt.required' => 'Envie o comprovante do Pix.',
             'pix_receipt.mimes' => 'O comprovante deve ser uma imagem JPG, PNG ou um PDF.',
             'pix_receipt.max' => 'O comprovante não pode ter mais de 5 MB.',
+            'payer_data_confirmed.accepted' => 'Confirme que os dados do recebedor e do pagador foram conferidos.',
         ];
     }
 

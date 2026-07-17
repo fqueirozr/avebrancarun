@@ -21,6 +21,11 @@ class PaymentGatewaySettingsTable
                     ->boolean(),
                 TextColumn::make('environment')
                     ->label('Ambiente')
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'sandbox' => 'Testes',
+                        'production' => 'Produção',
+                        default => $state,
+                    })
                     ->badge(),
                 TextColumn::make('checkout_minutes_to_expire')
                     ->label('Expiração')
