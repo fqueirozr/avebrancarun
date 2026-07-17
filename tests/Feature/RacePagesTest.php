@@ -55,6 +55,10 @@ test('race landing page is available', function () {
         ->assertSee('src="'.asset('storage/kits/kit-corrida.jpg').'"', false)
         ->assertSee('alt="Foto do Kit Corrida"', false)
         ->assertSeeText('Pagamento')
+        ->assertSeeText('Pix')
+        ->assertSeeText('Pagamento rápido e seguro para concluir sua inscrição.')
+        ->assertDontSeeText('Crédito/PIX')
+        ->assertDontSeeText('Asaas')
         ->assertSeeText('Responsável: Instituto Esportivo Ave Branca — CNPJ 12.345.678/0001-95');
 });
 

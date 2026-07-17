@@ -80,8 +80,8 @@
                     </div>
                     <div class="race-panel p-5 reveal-on-scroll" data-reveal>
                         <p class="text-sm font-black uppercase tracking-normal text-race-blue">Pagamento</p>
-                        <p class="mt-2 text-2xl font-black">Crédito/PIX</p>
-                        <p class="mt-2 text-sm font-semibold leading-6 text-zinc-600">Checkout ASAAS Gestão Financeira Instituição de Pagamento S.A.</p>
+                        <p class="mt-2 text-2xl font-black">Pix</p>
+                        <p class="mt-2 text-sm font-semibold leading-6 text-zinc-600">Pagamento rápido e seguro para concluir sua inscrição.</p>
                     </div>
                 </div>
             </section>
