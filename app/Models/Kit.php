@@ -17,12 +17,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'rules',
     'max_quantity',
     'has_shirt',
-    'upgrade_1_referrals',
-    'upgrade_1_contents',
-    'upgrade_2_referrals',
-    'upgrade_2_contents',
-    'upgrade_3_referrals',
-    'upgrade_3_contents',
     'is_active',
     'sort_order',
 ])]
@@ -54,11 +48,6 @@ class Kit extends Model
         return $this->type !== self::TypeStandard;
     }
 
-    public function allowsReferralCode(): bool
-    {
-        return in_array($this->type, [self::TypeStandard, self::TypePathfinder], true);
-    }
-
     public function quantityLimitHasBeenReached(): bool
     {
         if ($this->max_quantity === null) {
@@ -68,35 +57,6 @@ class Kit extends Model
         return $this->participantRegistrations()
             ->where('payment_status', '!=', 'cancelled')
             ->count() >= $this->max_quantity;
-    }
-
-    public function upgradeLevelFor(int $referrals): int
-    {
-        if ($this->type !== self::TypePathfinder) {
-            return 0;
-        }
-
-        return collect([$this->upgrade_1_referrals, $this->upgrade_2_referrals, $this->upgrade_3_referrals])
-            ->filter(fn ($threshold): bool => $threshold !== null && $referrals >= (int) $threshold)
-            ->count();
-    }
-
-    /**
-     * @return array<int, string>
-     */
-    public function upgradeContentsThroughLevel(int $level): array
-    {
-        $maximumLevel = min(max($level, 0), 3);
-
-        if ($maximumLevel === 0) {
-            return [];
-        }
-
-        return collect(range(1, $maximumLevel))
-            ->map(fn (int $upgradeLevel): ?string => $this->{"upgrade_{$upgradeLevel}_contents"})
-            ->filter(fn (?string $contents): bool => filled($contents))
-            ->values()
-            ->all();
     }
 
     /**
@@ -136,25 +96,6 @@ class Kit extends Model
         return "{$this->name} - R$ ".number_format((float) $this->price, 2, ',', '.');
     }
 
-    protected static function booted(): void
-    {
-        static::saved(function (Kit $kit): void {
-            if (! $kit->wasChanged([
-                'type',
-                'upgrade_1_referrals',
-                'upgrade_2_referrals',
-                'upgrade_3_referrals',
-            ])) {
-                return;
-            }
-
-            $kit->participantRegistrations()
-                ->whereNotNull('pathfinder_id')
-                ->with('pathfinder')
-                ->each(fn (ParticipantRegistration $registration) => $registration->pathfinder?->recalculateRegistrationUpgrade());
-        });
-    }
-
     /**
      * Get the attributes that should be cast.
      *
@@ -166,9 +107,6 @@ class Kit extends Model
             'price' => 'decimal:2',
             'max_quantity' => 'integer',
             'has_shirt' => 'boolean',
-            'upgrade_1_referrals' => 'integer',
-            'upgrade_2_referrals' => 'integer',
-            'upgrade_3_referrals' => 'integer',
             'is_active' => 'boolean',
         ];
     }

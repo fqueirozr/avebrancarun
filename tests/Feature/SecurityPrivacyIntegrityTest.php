@@ -6,6 +6,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\URL;
 
 uses(RefreshDatabase::class);
@@ -26,18 +27,9 @@ test('the Asaas webhook remains csrf-exempt but requires its secret token', func
         ->assertUnauthorized();
 });
 
-test('private health information is encrypted at rest', function () {
-    $registration = ParticipantRegistration::factory()->create([
-        'health_notes' => 'Alergia grave a penicilina',
-    ]);
-
-    $storedValue = DB::table('participant_registrations')
-        ->where('id', $registration->id)
-        ->value('health_notes');
-
-    expect($storedValue)
-        ->not->toBe('Alergia grave a penicilina')
-        ->and($registration->refresh()->health_notes)->toBe('Alergia grave a penicilina');
+test('registration no longer stores private health information or general notes', function () {
+    expect(Schema::hasColumn('participant_registrations', 'health_notes'))->toBeFalse()
+        ->and(Schema::hasColumn('participant_registrations', 'notes'))->toBeFalse();
 });
 
 test('payment credentials are encrypted at rest and omitted from serialization', function () {

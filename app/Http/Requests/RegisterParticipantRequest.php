@@ -5,7 +5,6 @@ namespace App\Http\Requests;
 use App\Models\EventSetting;
 use App\Models\Kit;
 use App\Models\ParticipantRegistration;
-use App\Models\Pathfinder;
 use App\Models\PaymentGatewaySetting;
 use App\Models\RaceModality;
 use Illuminate\Contracts\Validation\ValidationRule;
@@ -59,16 +58,16 @@ class RegisterParticipantRequest extends FormRequest
             'billing_postal_code' => [Rule::requiredIf($requiresCheckoutData), 'nullable', 'string', 'regex:/^\d{8}$/'],
             'race_modality_id' => ['required', Rule::exists('race_modalities', 'id')->where('is_active', true)],
             'kit_id' => ['required', Rule::exists('kits', 'id')->where('is_active', true)],
-            'notes' => ['nullable', 'string', 'max:1000'],
+            'shirt_id' => ['nullable', Rule::exists('shirts', 'id')->where('is_active', true)],
+            'extra_shirt_size' => [Rule::requiredIf($this->filled('shirt_id')), 'nullable', Rule::in(array_keys(ParticipantRegistration::shirtSizeOptions()))],
+            'extra_shirt_quantity' => [Rule::requiredIf($this->filled('shirt_id')), 'nullable', 'integer', 'min:1', 'max:10'],
             'emergency_contact_name' => ['nullable', 'string', 'max:255'],
             'emergency_contact_phone' => ['nullable', 'string', 'regex:/^\d{10,11}$/'],
-            'health_notes' => ['nullable', 'string', 'max:1000'],
             'accepted_regulation' => ['accepted'],
             'accepted_privacy_policy' => ['accepted'],
             'accepted_fitness_declaration' => ['accepted'],
             'accepted_data_confirmation' => ['accepted'],
             'accepted_special_kit_rules' => ['nullable', 'boolean'],
-            'referral_code' => ['nullable', 'digits:4'],
         ];
     }
 
@@ -114,10 +113,8 @@ class RegisterParticipantRequest extends FormRequest
             'billing_postal_code' => 'o CEP do pagador',
             'race_modality_id' => 'a prova',
             'kit_id' => 'o kit',
-            'notes' => 'as observações',
             'emergency_contact_name' => 'o nome do contato de emergência',
             'emergency_contact_phone' => 'o telefone do contato de emergência',
-            'health_notes' => 'as informações de saúde e emergência',
             'accepted_regulation' => 'o Regulamento',
             'accepted_privacy_policy' => 'a Política de Privacidade',
             'accepted_fitness_declaration' => 'a declaração de aptidão para participar da prova',
@@ -178,25 +175,6 @@ class RegisterParticipantRequest extends FormRequest
 
                 if ($kit?->requiresRulesAcknowledgement() && ! $this->boolean('accepted_special_kit_rules')) {
                     $validator->errors()->add('accepted_special_kit_rules', 'Você precisa ler e declarar ciência das regras deste kit.');
-                }
-
-                if ($kit !== null && ! $kit->allowsReferralCode() && filled($this->input('referral_code'))) {
-                    $validator->errors()->add('referral_code', 'Este tipo de inscrição não aceita código de indicação.');
-                }
-
-                $pathfinder = filled($this->input('referral_code'))
-                    ? Pathfinder::query()
-                        ->where('code', $this->input('referral_code'))
-                        ->where('is_active', true)
-                        ->first()
-                    : null;
-
-                if ($kit?->type === Kit::TypePathfinder && $pathfinder === null) {
-                    $validator->errors()->add('referral_code', 'Informe o código ativo do desbravador.');
-                } elseif ($kit?->type === Kit::TypeStandard && filled($this->input('referral_code')) && $pathfinder === null) {
-                    $validator->errors()->add('referral_code', 'Código de indicação inválido.');
-                } elseif ($kit?->type === Kit::TypePathfinder && $pathfinder?->registration()->exists()) {
-                    $validator->errors()->add('referral_code', 'Este desbravador já possui uma inscrição.');
                 }
 
                 if (filled($this->input('billing_name')) && ! preg_match('/\pL+\s+\pL+/u', (string) $this->input('billing_name'))) {

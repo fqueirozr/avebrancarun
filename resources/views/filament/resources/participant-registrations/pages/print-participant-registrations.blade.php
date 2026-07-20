@@ -189,7 +189,6 @@
                         <th>Atleta</th>
                         <th>Prova</th>
                         <th>Kit</th>
-                        <th>Upgrade do Desbravador</th>
                         <th>Camisa</th>
                         <th>Assinatura do recebedor</th>
                     </tr>
@@ -201,29 +200,6 @@
                             <td>{{ $registration->athlete_name }}</td>
                             <td>{{ $registration->modality }}</td>
                             <td>{{ $registration->kit?->name ?? 'Não informado' }}</td>
-                            <td>
-                                @if ($registration->kit?->type === \App\Models\Kit::TypePathfinder)
-                                    <div class="print-list__upgrade-level">
-                                        Nível {{ $registration->pathfinder_upgrade_level }}
-                                    </div>
-
-                                    @php
-                                        $upgradeContents = $registration->kit->upgradeContentsThroughLevel($registration->pathfinder_upgrade_level);
-                                    @endphp
-
-                                    @if ($upgradeContents === [])
-                                        <div>Nenhum acréscimo conquistado</div>
-                                    @else
-                                        <div class="print-list__upgrade-items">
-                                            @foreach ($upgradeContents as $contents)
-                                                <div>{{ $loop->iteration }}. {{ $contents }}</div>
-                                            @endforeach
-                                        </div>
-                                    @endif
-                                @else
-                                    —
-                                @endif
-                            </td>
                             <td>{{ $registration->shirt_size }}</td>
                             <td class="print-list__signature"></td>
                         </tr>

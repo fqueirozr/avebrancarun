@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 
 #[Fillable([
@@ -29,8 +30,6 @@ use Illuminate\Support\Carbon;
     'race_modality_id',
     'kit_id',
     'pathfinder_id',
-    'referred_by_pathfinder_id',
-    'pathfinder_upgrade_level',
     'modality',
     'bib_number',
     'result_status',
@@ -39,10 +38,8 @@ use Illuminate\Support\Carbon;
     'overall_rank',
     'sex_rank',
     'category_rank',
-    'notes',
     'emergency_contact_name',
     'emergency_contact_phone',
-    'health_notes',
     'regulation_accepted_at',
     'regulation_version',
     'regulation_acceptance_ip',
@@ -99,9 +96,9 @@ class ParticipantRegistration extends Model
         return $this->belongsTo(Pathfinder::class);
     }
 
-    public function referredByPathfinder(): BelongsTo
+    public function shirtOrders(): HasMany
     {
-        return $this->belongsTo(Pathfinder::class, 'referred_by_pathfinder_id');
+        return $this->hasMany(ShirtOrder::class);
     }
 
     /**
@@ -208,7 +205,7 @@ class ParticipantRegistration extends Model
 
     public function priceFor(Kit $kit): float
     {
-        return (float) $kit->price;
+        return (float) $kit->price + (float) $this->shirtOrders()->sum('total_price');
     }
 
     public static function generateUniqueBibNumber(): string
@@ -244,42 +241,12 @@ class ParticipantRegistration extends Model
             if ($registration->isDirty('kit_id')) {
                 $kit = Kit::query()->find($registration->kit_id);
 
-                if ($kit?->type !== Kit::TypeStandard) {
-                    $registration->referred_by_pathfinder_id = null;
-                }
-
                 if ($kit?->type !== Kit::TypePathfinder) {
                     $registration->pathfinder_id = null;
-                    $registration->pathfinder_upgrade_level = 0;
                 }
             }
         });
 
-        static::saved(function (ParticipantRegistration $registration): void {
-            $pathfinderIds = [
-                $registration->getOriginal('referred_by_pathfinder_id'),
-                $registration->referred_by_pathfinder_id,
-            ];
-
-            if ($registration->wasRecentlyCreated || $registration->wasChanged('pathfinder_id')) {
-                $pathfinderIds[] = $registration->getOriginal('pathfinder_id');
-                $pathfinderIds[] = $registration->pathfinder_id;
-            }
-
-            Pathfinder::query()
-                ->whereKey(collect($pathfinderIds)->filter()->unique())
-                ->each(fn (Pathfinder $pathfinder) => $pathfinder->recalculateRegistrationUpgrade());
-        });
-
-        static::deleted(function (ParticipantRegistration $registration): void {
-            if ($registration->referred_by_pathfinder_id === null) {
-                return;
-            }
-
-            Pathfinder::query()
-                ->find($registration->referred_by_pathfinder_id)
-                ?->recalculateRegistrationUpgrade();
-        });
     }
 
     /**
@@ -291,7 +258,6 @@ class ParticipantRegistration extends Model
     {
         return [
             'birth_date' => 'date',
-            'health_notes' => 'encrypted',
             'filled_by_legal_representative' => 'boolean',
             'regulation_accepted_at' => 'datetime',
             'privacy_policy_accepted_at' => 'datetime',
@@ -300,7 +266,6 @@ class ParticipantRegistration extends Model
             'overall_rank' => 'integer',
             'sex_rank' => 'integer',
             'category_rank' => 'integer',
-            'pathfinder_upgrade_level' => 'integer',
             'pix_receipt_submitted_at' => 'datetime',
         ];
     }

@@ -74,7 +74,6 @@ document.querySelectorAll('[data-registration-form]').forEach((form) => {
     const specialKitConfirm = document.querySelector('[data-special-kit-confirm]');
     const specialKitRulesContent = document.querySelector('[data-special-kit-rules-content]');
     const specialKitRulesTitle = document.querySelector('[data-special-kit-rules-title]');
-    const referralCodeField = form.querySelector('[data-referral-code-field]');
     let currentStepIndex = 0;
 
     const fieldLabels = {
@@ -96,10 +95,8 @@ document.querySelectorAll('[data-registration-form]').forEach((form) => {
         billing_postal_code: 'CEP',
         race_modality_id: 'Prova',
         kit_id: 'Kit',
-        notes: 'Detalhes gerais',
         emergency_contact_name: 'Contato de emergencia',
         emergency_contact_phone: 'Telefone de emergencia',
-        health_notes: 'Saude e suporte emergencial',
     };
 
     const visibleSteps = () => steps.filter((step) => !step.dataset.skipStep);
@@ -317,19 +314,6 @@ document.querySelectorAll('[data-registration-form]').forEach((form) => {
             if (!option.matches('[data-special-kit]') && specialKitAcknowledgement) {
                 specialKitAcknowledgement.checked = false;
                 specialKitConfirm.disabled = true;
-            }
-
-            if (referralCodeField) {
-                const identifiesPathfinder = option.dataset.kitType === 'pathfinder';
-
-                referralCodeField.hidden = option.dataset.allowsReferral !== 'true';
-                referralCodeField.querySelector('input').disabled = referralCodeField.hidden;
-                referralCodeField.querySelector('[data-referral-code-label]').textContent = identifiesPathfinder
-                    ? 'Código de identificação do desbravador'
-                    : 'Código de indicação';
-                referralCodeField.querySelector('[data-referral-code-help]').textContent = identifiesPathfinder
-                    ? 'Obrigatório para identificar o desbravador desta inscrição. Não conta como indicação.'
-                    : 'Use o código de um desbravador para registrar a indicação.';
             }
 
             const shirtSizeField = form.querySelector('[data-shirt-size-field]');

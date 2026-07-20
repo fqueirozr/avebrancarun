@@ -7,9 +7,7 @@ use App\Models\ParticipantRegistration;
 use App\Models\RaceModality;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Utilities\Get;
@@ -105,19 +103,6 @@ class ParticipantRegistrationForm
                     ->preload()
                     ->live()
                     ->required(),
-                Placeholder::make('pathfinder_kit_additions')
-                    ->label('Acréscimos do kit adquiridos pelas indicações')
-                    ->content(function (?ParticipantRegistration $record): string {
-                        $additions = $record?->kit?->upgradeContentsThroughLevel($record->pathfinder_upgrade_level ?? 0) ?? [];
-
-                        return $additions === []
-                            ? 'Nenhum acréscimo adquirido até o momento.'
-                            : collect($additions)
-                                ->map(fn (string $addition, int $index): string => ($index + 1).'. '.$addition)
-                                ->implode("\n");
-                    })
-                    ->visible(fn (?ParticipantRegistration $record): bool => $record?->kit?->type === Kit::TypePathfinder)
-                    ->columnSpanFull(),
                 Select::make('payment_status')
                     ->label('Status do pagamento')
                     ->options(ParticipantRegistration::paymentStatusOptions())
@@ -174,10 +159,6 @@ class ParticipantRegistrationForm
                     ->columnSpanFull()
                     ->disabled()
                     ->dehydrated(false),
-                Textarea::make('notes')
-                    ->label('Observações')
-                    ->columnSpanFull()
-                    ->maxLength(1000),
                 TextInput::make('emergency_contact_name')
                     ->label('Contato de emergência')
                     ->maxLength(255),
@@ -186,10 +167,6 @@ class ParticipantRegistrationForm
                     ->tel()
                     ->minLength(10)
                     ->maxLength(11),
-                Textarea::make('health_notes')
-                    ->label('Saúde e emergência')
-                    ->columnSpanFull()
-                    ->maxLength(1000),
                 TextInput::make('privacy_policy_version')
                     ->label('Versão da política aceita')
                     ->disabled()

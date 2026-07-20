@@ -4,9 +4,11 @@ use App\Http\Controllers\AsaasWebhookController;
 use App\Http\Controllers\AthletePageController;
 use App\Http\Controllers\ContactMessageController;
 use App\Http\Controllers\ParticipantRegistrationController;
+use App\Http\Controllers\ShirtOrderController;
 use App\Models\EventSetting;
 use App\Models\Kit;
 use App\Models\RaceModality;
+use App\Models\Shirt;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -22,6 +24,7 @@ Route::get('/', function () {
             ->orderBy('sort_order')
             ->orderBy('name')
             ->get(),
+        'shirts' => Shirt::query()->where('is_active', true)->orderBy('name')->get(),
     ]);
 })->name('home');
 
@@ -38,9 +41,12 @@ Route::get('/inscricao', function () {
             ->orderBy('sort_order')
             ->orderBy('name')
             ->get(),
+        'shirts' => Shirt::query()->where('is_active', true)->orderBy('name')->get(),
     ]);
 })->name('registration');
 Route::post('/inscricao', [ParticipantRegistrationController::class, 'store'])->name('registration.store');
+Route::get('/camisetas', [ShirtOrderController::class, 'index'])->name('shirts.index');
+Route::post('/camisetas', [ShirtOrderController::class, 'store'])->name('shirts.store');
 Route::get('/inscricao/{registration}/pix', [ParticipantRegistrationController::class, 'showPix'])
     ->middleware('signed')
     ->name('registration.pix.show');

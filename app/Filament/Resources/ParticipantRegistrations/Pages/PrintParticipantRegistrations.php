@@ -26,7 +26,7 @@ class PrintParticipantRegistrations extends Page
     public function getRegistrations(): Collection
     {
         return ParticipantRegistration::query()
-            ->with('kit:id,name,type,upgrade_1_contents,upgrade_2_contents,upgrade_3_contents')
+            ->with('kit:id,name,type')
             ->where('payment_status', 'paid')
             ->orderBy('kit_id')
             ->orderBy('modality')

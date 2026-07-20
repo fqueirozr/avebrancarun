@@ -21,6 +21,10 @@ class PathfinderResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
+    protected static ?string $modelLabel = 'desbravador';
+
+    protected static ?string $pluralModelLabel = 'desbravadores';
+
     protected static ?string $navigationLabel = 'Desbravadores';
 
     protected static string|UnitEnum|null $navigationGroup = 'Secretaria';

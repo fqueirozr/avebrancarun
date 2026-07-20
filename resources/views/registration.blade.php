@@ -305,7 +305,7 @@
                             @forelse ($kits as $kit)
                                 <label class="rounded-md border border-zinc-200 text-sm transition has-checked:border-race-cyan has-checked:bg-amber-50">
                                     <span class="flex items-start gap-3 px-4 py-3">
-                                        <input type="radio" name="kit_id" value="{{ $kit->id }}" @checked((int) old('kit_id') === $kit->id) @if ($kit->requiresRulesAcknowledgement()) data-special-kit data-kit-name="{{ $kit->name }}" @endif data-allows-referral="{{ $kit->allowsReferralCode() ? 'true' : 'false' }}" data-has-shirt="{{ $kit->has_shirt ? 'true' : 'false' }}" data-kit-type="{{ $kit->type }}" class="mt-1 size-4 accent-race-cyan" required>
+                                        <input type="radio" name="kit_id" value="{{ $kit->id }}" @checked((int) old('kit_id') === $kit->id) @if ($kit->requiresRulesAcknowledgement()) data-special-kit data-kit-name="{{ $kit->name }}" @endif data-has-shirt="{{ $kit->has_shirt ? 'true' : 'false' }}" data-kit-type="{{ $kit->type }}" class="mt-1 size-4 accent-race-cyan" required>
                                         <span class="grid gap-1">
                                             <span class="font-bold">{{ $kit->name }}</span>
                                             <span class="font-black text-race-blue">R$ {{ number_format((float) $kit->price, 2, ',', '.') }}</span>
@@ -346,26 +346,31 @@
                         @error('accepted_special_kit_rules')
                             <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
                         @enderror
-                        <label class="grid gap-2" data-referral-code-field hidden>
-                            <span class="text-sm font-bold text-zinc-800" data-referral-code-label>Código de indicação</span>
-                            <input type="text" name="referral_code" value="{{ old('referral_code') }}" inputmode="numeric" maxlength="4" pattern="\d{4}" class="rounded-md border border-zinc-300 px-4 py-3" placeholder="0000">
-                            <span class="text-xs text-zinc-600" data-referral-code-help>Use o código de um desbravador para registrar a indicação.</span>
-                            @error('referral_code')
-                                <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
-                            @enderror
-                        </label>
+                        @if ($shirts->isNotEmpty())
+                            <div class="grid gap-3 rounded-md border border-zinc-200 bg-zinc-50 p-4">
+                                <p class="font-black text-zinc-950">Camiseta adicional (opcional)</p>
+                                <select name="shirt_id" class="rounded-md border border-zinc-300 px-4 py-3">
+                                    <option value="">Não adicionar camiseta</option>
+                                    @foreach ($shirts as $shirt)
+                                        <option value="{{ $shirt->id }}" @selected((int) old('shirt_id') === $shirt->id)>{{ $shirt->name }} — R$ {{ number_format((float) $shirt->price, 2, ',', '.') }}</option>
+                                    @endforeach
+                                </select>
+                                <div class="grid gap-3 sm:grid-cols-2">
+                                    <select name="extra_shirt_size" class="rounded-md border border-zinc-300 px-4 py-3">
+                                        <option value="">Tamanho</option>
+                                        @foreach (\App\Models\ParticipantRegistration::shirtSizeOptions() as $size)
+                                            <option value="{{ $size }}" @selected(old('extra_shirt_size') === $size)>{{ $size }}</option>
+                                        @endforeach
+                                    </select>
+                                    <input type="number" name="extra_shirt_quantity" value="{{ old('extra_shirt_quantity', 1) }}" min="1" max="10" class="rounded-md border border-zinc-300 px-4 py-3" aria-label="Quantidade de camisetas">
+                                </div>
+                                <a href="{{ route('shirts.index') }}" class="text-sm font-bold text-race-blue underline">Ou compre por um link próprio</a>
+                            </div>
+                        @endif
                     </fieldset>
 
                     <fieldset class="grid min-w-0 gap-5" data-registration-step data-step-title="Observacoes">
-                        <legend class="mb-4 text-base font-black text-zinc-950">Observações</legend>
-
-                        <label class="grid min-w-0 gap-2">
-                            <span class="text-sm font-bold leading-5 text-zinc-800">Detalhes gerais</span>
-                            <textarea name="notes" rows="3" class="min-w-0 rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-race-cyan focus:ring-3 focus:ring-amber-100" placeholder="Equipe, preferências operacionais ou detalhe não sensível">{{ old('notes') }}</textarea>
-                            @error('notes')
-                                <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
-                            @enderror
-                        </label>
+                        <legend class="mb-4 text-base font-black text-zinc-950">Contato de emergência</legend>
 
                         <div class="grid min-w-0 grid-cols-1 gap-5 md:grid-cols-2">
                             <label class="grid min-w-0 gap-2">
@@ -385,14 +390,6 @@
                             </label>
                         </div>
 
-                        <label class="grid min-w-0 gap-2">
-                            <span class="text-sm font-bold leading-5 text-zinc-800">Saúde e suporte emergencial</span>
-                            <textarea name="health_notes" rows="4" class="min-w-0 rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-race-cyan focus:ring-3 focus:ring-amber-100" placeholder="Alergias, restrições médicas, medicamentos ou condição relevante para atendimento durante o evento">{{ old('health_notes') }}</textarea>
-                            <span class="text-xs font-semibold leading-5 text-zinc-500">Use este campo apenas para informações necessárias à segurança do atleta no evento.</span>
-                            @error('health_notes')
-                                <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
-                            @enderror
-                        </label>
                     </fieldset>
 
                     <fieldset class="grid min-w-0 gap-4 border-t border-zinc-200 pt-6" data-registration-step data-step-title="Conferencia">
@@ -431,7 +428,7 @@
 
                         <label class="flex items-start gap-3 rounded-md border border-zinc-200 bg-white px-4 py-3 text-sm font-semibold text-zinc-800 transition has-checked:border-race-cyan has-checked:bg-amber-50">
                             <input type="checkbox" name="accepted_fitness_declaration" value="1" @checked(old('accepted_fitness_declaration')) class="mt-1 size-4 accent-race-cyan" required>
-                            <span>Declaro estar apto a participar da prova.</span>
+                            <span>Declaro estar em boas condições de saúde e apto(a) para participar da corrida.</span>
                         </label>
                         @error('accepted_fitness_declaration')
                             <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
@@ -518,11 +515,11 @@
 
                     <h3>1. Dados coletados</h3>
                     <p>Coletamos dados de identificação e contato do atleta, como nome, data de nascimento, CPF, telefone, e-mail, prova escolhida e dados do responsável legal quando o atleta for menor de idade. O app não coleta nem valida laudo de PCD. Quando houver pagamento por Pix, coletamos o comprovante necessário para conferência.</p>
-                    <p>Campos de observações gerais devem ser usados para informações operacionais não sensíveis. Informações de saúde, alergias, medicamentos, restrições médicas, contato de emergência e dados semelhantes devem ser informados apenas nos campos próprios de saúde e emergência.</p>
+                    <p>Também coletamos o contato de emergência informado para eventual suporte durante o evento.</p>
 
                     <h3>2. Finalidades e bases de tratamento</h3>
                     <p>Usamos os dados para criar e administrar a inscrição, identificar atletas, confirmar idade e autorização de menores, viabilizar pagamento, emitir comunicações essenciais sobre o evento, prestar suporte, organizar kits, apuração, segurança, atendimento emergencial, prevenção a fraudes, cumprimento de obrigações legais e defesa de direitos.</p>
-                    <p>Dados de saúde e emergência são usados somente para segurança do atleta e eventual suporte emergencial durante o evento.</p>
+                    <p>O contato de emergência é usado somente para segurança do atleta e eventual suporte emergencial durante o evento.</p>
 
                     <h3>3. Pagamentos</h3>
                     <p>O pagamento é realizado por Pix. O comprovante enviado é armazenado em área restrita e utilizado somente para conferência e confirmação da inscrição.</p>

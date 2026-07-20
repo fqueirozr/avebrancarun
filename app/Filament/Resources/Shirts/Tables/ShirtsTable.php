@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Resources\Pathfinders\Tables;
+namespace App\Filament\Resources\Shirts\Tables;
 
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -9,15 +9,16 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
-class PathfindersTable
+class ShirtsTable
 {
     public static function configure(Table $table): Table
     {
         return $table
             ->columns([
                 TextColumn::make('name')->label('Nome')->searchable()->sortable(),
-                TextColumn::make('code')->label('Código')->copyable()->searchable(),
-                IconColumn::make('is_active')->label('Ativo')->boolean(),
+                TextColumn::make('price')->label('Valor')->money('BRL')->sortable(),
+                TextColumn::make('stock_quantity')->label('Estoque')->placeholder('Ilimitado'),
+                IconColumn::make('is_active')->label('Ativa')->boolean(),
             ])
             ->filters([
                 //

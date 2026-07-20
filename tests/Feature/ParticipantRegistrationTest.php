@@ -371,10 +371,8 @@ test('a participant can submit a registration', function () {
         'billing_postal_code' => '70000000',
         'race_modality_id' => $raceModality->id,
         'kit_id' => $kit->id,
-        'notes' => $registration->notes,
         'emergency_contact_name' => 'Ana Silva',
         'emergency_contact_phone' => '(11) 98888-7777',
-        'health_notes' => 'Alergia a amendoim.',
         'accepted_regulation' => '1',
         'accepted_privacy_policy' => '1',
         'accepted_fitness_declaration' => '1',
@@ -396,7 +394,6 @@ test('a participant can submit a registration', function () {
         'kit_id' => $kit->id,
         'modality' => 'Adulto a partir de 16 anos - 6 km',
         'result_category' => 'Feminino 30–39',
-        'notes' => $registration->notes,
         'emergency_contact_name' => 'Ana Silva',
         'emergency_contact_phone' => '11988887777',
         'privacy_policy_version' => ParticipantRegistration::PrivacyPolicyVersion,
@@ -405,8 +402,7 @@ test('a participant can submit a registration', function () {
 
     $storedRegistration = ParticipantRegistration::query()->where('email', 'maria@example.com')->firstOrFail();
 
-    expect($storedRegistration->health_notes)->toBe('Alergia a amendoim.')
-        ->and($storedRegistration->privacy_policy_accepted_at)->not->toBeNull()
+    expect($storedRegistration->privacy_policy_accepted_at)->not->toBeNull()
         ->and($storedRegistration->privacy_policy_acceptance_ip)->not->toBeNull()
         ->and($storedRegistration->privacy_policy_acceptance_user_agent)->not->toBeNull()
         ->and($storedRegistration->data_confirmation_accepted_at)->not->toBeNull()
@@ -987,9 +983,6 @@ test('an authenticated admin can print the paid kit delivery list with a signatu
     $kit = Kit::factory()->create([
         'name' => 'Kit Desbravador',
         'type' => Kit::TypePathfinder,
-        'upgrade_1_contents' => 'Camiseta exclusiva',
-        'upgrade_2_contents' => 'Boné do evento',
-        'upgrade_3_contents' => 'Mochila premium',
     ]);
 
     ParticipantRegistration::factory()->create([
@@ -998,7 +991,6 @@ test('an authenticated admin can print the paid kit delivery list with a signatu
         'email' => 'maria@example.com',
         'payment_status' => 'paid',
         'kit_id' => $kit->id,
-        'pathfinder_upgrade_level' => 2,
     ]);
 
     ParticipantRegistration::factory()->create([
@@ -1013,11 +1005,6 @@ test('an authenticated admin can print the paid kit delivery list with a signatu
         ->assertSee('Maria Silva')
         ->assertSee('Kit Desbravador')
         ->assertSee('GG')
-        ->assertSee('Upgrade do Desbravador')
-        ->assertSee('Nível 2')
-        ->assertSee('Camiseta exclusiva')
-        ->assertSee('Boné do evento')
-        ->assertDontSee('Mochila premium')
         ->assertSee('Assinatura do recebedor')
         ->assertDontSee('maria@example.com')
         ->assertDontSee('João Pendente');

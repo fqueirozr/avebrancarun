@@ -46,10 +46,8 @@ class ParticipantRegistrationFactory extends Factory
             'modality' => fn (array $attributes): string => RaceModality::query()
                 ->find($attributes['race_modality_id'])
                 ->displayName(),
-            'notes' => fake()->optional()->sentence(),
             'emergency_contact_name' => fake()->optional()->name(),
             'emergency_contact_phone' => fake()->optional()->numerify('119########'),
-            'health_notes' => fake()->optional()->sentence(),
             'regulation_accepted_at' => now(),
             'regulation_version' => hash('sha256', 'Test regulation'),
             'regulation_acceptance_ip' => fake()->ipv4(),

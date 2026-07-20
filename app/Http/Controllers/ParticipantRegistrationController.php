@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\CreateShirtOrder;
 use App\Http\Requests\RegisterParticipantRequest;
 use App\Http\Requests\StorePixReceiptRequest;
 use App\Mail\ParticipantRegistrationReceived;
@@ -9,9 +10,9 @@ use App\Mail\ParticipantRegistrationUpdated;
 use App\Models\EventSetting;
 use App\Models\Kit;
 use App\Models\ParticipantRegistration;
-use App\Models\Pathfinder;
 use App\Models\PaymentGatewaySetting;
 use App\Models\RaceModality;
+use App\Models\Shirt;
 use App\Payments\CheckoutRequest;
 use App\Payments\PaymentGateway;
 use App\Support\PixPayload;
@@ -28,11 +29,18 @@ use Throwable;
 
 class ParticipantRegistrationController extends Controller
 {
-    public function __construct(private readonly PaymentGateway $paymentGateway) {}
+    public function __construct(
+        private readonly PaymentGateway $paymentGateway,
+        private readonly CreateShirtOrder $createShirtOrder,
+    ) {}
 
     public function store(RegisterParticipantRequest $request): RedirectResponse
     {
         $validated = $request->validated();
+        $shirtId = $validated['shirt_id'] ?? null;
+        $extraShirtSize = $validated['extra_shirt_size'] ?? null;
+        $extraShirtQuantity = $validated['extra_shirt_quantity'] ?? null;
+        unset($validated['shirt_id'], $validated['extra_shirt_size'], $validated['extra_shirt_quantity']);
         unset(
             $validated['accepted_regulation'],
             $validated['accepted_privacy_policy'],
@@ -40,11 +48,8 @@ class ParticipantRegistrationController extends Controller
             $validated['accepted_data_confirmation'],
             $validated['accepted_special_kit_rules'],
         );
-        $referralCode = $validated['referral_code'] ?? null;
-        unset($validated['referral_code']);
-
         try {
-            [$registration, $raceModality, $kit] = DB::transaction(function () use ($request, $validated, $referralCode): array {
+            [$registration, $raceModality, $kit] = DB::transaction(function () use ($request, $validated, $shirtId, $extraShirtSize, $extraShirtQuantity): array {
                 $eventSetting = EventSetting::query()->lockForUpdate()->first();
                 $raceModality = RaceModality::query()->lockForUpdate()->findOrFail($validated['race_modality_id']);
                 $kit = Kit::query()->lockForUpdate()->findOrFail($validated['kit_id']);
@@ -83,17 +88,9 @@ class ParticipantRegistrationController extends Controller
                     throw ValidationException::withMessages(['participant_cpf' => 'Este atleta já possui uma inscrição.']);
                 }
 
-                $pathfinder = filled($referralCode) ? Pathfinder::query()->lockForUpdate()->where('code', $referralCode)->where('is_active', true)->first() : null;
-
-                if ($kit->type === Kit::TypePathfinder && ($pathfinder === null || $pathfinder->registration()->exists())) {
-                    throw ValidationException::withMessages(['referral_code' => 'O código do desbravador é inválido ou já está vinculado.']);
-                }
-
                 $registration = ParticipantRegistration::create([
                     ...$validated,
                     'shirt_size' => $kit->has_shirt ? ($validated['shirt_size'] ?? null) : null,
-                    'pathfinder_id' => $kit->type === Kit::TypePathfinder ? $pathfinder?->id : null,
-                    'referred_by_pathfinder_id' => $kit->type === Kit::TypeStandard ? $pathfinder?->id : null,
                     'regulation_accepted_at' => now(),
                     'regulation_version' => hash('sha256', (string) $eventSetting?->regulation),
                     'regulation_acceptance_ip' => $request->ip(),
@@ -118,6 +115,16 @@ class ParticipantRegistrationController extends Controller
                         $raceModality->ageReferenceDate($eventSetting?->eventDateForAgeCalculation()),
                     ),
                 ]);
+
+                if ($shirtId !== null) {
+                    $this->createShirtOrder->handle(Shirt::query()->findOrFail($shirtId), [
+                        'customer_name' => $registration->athlete_name,
+                        'customer_email' => $registration->email,
+                        'customer_phone' => $registration->phone,
+                        'size' => $extraShirtSize,
+                        'quantity' => (int) $extraShirtQuantity,
+                    ], $registration);
+                }
 
                 return [$registration, $raceModality, $kit];
             }, attempts: 3);
