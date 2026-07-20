@@ -14,18 +14,23 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use UnitEnum;
 
 class ShirtOrderResource extends Resource
 {
     protected static ?string $model = ShirtOrder::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedShoppingCart;
 
     protected static ?string $modelLabel = 'pedido de camiseta';
 
     protected static ?string $pluralModelLabel = 'pedidos de camisetas';
 
     protected static ?string $navigationLabel = 'Pedidos de camisetas';
+
+    protected static string|UnitEnum|null $navigationGroup = 'Secretaria';
+
+    protected static ?int $navigationSort = 5;
 
     public static function form(Schema $schema): Schema
     {

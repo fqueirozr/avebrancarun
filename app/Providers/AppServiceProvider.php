@@ -2,8 +2,11 @@
 
 namespace App\Providers;
 
+use App\Models\MailSetting;
 use App\Payments\PaymentGateway;
 use App\Payments\PaymentGatewayManager;
+use App\Settings\ApplyMailSettings;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -19,8 +22,10 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Bootstrap any application services.
      */
-    public function boot(): void
+    public function boot(ApplyMailSettings $applyMailSettings): void
     {
-        //
+        if (Schema::hasTable('mail_settings')) {
+            $applyMailSettings->handle(MailSetting::current());
+        }
     }
 }
