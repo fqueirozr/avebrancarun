@@ -3,9 +3,9 @@
 namespace App\Filament\Resources\Pathfinders\Schemas;
 
 use App\Models\Pathfinder;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Schemas\Components\Placeholder;
 use Filament\Schemas\Schema;
 
 class PathfinderForm
