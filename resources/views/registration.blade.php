@@ -330,6 +330,14 @@
                         @error('kit_id')
                             <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
                         @enderror
+                        <label class="grid gap-2" data-pathfinder-code-field hidden>
+                            <span class="text-sm font-bold text-zinc-800">Código do desbravador</span>
+                            <input type="text" name="pathfinder_code" value="{{ old('pathfinder_code') }}" inputmode="numeric" maxlength="4" pattern="\d{4}" class="rounded-md border border-zinc-300 bg-white px-4 py-3 text-base outline-none transition focus:border-race-cyan focus:ring-3 focus:ring-amber-100" placeholder="0000" disabled>
+                            <span class="text-xs text-zinc-600">Informe o código de 4 dígitos recebido no cadastro de desbravadores.</span>
+                            @error('pathfinder_code')
+                                <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
+                            @enderror
+                        </label>
                         <label class="grid gap-2" data-shirt-size-field hidden>
                             <span class="text-sm font-bold text-zinc-800">Tamanho da camisa</span>
                             <select name="shirt_size" class="rounded-md border border-zinc-300 bg-white px-4 py-3 text-base outline-none transition focus:border-race-cyan focus:ring-3 focus:ring-amber-100" required>

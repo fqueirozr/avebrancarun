@@ -6,6 +6,7 @@ use App\Mail\ParticipantRegistrationUpdated;
 use App\Models\EventSetting;
 use App\Models\Kit;
 use App\Models\ParticipantRegistration;
+use App\Models\Pathfinder;
 use App\Models\PaymentGatewaySetting;
 use App\Models\RaceModality;
 use App\Models\User;
@@ -150,6 +151,59 @@ test('every non-standard kit requires acknowledgement of its rules', function (s
     'social' => Kit::TypeSocial,
     'pathfinder' => Kit::TypePathfinder,
 ]);
+
+test('pathfinder kit requires a valid active pathfinder code', function () {
+    $raceModality = RaceModality::factory()->create();
+    $kit = Kit::factory()->create([
+        'price' => 0,
+        'type' => Kit::TypePathfinder,
+    ]);
+
+    $this->post(route('registration.store'), validRegistrationPayload($raceModality, $kit, [
+        'accepted_special_kit_rules' => '1',
+    ]))->assertSessionHasErrors('pathfinder_code');
+
+    $this->post(route('registration.store'), validRegistrationPayload($raceModality, $kit, [
+        'participant_cpf' => '153.509.460-56',
+        'accepted_special_kit_rules' => '1',
+        'pathfinder_code' => '9999',
+    ]))->assertSessionHasErrors('pathfinder_code');
+});
+
+test('pathfinder registration stores the pathfinder identified by code', function () {
+    Mail::fake();
+    $raceModality = RaceModality::factory()->create();
+    $kit = Kit::factory()->create([
+        'price' => 0,
+        'type' => Kit::TypePathfinder,
+    ]);
+    $pathfinder = Pathfinder::factory()->create(['code' => '1234']);
+
+    $this->post(route('registration.store'), validRegistrationPayload($raceModality, $kit, [
+        'accepted_special_kit_rules' => '1',
+        'pathfinder_code' => $pathfinder->code,
+    ]))->assertSessionDoesntHaveErrors();
+
+    expect(ParticipantRegistration::query()->sole()->pathfinder->is($pathfinder))->toBeTrue();
+});
+
+test('pathfinder code cannot be used by more than one registration', function () {
+    $raceModality = RaceModality::factory()->create();
+    $kit = Kit::factory()->create([
+        'price' => 0,
+        'type' => Kit::TypePathfinder,
+    ]);
+    $pathfinder = Pathfinder::factory()->create(['code' => '1234']);
+    ParticipantRegistration::factory()->create([
+        'kit_id' => $kit->id,
+        'pathfinder_id' => $pathfinder->id,
+    ]);
+
+    $this->post(route('registration.store'), validRegistrationPayload($raceModality, $kit, [
+        'accepted_special_kit_rules' => '1',
+        'pathfinder_code' => $pathfinder->code,
+    ]))->assertSessionHasErrors('pathfinder_code');
+});
 
 test('special kit acknowledgement is recorded for audit', function () {
     Mail::fake();

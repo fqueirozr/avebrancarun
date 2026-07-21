@@ -10,6 +10,7 @@ use App\Mail\ParticipantRegistrationUpdated;
 use App\Models\EventSetting;
 use App\Models\Kit;
 use App\Models\ParticipantRegistration;
+use App\Models\Pathfinder;
 use App\Models\PaymentGatewaySetting;
 use App\Models\RaceModality;
 use App\Models\Shirt;
@@ -40,7 +41,8 @@ class ParticipantRegistrationController extends Controller
         $shirtId = $validated['shirt_id'] ?? null;
         $extraShirtSize = $validated['extra_shirt_size'] ?? null;
         $extraShirtQuantity = $validated['extra_shirt_quantity'] ?? null;
-        unset($validated['shirt_id'], $validated['extra_shirt_size'], $validated['extra_shirt_quantity']);
+        $pathfinderCode = $validated['pathfinder_code'] ?? null;
+        unset($validated['shirt_id'], $validated['extra_shirt_size'], $validated['extra_shirt_quantity'], $validated['pathfinder_code']);
         unset(
             $validated['accepted_regulation'],
             $validated['accepted_privacy_policy'],
@@ -49,7 +51,7 @@ class ParticipantRegistrationController extends Controller
             $validated['accepted_special_kit_rules'],
         );
         try {
-            [$registration, $raceModality, $kit] = DB::transaction(function () use ($request, $validated, $shirtId, $extraShirtSize, $extraShirtQuantity): array {
+            [$registration, $raceModality, $kit] = DB::transaction(function () use ($request, $validated, $shirtId, $extraShirtSize, $extraShirtQuantity, $pathfinderCode): array {
                 $eventSetting = EventSetting::query()->lockForUpdate()->first();
                 $raceModality = RaceModality::query()->lockForUpdate()->findOrFail($validated['race_modality_id']);
                 $kit = Kit::query()->lockForUpdate()->findOrFail($validated['kit_id']);
@@ -88,8 +90,27 @@ class ParticipantRegistrationController extends Controller
                     throw ValidationException::withMessages(['participant_cpf' => 'Este atleta já possui uma inscrição.']);
                 }
 
+                $pathfinder = null;
+
+                if ($kit->type === Kit::TypePathfinder) {
+                    $pathfinder = Pathfinder::query()
+                        ->where('code', $pathfinderCode)
+                        ->where('is_active', true)
+                        ->lockForUpdate()
+                        ->first();
+
+                    if ($pathfinder === null || $pathfinder->registration()->exists()) {
+                        throw ValidationException::withMessages([
+                            'pathfinder_code' => $pathfinder === null
+                                ? 'Código de desbravador inválido ou inativo.'
+                                : 'Este código de desbravador já foi utilizado em uma inscrição.',
+                        ]);
+                    }
+                }
+
                 $registration = ParticipantRegistration::create([
                     ...$validated,
+                    'pathfinder_id' => $pathfinder?->id,
                     'shirt_size' => $kit->has_shirt ? ($validated['shirt_size'] ?? null) : null,
                     'regulation_accepted_at' => now(),
                     'regulation_version' => hash('sha256', (string) $eventSetting?->regulation),

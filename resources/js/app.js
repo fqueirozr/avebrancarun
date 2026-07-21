@@ -95,6 +95,7 @@ document.querySelectorAll('[data-registration-form]').forEach((form) => {
         billing_postal_code: 'CEP',
         race_modality_id: 'Prova',
         kit_id: 'Kit',
+        pathfinder_code: 'Codigo do desbravador',
         emergency_contact_name: 'Contato de emergencia',
         emergency_contact_phone: 'Telefone de emergencia',
     };
@@ -317,6 +318,19 @@ document.querySelectorAll('[data-registration-form]').forEach((form) => {
             }
 
             const shirtSizeField = form.querySelector('[data-shirt-size-field]');
+            const pathfinderCodeField = form.querySelector('[data-pathfinder-code-field]');
+
+            if (pathfinderCodeField) {
+                const pathfinderCodeInput = pathfinderCodeField.querySelector('input');
+
+                pathfinderCodeField.hidden = option.dataset.kitType !== 'pathfinder';
+                pathfinderCodeInput.disabled = pathfinderCodeField.hidden;
+                pathfinderCodeInput.required = !pathfinderCodeField.hidden;
+
+                if (pathfinderCodeField.hidden) {
+                    pathfinderCodeInput.value = '';
+                }
+            }
 
             if (shirtSizeField) {
                 const shirtSizeSelect = shirtSizeField.querySelector('select');
