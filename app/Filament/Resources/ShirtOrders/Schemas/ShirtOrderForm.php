@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\ShirtOrders\Schemas;
 
+use App\Models\ShirtOrder;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
@@ -47,10 +49,24 @@ class ShirtOrderForm
                     ->required()
                     ->numeric()
                     ->prefix('R$'),
-                TextInput::make('payment_status')
+                Select::make('payment_status')
                     ->label('Status do pagamento')
+                    ->options(ShirtOrder::paymentStatusOptions())
                     ->required()
                     ->default('pending'),
+                FileUpload::make('payment_receipt_path')
+                    ->label('Comprovante do Pix')
+                    ->helperText('Comprovante enviado na inscrição vinculada.')
+                    ->afterStateHydrated(fn (FileUpload $component, ?ShirtOrder $record): FileUpload => $component->state(
+                        $record?->participantRegistration?->pix_receipt_path,
+                    ))
+                    ->disk('local')
+                    ->visibility('private')
+                    ->downloadable()
+                    ->openable()
+                    ->disabled()
+                    ->dehydrated(false)
+                    ->columnSpanFull(),
             ]);
     }
 }

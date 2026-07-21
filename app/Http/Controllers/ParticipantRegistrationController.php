@@ -157,6 +157,8 @@ class ParticipantRegistrationController extends Controller
             throw $exception;
         }
 
+        $registration->load('kit', 'shirtOrders.shirt');
+
         if ((float) $kit->price > 0 && PaymentGatewaySetting::current()->hasManualPix()) {
             Mail::to($registration->email)->send(new ParticipantRegistrationReceived($registration));
 

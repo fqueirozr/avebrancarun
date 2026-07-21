@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Actions\CreateShirtOrder;
 use App\Http\Requests\StoreShirtOrderRequest;
+use App\Mail\ShirtOrderReceived;
 use App\Models\Shirt;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\View\View;
 
 class ShirtOrderController extends Controller
@@ -22,8 +24,11 @@ class ShirtOrderController extends Controller
         $shirt = Shirt::query()->findOrFail($data['shirt_id']);
         unset($data['shirt_id']);
 
-        DB::transaction(fn () => $action->handle($shirt, $data));
+        $shirtOrder = DB::transaction(fn () => $action->handle($shirt, $data));
+        $shirtOrder->load('shirt');
 
-        return to_route('shirts.index')->with('status', 'Pedido de camiseta registrado com sucesso.');
+        Mail::to($shirtOrder->customer_email)->send(new ShirtOrderReceived($shirtOrder));
+
+        return to_route('shirts.index')->with('status', 'Pedido de camiseta registrado com sucesso. O recibo foi enviado por e-mail.');
     }
 }

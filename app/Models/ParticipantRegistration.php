@@ -247,6 +247,14 @@ class ParticipantRegistration extends Model
             }
         });
 
+        static::updated(function (ParticipantRegistration $registration): void {
+            if ($registration->wasChanged('payment_status')) {
+                $registration->shirtOrders()->update([
+                    'payment_status' => $registration->payment_status,
+                ]);
+            }
+        });
+
     }
 
     /**

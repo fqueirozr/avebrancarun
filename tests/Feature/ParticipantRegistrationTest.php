@@ -1,5 +1,6 @@
 <?php
 
+use App\Filament\Resources\ParticipantRegistrations\Pages\ListParticipantRegistrations;
 use App\Filament\Resources\ParticipantRegistrations\ParticipantRegistrationResource;
 use App\Mail\ParticipantRegistrationReceived;
 use App\Mail\ParticipantRegistrationUpdated;
@@ -9,6 +10,8 @@ use App\Models\ParticipantRegistration;
 use App\Models\Pathfinder;
 use App\Models\PaymentGatewaySetting;
 use App\Models\RaceModality;
+use App\Models\Shirt;
+use App\Models\ShirtOrder;
 use App\Models\User;
 use App\Payments\CheckoutRequest;
 use App\Payments\CheckoutResponse;
@@ -18,6 +21,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
+use Livewire\Livewire;
 
 uses(RefreshDatabase::class);
 
@@ -584,6 +588,34 @@ test('the registration factory generates unique protocols without model events',
     expect($protocolNumbers->unique())->toHaveCount(10);
 });
 
+test('the registration receipt includes an added standalone shirt', function () {
+    $kit = Kit::factory()->create(['price' => 50]);
+    $registration = ParticipantRegistration::factory()->create(['kit_id' => $kit->id]);
+    $shirt = Shirt::factory()->create(['name' => 'Camiseta Oficial', 'price' => 35]);
+
+    ShirtOrder::factory()->create([
+        'shirt_id' => $shirt->id,
+        'participant_registration_id' => $registration->id,
+        'customer_name' => $registration->athlete_name,
+        'customer_email' => $registration->email,
+        'customer_phone' => $registration->phone,
+        'size' => 'G',
+        'quantity' => 2,
+        'unit_price' => 35,
+        'total_price' => 70,
+    ]);
+
+    $mail = new ParticipantRegistrationReceived(
+        $registration->load('kit', 'shirtOrders.shirt')
+    );
+
+    $mail->assertSeeInHtml('Camiseta avulsa adicionada à inscrição');
+    $mail->assertSeeInHtml('Camiseta Oficial');
+    $mail->assertSeeInHtml('R$ 70,00');
+    $mail->assertSeeInHtml('R$ 120,00');
+    $mail->assertSeeInHtml('serve como recibo da inscrição');
+});
+
 test('registrations receive unique random four digit bib numbers', function () {
     $registrations = ParticipantRegistration::factory()->count(25)->create();
     $bibNumbers = $registrations->pluck('bib_number');
@@ -1029,7 +1061,7 @@ test('registration update email shows cancelled status', function () {
     $mail->assertSeeInHtml('Esta inscrição foi cancelada');
 });
 
-test('an authenticated admin can print the paid kit delivery list with a signature field', function () {
+test('an authenticated admin can print kits with linked and standalone shirts', function () {
     config(['app.env' => 'local']);
 
     $user = User::factory()->create();
@@ -1039,12 +1071,40 @@ test('an authenticated admin can print the paid kit delivery list with a signatu
         'type' => Kit::TypePathfinder,
     ]);
 
-    ParticipantRegistration::factory()->create([
+    $registration = ParticipantRegistration::factory()->create([
         'athlete_name' => 'Maria Silva',
         'shirt_size' => 'GG',
         'email' => 'maria@example.com',
         'payment_status' => 'paid',
         'kit_id' => $kit->id,
+    ]);
+
+    $linkedShirt = Shirt::factory()->create(['name' => 'Camiseta Extra Atleta']);
+    ShirtOrder::factory()->create([
+        'shirt_id' => $linkedShirt->id,
+        'participant_registration_id' => $registration->id,
+        'customer_name' => 'Maria Silva',
+        'customer_email' => 'maria@example.com',
+        'customer_phone' => '11999999999',
+        'size' => 'M',
+        'quantity' => 2,
+        'unit_price' => 35,
+        'total_price' => 70,
+        'payment_status' => 'paid',
+    ]);
+
+    $standaloneShirt = Shirt::factory()->create(['name' => 'Camiseta Sem Inscrição']);
+    ShirtOrder::factory()->create([
+        'shirt_id' => $standaloneShirt->id,
+        'participant_registration_id' => null,
+        'customer_name' => 'Carlos Comprador',
+        'customer_email' => 'carlos@example.com',
+        'customer_phone' => '11888888888',
+        'size' => 'G',
+        'quantity' => 1,
+        'unit_price' => 35,
+        'total_price' => 35,
+        'payment_status' => 'pending',
     ]);
 
     ParticipantRegistration::factory()->create([
@@ -1059,7 +1119,39 @@ test('an authenticated admin can print the paid kit delivery list with a signatu
         ->assertSee('Maria Silva')
         ->assertSee('Kit Desbravador')
         ->assertSee('GG')
+        ->assertSee('Camiseta avulsa')
+        ->assertSee('Camiseta Extra Atleta')
+        ->assertSee('tam. M')
+        ->assertSee('2 un.')
+        ->assertSee('Camisetas avulsas sem inscrição')
+        ->assertSee('Carlos Comprador')
+        ->assertSee('Camiseta Sem Inscrição')
         ->assertSee('Assinatura do recebedor')
         ->assertDontSee('maria@example.com')
         ->assertDontSee('João Pendente');
+});
+
+test('the registration panel identifies a linked standalone shirt', function () {
+    $user = User::factory()->create();
+    $registration = ParticipantRegistration::factory()->create();
+    $shirt = Shirt::factory()->create(['name' => 'Camiseta Extra Atleta']);
+
+    ShirtOrder::factory()->create([
+        'shirt_id' => $shirt->id,
+        'participant_registration_id' => $registration->id,
+        'customer_name' => $registration->athlete_name,
+        'customer_email' => $registration->email,
+        'customer_phone' => $registration->phone,
+        'size' => 'G',
+        'quantity' => 2,
+        'unit_price' => 35,
+        'total_price' => 70,
+    ]);
+
+    $this->actingAs($user);
+
+    Livewire::test(ListParticipantRegistrations::class)
+        ->assertSuccessful()
+        ->assertSee('Camiseta avulsa')
+        ->assertSee('Camiseta Extra Atleta (G) × 2');
 });

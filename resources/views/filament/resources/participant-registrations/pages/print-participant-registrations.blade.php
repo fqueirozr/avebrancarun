@@ -1,6 +1,7 @@
 <x-filament-panels::page>
     @php
         $registrations = $this->getRegistrations();
+        $standaloneShirtOrders = $this->getStandaloneShirtOrders();
     @endphp
 
     <style>
@@ -65,6 +66,21 @@
             color: #52525b;
             padding: 2rem;
             text-align: center;
+        }
+
+        .print-list__section {
+            margin-top: 2rem;
+        }
+
+        .print-list__section-title {
+            font-size: 1.125rem;
+            font-weight: 800;
+            margin: 0 0 0.75rem;
+        }
+
+        .print-list__shirt-items {
+            display: grid;
+            gap: 0.2rem;
         }
 
         .print-list__upgrade-level {
@@ -190,6 +206,7 @@
                         <th>Prova</th>
                         <th>Kit</th>
                         <th>Camisa</th>
+                        <th>Camiseta avulsa</th>
                         <th>Assinatura do recebedor</th>
                     </tr>
                 </thead>
@@ -201,11 +218,55 @@
                             <td>{{ $registration->modality }}</td>
                             <td>{{ $registration->kit?->name ?? 'Não informado' }}</td>
                             <td>{{ $registration->shirt_size }}</td>
+                            <td>
+                                @if ($registration->shirtOrders->isEmpty())
+                                    —
+                                @else
+                                    <div class="print-list__shirt-items">
+                                        @foreach ($registration->shirtOrders as $shirtOrder)
+                                            <span>{{ $shirtOrder->shirt?->name ?? 'Camiseta' }} — tam. {{ $shirtOrder->size }} — {{ $shirtOrder->quantity }} un.</span>
+                                        @endforeach
+                                    </div>
+                                @endif
+                            </td>
                             <td class="print-list__signature"></td>
                         </tr>
                     @endforeach
                 </tbody>
             </table>
+        @endif
+
+        @if ($standaloneShirtOrders->isNotEmpty())
+            <section class="print-list__section">
+                <h3 class="print-list__section-title">Camisetas avulsas sem inscrição</h3>
+
+                <table class="print-list__table">
+                    <thead>
+                        <tr>
+                            <th>Pedido</th>
+                            <th>Cliente</th>
+                            <th>Camiseta</th>
+                            <th>Tamanho</th>
+                            <th>Quantidade</th>
+                            <th>Pagamento</th>
+                            <th>Assinatura do recebedor</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($standaloneShirtOrders as $shirtOrder)
+                            <tr>
+                                <td>#{{ $shirtOrder->id }}</td>
+                                <td>{{ $shirtOrder->customer_name }}</td>
+                                <td>{{ $shirtOrder->shirt?->name ?? 'Não informada' }}</td>
+                                <td>{{ $shirtOrder->size }}</td>
+                                <td>{{ $shirtOrder->quantity }}</td>
+                                <td>{{ match ($shirtOrder->payment_status) { 'paid' => 'Pago', 'cancelled' => 'Cancelado', default => 'Pendente' } }}</td>
+                                <td class="print-list__signature"></td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </section>
         @endif
     </section>
 

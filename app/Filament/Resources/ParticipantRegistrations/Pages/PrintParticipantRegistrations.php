@@ -4,6 +4,7 @@ namespace App\Filament\Resources\ParticipantRegistrations\Pages;
 
 use App\Filament\Resources\ParticipantRegistrations\ParticipantRegistrationResource;
 use App\Models\ParticipantRegistration;
+use App\Models\ShirtOrder;
 use Filament\Actions\Action;
 use Filament\Resources\Pages\Page;
 use Filament\Support\Icons\Heroicon;
@@ -26,11 +27,28 @@ class PrintParticipantRegistrations extends Page
     public function getRegistrations(): Collection
     {
         return ParticipantRegistration::query()
-            ->with('kit:id,name,type')
+            ->with([
+                'kit:id,name,type',
+                'shirtOrders.shirt:id,name',
+            ])
             ->where('payment_status', 'paid')
             ->orderBy('kit_id')
             ->orderBy('modality')
             ->orderBy('athlete_name')
+            ->get();
+    }
+
+    /**
+     * @return Collection<int, ShirtOrder>
+     */
+    public function getStandaloneShirtOrders(): Collection
+    {
+        return ShirtOrder::query()
+            ->with('shirt:id,name')
+            ->whereNull('participant_registration_id')
+            ->orderBy('shirt_id')
+            ->orderBy('size')
+            ->orderBy('customer_name')
             ->get();
     }
 

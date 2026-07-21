@@ -17,6 +17,7 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Mail;
 
 class ParticipantRegistrationsTable
@@ -25,6 +26,7 @@ class ParticipantRegistrationsTable
     {
         return $table
             ->poll('10s')
+            ->modifyQueryUsing(fn (Builder $query): Builder => $query->with('shirtOrders.shirt'))
             ->columns([
                 TextColumn::make('protocol_number')
                     ->label('Protocolo')
@@ -43,6 +45,14 @@ class ParticipantRegistrationsTable
                     ->label('Kit')
                     ->searchable()
                     ->sortable()
+                    ->toggleable(),
+                TextColumn::make('standalone_shirts')
+                    ->label('Camiseta avulsa')
+                    ->state(fn (ParticipantRegistration $record): string => $record->shirtOrders
+                        ->map(fn ($shirtOrder): string => ($shirtOrder->shirt?->name ?? 'Camiseta').' ('.$shirtOrder->size.') × '.$shirtOrder->quantity)
+                        ->join(', '))
+                    ->placeholder('Não adquirida')
+                    ->wrap()
                     ->toggleable(),
                 TextColumn::make('participant_cpf')
                     ->label('CPF atleta')

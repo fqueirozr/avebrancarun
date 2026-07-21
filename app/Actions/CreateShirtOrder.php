@@ -27,6 +27,7 @@ class CreateShirtOrder
             'participant_registration_id' => $registration?->id,
             'unit_price' => $shirt->price,
             'total_price' => (float) $shirt->price * $data['quantity'],
+            'payment_status' => $registration?->payment_status ?? 'pending',
         ]);
     }
 }

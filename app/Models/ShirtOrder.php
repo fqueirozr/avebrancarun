@@ -14,6 +14,12 @@ class ShirtOrder extends Model
     /** @use HasFactory<ShirtOrderFactory> */
     use HasFactory;
 
+    /** @return array<string, string> */
+    public static function paymentStatusOptions(): array
+    {
+        return ParticipantRegistration::paymentStatusOptions();
+    }
+
     public function shirt(): BelongsTo
     {
         return $this->belongsTo(Shirt::class);
