@@ -27,7 +27,7 @@ class ShirtOrderReceived extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Pedido de camiseta recebido - Ave Branca Run',
+            subject: 'Pedido de item avulso recebido - Ave Branca Run',
         );
     }
 

@@ -108,6 +108,13 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
 
 - Laravel can be deployed using [Laravel Cloud](https://cloud.laravel.com/), which is the fastest way to deploy and scale production Laravel applications.
 
+=== tests rules ===
+
+# Test Enforcement
+
+- Every change must be programmatically tested. Write a new test or update an existing test, then run the affected tests to make sure they pass.
+- Run the minimum number of tests needed to ensure code quality and speed. Use `php artisan test --compact` with a specific filename or filter.
+
 === laravel/core rules ===
 
 # Do Things the Laravel Way
@@ -153,52 +160,5 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
 - The `{name}` argument should not include the test suite directory. Use `php artisan make:test --pest SomeFeatureTest` instead of `php artisan make:test --pest Feature/SomeFeatureTest`.
 - Run tests: `php artisan test --compact` or filter: `php artisan test --compact --filter=testName`.
 - Do NOT delete tests without approval.
-
-=== privacy/lgpd project rules ===
-
-# Privacy, LGPD, and Event Registration Rules
-
-These rules come from the project's Privacy Policy for event registrations and must be considered in future changes to registration, contact, payment, admin, reporting, email, webhook, analytics, cookies, and public result/image flows.
-
-## Data Minimization and Purpose
-
-- Collect only data needed for account/contact, event registration, participant identification, payment, event operation, safety, support, legal obligations, fraud prevention, and permitted communications.
-- Do not add new personal data fields without a clear purpose, legal basis, retention expectation, and UI copy explaining why the data is needed.
-- Treat CPF, CNPJ, birth date, phone, email, address, payment identifiers, emergency/health notes, minor/guardian data, and image/public result data as personal data.
-- Treat health, emergency, medical restriction, medication, allergy, and fitness information as higher-sensitivity data. Use it only for event safety and emergency support.
-
-## Consent, Notices, and Transparency
-
-- The public registration flow must keep explicit required acceptance for the regulation, Privacy Policy, and fitness declaration before creating a registration.
-- The Privacy Policy shown to users must describe the actual system behavior: collected data, Asaas payment processing, sharing with organizers/timing/kit/support/payment providers, public results/images, cookies when used, retention, user rights, minor registration rules, and contact/DPO channel.
-- If promotional messages are added, provide an opt-in or another valid legal basis, and provide an unsubscribe/opt-out path. Essential event/payment/support messages may remain separate.
-- If cookies, analytics, remarketing, pixels, or tracking scripts are added, document their purpose in the user-facing policy and provide appropriate controls when required.
-
-## Payments and Asaas
-
-- Asaas is the payment processor for checkout. Send only the customer and transaction data needed to create and reconcile charges.
-- Never store full credit card, Pix key ownership, boleto, or other complete financial instrument data in this application.
-- Payment gateway secrets must stay encrypted at rest or in environment/config, never hardcoded or exposed in logs, emails, views, or tests.
-- Webhooks and payment logs must avoid recording full personal payloads unless strictly necessary for diagnostics.
-
-## Sharing, Public Disclosure, and Images
-
-- Share participant data only with parties needed for the event or legal obligations: organizers, timing/results providers, kit/logistics providers, payment institutions, technology/support providers, medical/emergency teams, insurers, sponsors/partners when legally supported, and public authorities when required.
-- Public event outputs should be limited to what the Privacy Policy allows, such as participant name, bib number, category, team, race time, classification, photos, and videos.
-- Do not sell personal data.
-
-## Minors and Guardians
-
-- Registration of minors requires parent/legal guardian data and authorization according to event rules.
-- When collecting minor data, use it only for registration, participation, safety, and legal obligations.
-- Keep guardian data requirements enforced in a Form Request and covered with Pest tests.
-
-## Retention, Security, and Rights
-
-- Personal data should be retained only while needed for registration, payment confirmation, support, legal/fiscal/regulatory/contractual obligations, fraud prevention, rights defense, and event history/results where applicable.
-- After the needed period, data should be deleted, anonymized, or retained only where legally permitted.
-- Future exports, admin screens, emails, print views, and logs must avoid unnecessary exposure of CPF/CNPJ, address, phone, email, payment references, and sensitive notes.
-- Provide a practical path for titular rights requests: confirmation, access, correction, anonymization/blocking/deletion where applicable, portability when applicable, sharing information, consent revocation, and review of automated decisions if introduced.
-- Security-related changes must preserve CSRF on web forms, validation through Form Requests, encrypted casts for secrets/sensitive fields where suitable, access control for admin data, and minimal logging of personal data.
 
 </laravel-boost-guidelines>

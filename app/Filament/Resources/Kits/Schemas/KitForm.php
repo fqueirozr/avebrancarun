@@ -39,7 +39,7 @@ class KitForm
                 RichEditor::make('rules')->label('Regras exibidas no modal')->columnSpanFull(),
                 TextInput::make('max_quantity')
                     ->label('Quantidade máxima')
-                    ->helperText('Deixe em branco para não limitar este kit.')
+                    ->helperText('Deixe em branco para não limitar este pacote.')
                     ->integer()
                     ->minValue(1),
                 Toggle::make('has_shirt')

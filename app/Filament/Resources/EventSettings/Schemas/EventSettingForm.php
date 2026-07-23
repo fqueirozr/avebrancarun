@@ -69,7 +69,7 @@ class EventSettingForm
                 Section::make('Informações da prova')
                     ->schema([
                         self::richEditor('general_information', 'Informações gerais', 'Informe data, local, horários e demais orientações gerais'),
-                        self::richEditor('kit_information', 'Retirada de kit', 'Informe os itens do kit ou orientações de retirada'),
+                        self::richEditor('kit_information', 'Retirada de pacote', 'Informe os itens do pacote ou orientações de retirada'),
                         self::richEditor('baggage_storage_information', 'Guarda-volumes', 'Informe se haverá guarda-volumes e quais são as regras'),
                         self::richEditor('timing_information', 'Cronometragem', 'Informe como funcionará a apuração e divulgação dos resultados'),
                         self::richEditor('special_registrations_information', 'Inscrições especiais', 'Informe regras para PCD, cortesias ou necessidades específicas'),

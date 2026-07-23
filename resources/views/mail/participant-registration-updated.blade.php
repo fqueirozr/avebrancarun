@@ -1,5 +1,5 @@
 <x-mail::message>
-# Sua inscrição foi atualizada
+# {{ $updateTitle }}
 
 Olá {{ $registration->athlete_name }},
 

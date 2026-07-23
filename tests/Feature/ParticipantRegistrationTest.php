@@ -156,7 +156,7 @@ test('every non-standard kit requires acknowledgement of its rules', function (s
     'pathfinder' => Kit::TypePathfinder,
 ]);
 
-test('pathfinder kit requires a valid active pathfinder code', function () {
+test('pathfinder package requires the athlete cpf in the active pathfinder list', function () {
     $raceModality = RaceModality::factory()->create();
     $kit = Kit::factory()->create([
         'price' => 0,
@@ -165,39 +165,38 @@ test('pathfinder kit requires a valid active pathfinder code', function () {
 
     $this->post(route('registration.store'), validRegistrationPayload($raceModality, $kit, [
         'accepted_special_kit_rules' => '1',
-    ]))->assertSessionHasErrors('pathfinder_code');
+    ]))->assertSessionHasErrors('participant_cpf');
 
     $this->post(route('registration.store'), validRegistrationPayload($raceModality, $kit, [
         'participant_cpf' => '153.509.460-56',
         'accepted_special_kit_rules' => '1',
-        'pathfinder_code' => '9999',
-    ]))->assertSessionHasErrors('pathfinder_code');
+    ]))->assertSessionHasErrors('participant_cpf');
 });
 
-test('pathfinder registration stores the pathfinder identified by code', function () {
+test('pathfinder registration stores the pathfinder identified by athlete cpf', function () {
     Mail::fake();
     $raceModality = RaceModality::factory()->create();
     $kit = Kit::factory()->create([
         'price' => 0,
         'type' => Kit::TypePathfinder,
     ]);
-    $pathfinder = Pathfinder::factory()->create(['code' => '1234']);
+    $pathfinder = Pathfinder::factory()->create(['cpf' => '15350946056']);
 
     $this->post(route('registration.store'), validRegistrationPayload($raceModality, $kit, [
         'accepted_special_kit_rules' => '1',
-        'pathfinder_code' => $pathfinder->code,
+        'participant_cpf' => $pathfinder->cpf,
     ]))->assertSessionDoesntHaveErrors();
 
     expect(ParticipantRegistration::query()->sole()->pathfinder->is($pathfinder))->toBeTrue();
 });
 
-test('pathfinder code cannot be used by more than one registration', function () {
+test('pathfinder cpf cannot be used by more than one registration', function () {
     $raceModality = RaceModality::factory()->create();
     $kit = Kit::factory()->create([
         'price' => 0,
         'type' => Kit::TypePathfinder,
     ]);
-    $pathfinder = Pathfinder::factory()->create(['code' => '1234']);
+    $pathfinder = Pathfinder::factory()->create(['cpf' => '15350946056']);
     ParticipantRegistration::factory()->create([
         'kit_id' => $kit->id,
         'pathfinder_id' => $pathfinder->id,
@@ -205,8 +204,8 @@ test('pathfinder code cannot be used by more than one registration', function ()
 
     $this->post(route('registration.store'), validRegistrationPayload($raceModality, $kit, [
         'accepted_special_kit_rules' => '1',
-        'pathfinder_code' => $pathfinder->code,
-    ]))->assertSessionHasErrors('pathfinder_code');
+        'participant_cpf' => $pathfinder->cpf,
+    ]))->assertSessionHasErrors('participant_cpf');
 });
 
 test('special kit acknowledgement is recorded for audit', function () {
@@ -609,7 +608,7 @@ test('the registration receipt includes an added standalone shirt', function () 
         $registration->load('kit', 'shirtOrders.shirt')
     );
 
-    $mail->assertSeeInHtml('Camiseta avulsa adicionada à inscrição');
+    $mail->assertSeeInHtml('Item avulso adicionado à inscrição');
     $mail->assertSeeInHtml('Camiseta Oficial');
     $mail->assertSeeInHtml('R$ 70,00');
     $mail->assertSeeInHtml('R$ 120,00');
@@ -1115,15 +1114,15 @@ test('an authenticated admin can print kits with linked and standalone shirts', 
     $this->actingAs($user)
         ->get(ParticipantRegistrationResource::getUrl('print'))
         ->assertSuccessful()
-        ->assertSee('Lista de entrega de kits')
+        ->assertSee('Lista de entrega de pacotes')
         ->assertSee('Maria Silva')
         ->assertSee('Kit Desbravador')
         ->assertSee('GG')
-        ->assertSee('Camiseta avulsa')
+        ->assertSee('Item avulso')
         ->assertSee('Camiseta Extra Atleta')
         ->assertSee('tam. M')
         ->assertSee('2 un.')
-        ->assertSee('Camisetas avulsas sem inscrição')
+        ->assertSee('Itens avulsos sem inscrição')
         ->assertSee('Carlos Comprador')
         ->assertSee('Camiseta Sem Inscrição')
         ->assertSee('Assinatura do recebedor')
@@ -1152,6 +1151,6 @@ test('the registration panel identifies a linked standalone shirt', function () 
 
     Livewire::test(ListParticipantRegistrations::class)
         ->assertSuccessful()
-        ->assertSee('Camiseta avulsa')
+        ->assertSee('Item avulso')
         ->assertSee('Camiseta Extra Atleta (G) × 2');
 });

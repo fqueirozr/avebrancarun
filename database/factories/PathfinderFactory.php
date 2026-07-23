@@ -19,7 +19,7 @@ class PathfinderFactory extends Factory
     {
         return [
             'name' => fake()->name(),
-            'code' => fake()->unique()->numerify('####'),
+            'cpf' => fake()->unique()->numerify('###########'),
             'is_active' => true,
         ];
     }

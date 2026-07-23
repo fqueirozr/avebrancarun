@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\ParticipantRegistrations\Tables;
 
 use App\Filament\Exports\ParticipantRegistrationExporter;
-use App\Mail\ParticipantRegistrationUpdated;
 use App\Models\Kit;
 use App\Models\ParticipantRegistration;
 use App\Models\RaceModality;
@@ -18,7 +17,6 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Mail;
 
 class ParticipantRegistrationsTable
 {
@@ -42,14 +40,14 @@ class ParticipantRegistrationsTable
                     ->sortable()
                     ->wrap(),
                 TextColumn::make('kit.name')
-                    ->label('Kit')
+                    ->label('Pacote')
                     ->searchable()
                     ->sortable()
                     ->toggleable(),
                 TextColumn::make('standalone_shirts')
-                    ->label('Camiseta avulsa')
+                    ->label('Item avulso')
                     ->state(fn (ParticipantRegistration $record): string => $record->shirtOrders
-                        ->map(fn ($shirtOrder): string => ($shirtOrder->shirt?->name ?? 'Camiseta').' ('.$shirtOrder->size.') × '.$shirtOrder->quantity)
+                        ->map(fn ($shirtOrder): string => ($shirtOrder->shirt?->name ?? 'Item').' ('.$shirtOrder->size.') × '.$shirtOrder->quantity)
                         ->join(', '))
                     ->placeholder('Não adquirida')
                     ->wrap()
@@ -126,7 +124,7 @@ class ParticipantRegistrationsTable
                         return $query->where('modality', $modality?->displayName());
                     }),
                 SelectFilter::make('kit_id')
-                    ->label('Kit')
+                    ->label('Pacote')
                     ->options(fn (): array => Kit::options()),
             ])
             ->defaultSort('created_at', 'desc')
@@ -149,8 +147,6 @@ class ParticipantRegistrationsTable
                         $record->forceFill([
                             'payment_status' => 'cancelled',
                         ])->save();
-
-                        Mail::to($record->email)->send(new ParticipantRegistrationUpdated($record));
 
                         Notification::make()
                             ->success()

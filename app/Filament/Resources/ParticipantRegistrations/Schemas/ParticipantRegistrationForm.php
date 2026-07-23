@@ -97,7 +97,7 @@ class ParticipantRegistrationForm
                     ->preload()
                     ->required(),
                 Select::make('kit_id')
-                    ->label('Kit')
+                    ->label('Pacote')
                     ->options(fn (): array => Kit::options())
                     ->searchable()
                     ->preload()

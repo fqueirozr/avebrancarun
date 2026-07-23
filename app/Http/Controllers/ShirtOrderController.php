@@ -29,6 +29,6 @@ class ShirtOrderController extends Controller
 
         Mail::to($shirtOrder->customer_email)->send(new ShirtOrderReceived($shirtOrder));
 
-        return to_route('shirts.index')->with('status', 'Pedido de camiseta registrado com sucesso. O recibo foi enviado por e-mail.');
+        return to_route('store.index')->with('status', 'Pedido de item avulso registrado com sucesso. O recibo foi enviado por e-mail.');
     }
 }

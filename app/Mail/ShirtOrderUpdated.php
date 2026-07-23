@@ -20,8 +20,10 @@ class ShirtOrderUpdated extends Mailable implements ShouldQueue
     /**
      * Create a new message instance.
      */
-    public function __construct(public ShirtOrder $shirtOrder)
-    {
+    public function __construct(
+        public ShirtOrder $shirtOrder,
+        public string $updateTitle = 'Item avulso atualizado',
+    ) {
         $this->afterCommit();
     }
 
@@ -31,9 +33,7 @@ class ShirtOrderUpdated extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: $this->shirtOrder->payment_status === 'cancelled'
-                ? 'Pedido de camiseta cancelado - Ave Branca Run'
-                : 'Atualização do pagamento da camiseta - Ave Branca Run',
+            subject: "{$this->updateTitle} - Ave Branca Run",
         );
     }
 

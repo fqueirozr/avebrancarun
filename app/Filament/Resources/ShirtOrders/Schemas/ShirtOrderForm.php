@@ -15,7 +15,7 @@ class ShirtOrderForm
         return $schema
             ->components([
                 Select::make('shirt_id')
-                    ->label('Camiseta')
+                    ->label('Item avulso')
                     ->relationship('shirt', 'name')
                     ->required(),
                 Select::make('participant_registration_id')

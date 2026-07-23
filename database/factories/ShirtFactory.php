@@ -21,6 +21,7 @@ class ShirtFactory extends Factory
             'name' => fake()->words(2, true),
             'description' => fake()->optional()->sentence(),
             'price' => fake()->randomFloat(2, 20, 100),
+            'registration_price' => null,
             'stock_quantity' => fake()->optional()->numberBetween(1, 100),
             'is_active' => true,
         ];

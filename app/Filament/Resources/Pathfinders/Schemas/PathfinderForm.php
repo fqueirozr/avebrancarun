@@ -13,7 +13,13 @@ class PathfinderForm
         return $schema
             ->components([
                 TextInput::make('name')->label('Nome')->required()->maxLength(255),
-                TextInput::make('code')->label('Código')->helperText('Gerado automaticamente com 4 dígitos.')->disabled()->dehydrated(false),
+                TextInput::make('cpf')
+                    ->label('CPF')
+                    ->helperText('Informe somente os 11 dígitos.')
+                    ->numeric()
+                    ->length(11)
+                    ->unique(ignoreRecord: true)
+                    ->required(),
                 Toggle::make('is_active')->label('Ativo')->default(true)->required(),
             ]);
     }

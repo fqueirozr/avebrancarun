@@ -45,8 +45,13 @@ Route::get('/inscricao', function () {
     ]);
 })->name('registration');
 Route::post('/inscricao', [ParticipantRegistrationController::class, 'store'])->name('registration.store');
-Route::get('/camisetas', [ShirtOrderController::class, 'index'])->name('shirts.index');
-Route::post('/camisetas', [ShirtOrderController::class, 'store'])->name('shirts.store');
+Route::post('/inscricao/desbravador', [ParticipantRegistrationController::class, 'checkPathfinderEligibility'])
+    ->middleware('throttle:30,1')
+    ->name('registration.pathfinder.check');
+Route::get('/loja', [ShirtOrderController::class, 'index'])->name('store.index');
+Route::post('/loja', [ShirtOrderController::class, 'store'])->name('store.store');
+Route::redirect('/camiseta', '/loja');
+Route::redirect('/camisetas', '/loja');
 Route::get('/inscricao/{registration}/pix', [ParticipantRegistrationController::class, 'showPix'])
     ->middleware('signed')
     ->name('registration.pix.show');

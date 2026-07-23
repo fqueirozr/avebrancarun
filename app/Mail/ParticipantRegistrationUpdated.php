@@ -19,7 +19,10 @@ class ParticipantRegistrationUpdated extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct(public ParticipantRegistration $registration) {}
+    public function __construct(
+        public ParticipantRegistration $registration,
+        public string $updateTitle = 'Inscrição atualizada',
+    ) {}
 
     /**
      * Get the message envelope.
@@ -27,9 +30,7 @@ class ParticipantRegistrationUpdated extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: $this->registration->payment_status === 'cancelled'
-                ? 'Inscrição cancelada - Ave Branca Run'
-                : 'Atualização da inscrição - Ave Branca Run',
+            subject: "{$this->updateTitle} - Ave Branca Run",
         );
     }
 

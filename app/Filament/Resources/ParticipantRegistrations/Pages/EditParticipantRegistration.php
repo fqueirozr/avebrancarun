@@ -3,20 +3,16 @@
 namespace App\Filament\Resources\ParticipantRegistrations\Pages;
 
 use App\Filament\Resources\ParticipantRegistrations\ParticipantRegistrationResource;
-use App\Mail\ParticipantRegistrationUpdated;
 use App\Models\RaceModality;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
 use Filament\Support\Icons\Heroicon;
-use Illuminate\Support\Facades\Mail;
 
 class EditParticipantRegistration extends EditRecord
 {
     protected static string $resource = ParticipantRegistrationResource::class;
-
-    protected ?string $previousPaymentStatus = null;
 
     protected function getHeaderActions(): array
     {
@@ -34,8 +30,6 @@ class EditParticipantRegistration extends EditRecord
                         'payment_status' => 'cancelled',
                     ])->save();
 
-                    Mail::to($this->record->email)->send(new ParticipantRegistrationUpdated($this->record));
-
                     Notification::make()
                         ->success()
                         ->title('Inscrição cancelada')
@@ -44,11 +38,6 @@ class EditParticipantRegistration extends EditRecord
                 }),
             DeleteAction::make(),
         ];
-    }
-
-    protected function beforeSave(): void
-    {
-        $this->previousPaymentStatus = $this->record->payment_status;
     }
 
     /**
@@ -64,14 +53,5 @@ class EditParticipantRegistration extends EditRecord
         }
 
         return $data;
-    }
-
-    protected function afterSave(): void
-    {
-        if ($this->previousPaymentStatus === $this->record->payment_status) {
-            return;
-        }
-
-        Mail::to($this->record->email)->send(new ParticipantRegistrationUpdated($this->record));
     }
 }

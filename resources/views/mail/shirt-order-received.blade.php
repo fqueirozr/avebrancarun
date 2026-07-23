@@ -1,9 +1,9 @@
 <x-mail::message>
-# Pedido de camiseta recebido ✓
+# Pedido de item avulso recebido ✓
 
 Olá {{ $shirtOrder->customer_name }},
 
-Recebemos seu pedido avulso de camiseta da **Ave Branca Run**.
+Recebemos seu pedido de item avulso da **Ave Branca Run**.
 
 <x-mail::panel>
 **Número do pedido:** {{ $shirtOrder->id }}<br>
@@ -11,7 +11,7 @@ Recebemos seu pedido avulso de camiseta da **Ave Branca Run**.
 </x-mail::panel>
 
 <x-mail::table>
-| Camiseta | Tamanho | Quantidade | Valor unitário | Total |
+| Item | Tamanho | Quantidade | Valor unitário | Total |
 | :--- | :---: | ---: | ---: | ---: |
 | {{ $shirtOrder->shirt->name }} | {{ $shirtOrder->size }} | {{ $shirtOrder->quantity }} | R$ {{ number_format((float) $shirtOrder->unit_price, 2, ',', '.') }} | R$ {{ number_format((float) $shirtOrder->total_price, 2, ',', '.') }} |
 </x-mail::table>

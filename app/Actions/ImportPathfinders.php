@@ -13,18 +13,29 @@ class ImportPathfinders
     {
         $reader = ReaderFactory::createFromFileByMimeType($path);
         $reader->open($path);
-        $names = [];
+        $pathfinders = [];
 
         foreach ($reader->getSheetIterator() as $sheet) {
             foreach ($sheet->getRowIterator() as $index => $row) {
-                $name = trim((string) ($row->toArray()[0] ?? ''));
+                $values = $row->toArray();
+                $name = trim((string) ($values[0] ?? ''));
+                $cpf = preg_replace('/\D+/', '', (string) ($values[1] ?? ''));
 
                 if ($index === 1 && mb_strtolower($name) === 'nome') {
                     continue;
                 }
 
-                if ($name !== '') {
-                    $names[] = mb_substr($name, 0, 255);
+                if ($name !== '' || $cpf !== '') {
+                    if ($name === '' || strlen($cpf) !== 11) {
+                        throw ValidationException::withMessages([
+                            'file' => "A linha {$index} deve conter nome e CPF com 11 dígitos.",
+                        ]);
+                    }
+
+                    $pathfinders[] = [
+                        'name' => mb_substr($name, 0, 255),
+                        'cpf' => $cpf,
+                    ];
                 }
             }
 
@@ -33,16 +44,19 @@ class ImportPathfinders
 
         $reader->close();
 
-        if ($names === []) {
-            throw ValidationException::withMessages(['file' => 'A planilha não contém nomes para importar.']);
+        if ($pathfinders === []) {
+            throw ValidationException::withMessages(['file' => 'A planilha não contém desbravadores para importar.']);
         }
 
-        return DB::transaction(function () use ($names): int {
-            collect($names)->unique(fn (string $name): string => mb_strtolower($name))->each(
-                fn (string $name) => Pathfinder::query()->firstOrCreate(['name' => $name], ['is_active' => true]),
+        return DB::transaction(function () use ($pathfinders): int {
+            collect($pathfinders)->unique('cpf')->each(
+                fn (array $pathfinder) => Pathfinder::query()->updateOrCreate(
+                    ['cpf' => $pathfinder['cpf']],
+                    ['name' => $pathfinder['name'], 'is_active' => true],
+                ),
             );
 
-            return count($names);
+            return count($pathfinders);
         });
     }
 }

@@ -28,7 +28,7 @@
                         <p class="mt-2 font-semibold text-white/70">{{ $registration->modality }}</p>
                     </div>
                     <span class="w-fit rounded-full px-4 py-2 text-sm font-black {{ $registration->payment_status === 'paid' ? 'bg-emerald-400 text-emerald-950' : ($registration->payment_status === 'cancelled' ? 'bg-red-300 text-red-950' : 'bg-amber-300 text-amber-950') }}">
-                        Pagamento {{ mb_strtolower($registration->paymentStatusLabel()) }}
+                        {{ $registration->payment_status === 'paid' ? 'Inscrição confirmada' : 'Pagamento '.mb_strtolower($registration->paymentStatusLabel()) }}
                     </span>
                 </div>
             </section>
@@ -41,7 +41,7 @@
                         <div><dt class="text-xs font-black uppercase text-zinc-500">Sexo</dt><dd class="mt-1 font-bold">{{ $registration->sexLabel() }}</dd></div>
                         <div><dt class="text-xs font-black uppercase text-zinc-500">E-mail</dt><dd class="mt-1 break-all font-bold">{{ $registration->email }}</dd></div>
                         <div><dt class="text-xs font-black uppercase text-zinc-500">Telefone</dt><dd class="mt-1 font-bold">{{ $registration->phone }}</dd></div>
-                        <div><dt class="text-xs font-black uppercase text-zinc-500">Kit</dt><dd class="mt-1 font-bold">{{ $registration->kit?->name ?? 'Não informado' }}</dd></div>
+                        <div><dt class="text-xs font-black uppercase text-zinc-500">Pacote</dt><dd class="mt-1 font-bold">{{ $registration->kit?->name ?? 'Não informado' }}</dd></div>
                         <div><dt class="text-xs font-black uppercase text-zinc-500">Número de peito</dt><dd class="mt-1 font-bold">{{ $registration->bib_number ?: 'A definir' }}</dd></div>
                     </dl>
                 </article>

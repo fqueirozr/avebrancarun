@@ -15,7 +15,7 @@ class ListParticipantRegistrations extends ListRecords
     {
         return [
             Action::make('print')
-                ->label('Lista de entrega de kits')
+                ->label('Lista de entrega de pacotes')
                 ->icon(Heroicon::Printer)
                 ->url(fn (): string => ParticipantRegistrationResource::getUrl('print'))
                 ->openUrlInNewTab(),

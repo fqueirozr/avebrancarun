@@ -104,7 +104,7 @@
                     </div>
                 @endif
 
-                <form id="registration-form" action="{{ route('registration.store') }}" method="POST" class="mt-7 grid grid-cols-1 gap-5" data-registration-form>
+                <form id="registration-form" action="{{ route('registration.store') }}" method="POST" class="mt-7 grid grid-cols-1 gap-5" data-registration-form data-pathfinder-check-url="{{ route('registration.pathfinder.check') }}">
                     @csrf
 
                     <div class="grid gap-3 rounded-md border border-race-cyan/25 bg-[#f7fbff] p-4" data-registration-progress>
@@ -299,18 +299,18 @@
                         @enderror
                     </fieldset>
 
-                    <fieldset class="grid min-w-0 gap-3 border-b border-zinc-200 pb-6" data-registration-step data-step-title="Kit">
-                        <legend class="mb-4 text-base font-black text-zinc-950">Kit</legend>
+                    <fieldset class="grid min-w-0 gap-3 border-b border-zinc-200 pb-6" data-registration-step data-step-title="Pacote">
+                        <legend class="mb-4 text-base font-black text-zinc-950">Pacote</legend>
                         <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
                             @forelse ($kits as $kit)
-                                <label class="rounded-md border border-zinc-200 text-sm transition has-checked:border-race-cyan has-checked:bg-amber-50">
+                                <label @if ($kit->type === \App\Models\Kit::TypePathfinder) data-pathfinder-package hidden @endif class="rounded-md border border-zinc-200 text-sm transition has-checked:border-race-cyan has-checked:bg-amber-50">
                                     <span class="flex items-start gap-3 px-4 py-3">
                                         <input type="radio" name="kit_id" value="{{ $kit->id }}" @checked((int) old('kit_id') === $kit->id) @if ($kit->requiresRulesAcknowledgement()) data-special-kit data-kit-name="{{ $kit->name }}" @endif data-has-shirt="{{ $kit->has_shirt ? 'true' : 'false' }}" data-kit-type="{{ $kit->type }}" class="mt-1 size-4 accent-race-cyan" required>
                                         <span class="grid gap-1">
                                             <span class="font-bold">{{ $kit->name }}</span>
                                             <span class="font-black text-race-blue">R$ {{ number_format((float) $kit->price, 2, ',', '.') }}</span>
                                             @if (in_array($kit->type, [\App\Models\Kit::TypePcd60, \App\Models\Kit::TypeSocial], true))
-                                                <span class="font-semibold text-race-blue">Kit com desconto especial. O preço exibido já inclui o desconto.</span>
+                                                <span class="font-semibold text-race-blue">Pacote com desconto especial. O preço exibido já inclui o desconto.</span>
                                             @endif
                                             @if ($kit->description)
                                                 <span class="line-clamp-2 text-zinc-600">{{ $kit->description }}</span>
@@ -323,21 +323,13 @@
                                 </label>
                             @empty
                                 <div class="rounded-md border border-amber-200 bg-amber-50 p-4 text-sm font-semibold text-amber-950 md:col-span-2">
-                                    Nenhum kit ativo no momento.
+                                    Nenhum pacote ativo no momento.
                                 </div>
                             @endforelse
                         </div>
                         @error('kit_id')
                             <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
                         @enderror
-                        <label class="grid gap-2" data-pathfinder-code-field hidden>
-                            <span class="text-sm font-bold text-zinc-800">Código do desbravador</span>
-                            <input type="text" name="pathfinder_code" value="{{ old('pathfinder_code') }}" inputmode="numeric" maxlength="4" pattern="\d{4}" class="rounded-md border border-zinc-300 bg-white px-4 py-3 text-base outline-none transition focus:border-race-cyan focus:ring-3 focus:ring-amber-100" placeholder="0000" disabled>
-                            <span class="text-xs text-zinc-600">Informe o código de 4 dígitos recebido no cadastro de desbravadores.</span>
-                            @error('pathfinder_code')
-                                <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
-                            @enderror
-                        </label>
                         <label class="grid gap-2" data-shirt-size-field hidden>
                             <span class="text-sm font-bold text-zinc-800">Tamanho da camisa</span>
                             <select name="shirt_size" class="rounded-md border border-zinc-300 bg-white px-4 py-3 text-base outline-none transition focus:border-race-cyan focus:ring-3 focus:ring-amber-100" required>
@@ -346,7 +338,7 @@
                                     <option value="{{ $value }}" @selected(old('shirt_size') === $value)>{{ $label }}</option>
                                 @endforeach
                             </select>
-                            <span class="text-xs text-zinc-600">Usado exclusivamente para a separação e entrega do kit.</span>
+                            <span class="text-xs text-zinc-600">Usado exclusivamente para a separação e entrega do pacote.</span>
                             @error('shirt_size')
                                 <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
                             @enderror
@@ -356,11 +348,11 @@
                         @enderror
                         @if ($shirts->isNotEmpty())
                             <div class="grid gap-3 rounded-md border border-zinc-200 bg-zinc-50 p-4">
-                                <p class="font-black text-zinc-950">Camiseta adicional (opcional)</p>
+                                <p class="font-black text-zinc-950">Item avulso adicional (opcional)</p>
                                 <select name="shirt_id" class="rounded-md border border-zinc-300 px-4 py-3">
-                                    <option value="">Não adicionar camiseta</option>
+                                    <option value="">Não adicionar item</option>
                                     @foreach ($shirts as $shirt)
-                                        <option value="{{ $shirt->id }}" @selected((int) old('shirt_id') === $shirt->id)>{{ $shirt->name }} — R$ {{ number_format((float) $shirt->price, 2, ',', '.') }}</option>
+                                        <option value="{{ $shirt->id }}" @selected((int) old('shirt_id') === $shirt->id)>{{ $shirt->name }} — R$ {{ number_format($shirt->priceForRegistration(), 2, ',', '.') }}</option>
                                     @endforeach
                                 </select>
                                 <div class="grid gap-3 sm:grid-cols-2">
@@ -372,7 +364,7 @@
                                     </select>
                                     <input type="number" name="extra_shirt_quantity" value="{{ old('extra_shirt_quantity', 1) }}" min="1" max="10" class="rounded-md border border-zinc-300 px-4 py-3" aria-label="Quantidade de camisetas">
                                 </div>
-                                <a href="{{ route('shirts.index') }}" class="text-sm font-bold text-race-blue underline">Ou compre por um link próprio</a>
+                                <a href="{{ route('store.index') }}" class="text-sm font-bold text-race-blue underline">Ou compre separadamente na loja</a>
                             </div>
                         @endif
                     </fieldset>
@@ -473,15 +465,15 @@
             <div class="grid gap-5 p-6 sm:p-8">
                 <div>
                     <p class="text-sm font-black uppercase tracking-wide text-race-cyan">Inscrição especial</p>
-                    <h2 id="special-kit-rules-title" class="mt-1 text-2xl font-black leading-tight" data-special-kit-rules-title>Regras do kit especial</h2>
+                    <h2 id="special-kit-rules-title" class="mt-1 text-2xl font-black leading-tight" data-special-kit-rules-title>Regras do pacote especial</h2>
                 </div>
                 <div class="grid gap-3 text-sm leading-6 text-zinc-700" data-special-kit-rules-content>
-                    <p><strong>PCD:</strong> o desconto já está aplicado e não é necessário anexar laudo durante a inscrição. Na retirada do kit, apresente documento comprobatório.</p>
-                    <p><strong>60+:</strong> o desconto já está aplicado. Na retirada do kit, apresente documento oficial que comprove a idade.</p>
+                    <p><strong>PCD:</strong> o desconto já está aplicado e não é necessário anexar laudo durante a inscrição. Na retirada do pacote, apresente documento comprobatório.</p>
+                    <p><strong>60+:</strong> o desconto já está aplicado. Na retirada do pacote, apresente documento oficial que comprove a idade.</p>
                 </div>
                 <label class="flex items-start gap-3 rounded-md border border-zinc-200 bg-amber-50 px-4 py-3 text-sm font-semibold text-zinc-800">
                     <input type="checkbox" name="accepted_special_kit_rules" value="1" form="registration-form" @checked(old('accepted_special_kit_rules')) class="mt-1 size-4 accent-race-cyan" data-special-kit-acknowledgement>
-                    <span>Li e estou ciente das regras deste kit.</span>
+                    <span>Li e estou ciente das regras deste pacote.</span>
                 </label>
                 <div class="flex justify-end gap-3">
                     <button type="button" data-modal-close class="rounded-md border border-zinc-300 bg-white px-4 py-2 text-sm font-black text-zinc-800">Voltar</button>

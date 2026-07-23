@@ -16,7 +16,7 @@ class PathfindersTable
         return $table
             ->columns([
                 TextColumn::make('name')->label('Nome')->searchable()->sortable(),
-                TextColumn::make('code')->label('Código')->copyable()->searchable(),
+                TextColumn::make('cpf')->label('CPF')->copyable()->searchable(),
                 IconColumn::make('is_active')->label('Ativo')->boolean(),
             ])
             ->filters([

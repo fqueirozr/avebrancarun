@@ -21,11 +21,11 @@ class ShirtResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedShoppingBag;
 
-    protected static ?string $modelLabel = 'camiseta';
+    protected static ?string $modelLabel = 'item avulso';
 
-    protected static ?string $pluralModelLabel = 'camisetas';
+    protected static ?string $pluralModelLabel = 'itens avulsos';
 
-    protected static ?string $navigationLabel = 'Camisetas';
+    protected static ?string $navigationLabel = 'Itens avulsos';
 
     protected static string|UnitEnum|null $navigationGroup = 'Configuração';
 

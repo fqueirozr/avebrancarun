@@ -17,15 +17,15 @@ Recebemos sua inscrição para a **Ave Branca Run**. Agora ela está em análise
 | Protocolo | {{ $registration->protocol_number }} |
 | Atleta | {{ $registration->athlete_name }} |
 | Prova | {{ $registration->modality }} |
-| Inscrição / kit | R$ {{ number_format((float) $registration->kit->price, 2, ',', '.') }} |
+| Inscrição / pacote | R$ {{ number_format((float) $registration->kit->price, 2, ',', '.') }} |
 | Pagamento | {{ $registration->paymentStatusLabel() }} |
 </x-mail::table>
 
 @if ($registration->shirtOrders->isNotEmpty())
-## Camiseta avulsa adicionada à inscrição
+## Item avulso adicionado à inscrição
 
 <x-mail::table>
-| Camiseta | Tamanho | Quantidade | Valor unitário | Total |
+| Item | Tamanho | Quantidade | Valor unitário | Total |
 | :--- | :---: | ---: | ---: | ---: |
 @foreach ($registration->shirtOrders as $shirtOrder)
 | {{ $shirtOrder->shirt->name }} | {{ $shirtOrder->size }} | {{ $shirtOrder->quantity }} | R$ {{ number_format((float) $shirtOrder->unit_price, 2, ',', '.') }} | R$ {{ number_format((float) $shirtOrder->total_price, 2, ',', '.') }} |

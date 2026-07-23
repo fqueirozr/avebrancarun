@@ -3,22 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Camisetas</title>
+    <title>Loja | Itens avulsos</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="min-h-screen bg-zinc-100 text-zinc-950">
     <main class="mx-auto grid max-w-5xl gap-8 px-4 py-10">
         <header class="grid gap-2">
             <a href="{{ route('home') }}" class="text-sm font-bold text-blue-700">← Voltar</a>
-            <h1 class="text-3xl font-black">Camisetas do evento</h1>
-            <p class="text-zinc-600">Escolha uma camiseta e registre seu pedido separado do kit.</p>
+            <h1 class="text-3xl font-black">Itens avulsos</h1>
+            <p class="text-zinc-600">Escolha um item e registre seu pedido separado da inscrição.</p>
         </header>
 
         @if (session('status'))
             <div class="rounded-lg border border-emerald-300 bg-emerald-50 p-4 font-bold text-emerald-800">{{ session('status') }}</div>
         @endif
 
-        <form method="POST" action="{{ route('shirts.store') }}" class="grid gap-6 rounded-xl bg-white p-6 shadow-sm">
+        <form method="POST" action="{{ route('store.store') }}" class="grid gap-6 rounded-xl bg-white p-6 shadow-sm">
             @csrf
             <div class="grid gap-4 md:grid-cols-2">
                 @forelse ($shirts as $shirt)
@@ -30,7 +30,7 @@
                         @if ($shirt->description)<span class="text-sm text-zinc-600">{{ $shirt->description }}</span>@endif
                     </label>
                 @empty
-                    <p>Nenhuma camiseta disponível no momento.</p>
+                    <p>Nenhum item avulso disponível no momento.</p>
                 @endforelse
             </div>
 

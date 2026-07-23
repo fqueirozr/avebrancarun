@@ -115,30 +115,92 @@
                     </div>
 
                     @if ($kits->isNotEmpty())
-                        <div class="mt-16">
-                            <div class="mb-8 flex flex-col gap-4 reveal-on-scroll sm:flex-row sm:items-center sm:justify-between" data-reveal>
-                                <h3 class="text-3xl font-black leading-tight text-race-night sm:text-5xl">Kits</h3>
-                                <a href="{{ route('registration') }}" class="inline-flex w-fit rounded-md bg-race-night px-5 py-3 text-sm font-black text-white transition hover:-translate-y-0.5 hover:bg-race-blue">
-                                    Escolher kit
-                                </a>
+                        <div class="relative mt-16 overflow-hidden rounded-md border border-race-blue/10 bg-white px-5 py-8 text-race-night shadow-xl shadow-race-night/8 sm:px-8 sm:py-10 lg:px-10" data-packages-showcase data-theme="light">
+                            <div class="pointer-events-none absolute -right-24 -top-32 size-80 rounded-full bg-race-cyan/12 blur-3xl"></div>
+                            <div class="pointer-events-none absolute -bottom-32 left-1/4 size-72 rounded-full bg-race-blue/8 blur-3xl"></div>
+
+                            <div class="relative mb-8 grid gap-6 reveal-on-scroll lg:grid-cols-[1fr_auto] lg:items-end" data-reveal>
+                                <div class="max-w-2xl">
+                                    <div class="mb-4 flex items-center gap-3">
+                                        <span class="grid size-10 place-items-center rounded-full bg-race-cyan text-race-night shadow-lg shadow-race-cyan/20" aria-hidden="true">
+                                            <svg viewBox="0 0 24 24" fill="none" class="size-5" stroke="currentColor" stroke-width="2">
+                                                <path d="M20 12v8H4v-8M2 7h20v5H2zM12 7v13M12 7H7.5a2.5 2.5 0 1 1 0-5C11 2 12 7 12 7Zm0 0h4.5a2.5 2.5 0 1 0 0-5C13 2 12 7 12 7Z"/>
+                                            </svg>
+                                        </span>
+                                        <p class="text-xs font-black uppercase tracking-[0.22em] text-race-blue">Escolha o seu</p>
+                                    </div>
+                                    <h3 class="text-3xl font-black leading-tight sm:text-5xl">Pacotes para a sua corrida</h3>
+                                    <p class="mt-4 max-w-xl text-sm font-semibold leading-6 text-zinc-600 sm:text-base">
+                                        Compare as opções, confira o que combina com você e garanta sua participação.
+                                    </p>
+                                </div>
+
+                                <div class="flex items-center gap-3">
+                                    <span class="rounded-full border border-race-blue/10 bg-race-mist px-4 py-2 text-xs font-black text-race-blue">
+                                        {{ $kits->count() }} {{ $kits->count() === 1 ? 'opção disponível' : 'opções disponíveis' }}
+                                    </span>
+                                    <a href="{{ route('registration') }}" class="hidden items-center gap-2 rounded-md bg-race-blue px-5 py-3 text-sm font-black text-white transition hover:-translate-y-0.5 hover:bg-race-night sm:inline-flex">
+                                        Fazer inscrição
+                                        <span aria-hidden="true">→</span>
+                                    </a>
+                                </div>
                             </div>
 
-                            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                            <div class="relative grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
                                 @foreach ($kits as $kit)
-                                    <article class="race-panel overflow-hidden transition hover:-translate-y-1 hover:shadow-xl hover:shadow-race-night/10 reveal-on-scroll" data-reveal>
-                                        @if ($kit->photo_path)
-                                            <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($kit->photo_path) }}" alt="Foto do {{ $kit->name }}" class="aspect-[4/3] w-full object-cover">
-                                        @endif
-                                        <div class="p-5">
-                                            <p class="text-lg font-black text-zinc-950">{{ $kit->name }}</p>
-                                            <p class="mt-2 text-2xl font-black text-race-blue">R$ {{ number_format((float) $kit->price, 2, ',', '.') }}</p>
-                                            @if ($kit->description)
-                                                <p class="mt-3 text-sm font-semibold leading-6 text-zinc-600">{{ $kit->description }}</p>
+                                    <article class="group flex min-h-full flex-col overflow-hidden rounded-md border border-race-blue/10 bg-white text-race-night shadow-md shadow-race-night/8 transition duration-300 hover:-translate-y-1.5 hover:border-race-cyan/60 hover:shadow-xl hover:shadow-race-night/10 reveal-on-scroll" data-package-card data-reveal>
+                                        <div class="relative overflow-hidden bg-race-mist">
+                                            @if ($kit->photo_path)
+                                                <button type="button" class="block w-full cursor-zoom-in overflow-hidden" data-image-expand data-image-src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($kit->photo_path) }}" data-image-alt="Foto do {{ $kit->name }}">
+                                                    <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($kit->photo_path) }}" alt="Foto do {{ $kit->name }}" class="aspect-[4/3] w-full object-cover transition duration-500 group-hover:scale-105">
+                                                </button>
+                                            @else
+                                                <div class="grid aspect-[4/3] place-items-center bg-linear-to-br from-race-mist via-white to-race-ice">
+                                                    <span class="grid size-16 place-items-center rounded-full bg-race-night text-race-cyan shadow-xl" aria-hidden="true">
+                                                        <svg viewBox="0 0 24 24" fill="none" class="size-7" stroke="currentColor" stroke-width="1.8">
+                                                            <path d="M20 12v8H4v-8M2 7h20v5H2zM12 7v13M12 7H7.5a2.5 2.5 0 1 1 0-5C11 2 12 7 12 7Zm0 0h4.5a2.5 2.5 0 1 0 0-5C13 2 12 7 12 7Z"/>
+                                                        </svg>
+                                                    </span>
+                                                </div>
                                             @endif
+                                            <span class="absolute left-4 top-4 rounded-full border border-white/30 bg-race-night/85 px-3 py-1.5 text-[0.68rem] font-black uppercase tracking-wider text-white shadow-lg backdrop-blur">
+                                                Pacote do atleta
+                                            </span>
+                                            @if ($kit->has_shirt)
+                                                <span class="absolute bottom-4 right-4 rounded-full bg-race-cyan px-3 py-1.5 text-xs font-black text-race-night shadow-lg">
+                                                    Camiseta inclusa
+                                                </span>
+                                            @endif
+                                        </div>
+
+                                        <div class="flex flex-1 flex-col p-5 sm:p-6">
+                                            <div class="flex items-start justify-between gap-4">
+                                                <p class="text-xl font-black leading-tight text-zinc-950">{{ $kit->name }}</p>
+                                                <span class="shrink-0 rounded-full bg-race-mist px-2.5 py-1 text-[0.65rem] font-black uppercase tracking-wide text-race-blue">Disponível</span>
+                                            </div>
+                                            @if ($kit->description)
+                                                <p class="mt-3 line-clamp-3 text-sm font-semibold leading-6 text-zinc-600">{{ $kit->description }}</p>
+                                            @else
+                                                <p class="mt-3 text-sm font-semibold leading-6 text-zinc-500">Tudo o que você precisa para viver a experiência da prova.</p>
+                                            @endif
+                                            <div class="mt-auto flex items-end justify-between gap-4 border-t border-zinc-100 pt-5">
+                                                <div>
+                                                    <p class="text-[0.65rem] font-black uppercase tracking-wider text-zinc-400">Investimento</p>
+                                                    <p class="mt-1 text-2xl font-black text-race-blue">R$ {{ number_format((float) $kit->price, 2, ',', '.') }}</p>
+                                                </div>
+                                                <a href="{{ route('registration') }}" class="grid size-11 shrink-0 place-items-center rounded-full bg-race-night text-xl font-black text-white transition group-hover:bg-race-cyan group-hover:text-race-night" aria-label="Escolher {{ $kit->name }}">
+                                                    <span aria-hidden="true">→</span>
+                                                </a>
+                                            </div>
                                         </div>
                                     </article>
                                 @endforeach
                             </div>
+
+                            <a href="{{ route('registration') }}" class="relative mt-6 inline-flex w-full items-center justify-center gap-2 rounded-md bg-race-blue px-5 py-3.5 text-sm font-black text-white transition hover:bg-race-night sm:hidden">
+                                Fazer inscrição
+                                <span aria-hidden="true">→</span>
+                            </a>
                         </div>
                     @endif
                 </div>
@@ -154,7 +216,7 @@
                             <h2 class="mt-3 text-3xl font-black leading-tight sm:text-5xl">Informações da prova</h2>
                         </div>
                         <p class="max-w-3xl text-base font-semibold leading-8 text-white/70 reveal-on-scroll" data-reveal>
-                            Programação, retirada de kit, regulamento e percursos reunidos em uma área rápida de consultar antes da largada.
+                            Programação, retirada de pacote, regulamento e percursos reunidos em uma área rápida de consultar antes da largada.
                         </p>
                     </div>
 
@@ -162,7 +224,7 @@
                         <div class="grid gap-3 reveal-on-scroll" data-reveal>
                             @foreach ([
                                 ['titulo' => 'Informações gerais', 'valor' => $eventSetting->general_information, 'modal' => null, 'tipo' => 'general'],
-                                ['titulo' => 'Retirada de kit', 'valor' => $eventSetting->kit_information ?: 'Confira camiseta, número de peito e demais itens definidos pela organização.', 'modal' => null],
+                                ['titulo' => 'Retirada de pacote', 'valor' => $eventSetting->kit_information ?: 'Confira camiseta, número de peito e demais itens definidos pela organização.', 'modal' => null],
                                 ['titulo' => 'Guarda-volumes', 'valor' => $eventSetting->baggage_storage_information ?: 'Serviço e orientações serão confirmados pela organização antes do evento.', 'modal' => null],
                                 ['titulo' => 'Cronometragem', 'valor' => $eventSetting->timing_information ?: 'As informações de apuração e resultados serão divulgadas nos canais oficiais do evento.', 'modal' => null],
                                 ['titulo' => 'Inscrições especiais', 'valor' => $eventSetting->special_registrations_information ?: 'Entre em contato com a organização para necessidades específicas ou orientações adicionais.', 'modal' => null],
@@ -456,8 +518,8 @@
         <dialog id="kit-modal" class="m-auto w-[min(44rem,calc(100vw-2rem))] rounded-md border border-race-blue/10 bg-white p-0 text-zinc-950 shadow-2xl shadow-race-night/30 backdrop:bg-race-night/80">
             <div class="flex items-start justify-between gap-5 border-b border-race-cyan/20 bg-race-night p-5 text-white sm:p-6">
                 <div>
-                    <p class="text-sm font-black uppercase tracking-normal text-race-cyan">Kit atleta</p>
-                    <h2 class="mt-1 text-2xl font-black leading-tight">Informações do kit</h2>
+                    <p class="text-sm font-black uppercase tracking-normal text-race-cyan">Pacote do atleta</p>
+                    <h2 class="mt-1 text-2xl font-black leading-tight">Informações do pacote</h2>
                 </div>
                 <button type="button" data-modal-close class="rounded-md border border-white/20 bg-white/10 px-3 py-2 text-sm font-black text-white transition hover:bg-white/20" aria-label="Fechar modal">
                     Fechar
@@ -468,6 +530,13 @@
                     {{ \Filament\Forms\Components\RichEditor\RichContentRenderer::make($eventSetting->kit_information ?: 'Em definição') }}
                 </div>
             </div>
+        </dialog>
+
+        <dialog id="package-image-modal" class="m-auto max-h-[92vh] w-[min(64rem,calc(100vw-2rem))] overflow-hidden rounded-md bg-race-night p-0 shadow-2xl backdrop:bg-race-night/85">
+            <div class="flex justify-end p-3">
+                <button type="button" data-modal-close class="rounded-md bg-white px-4 py-2 text-sm font-black text-race-night">Fechar</button>
+            </div>
+            <img data-expanded-image src="" alt="" class="max-h-[80vh] w-full object-contain">
         </dialog>
 
         <dialog id="regulation-modal" class="m-auto w-[min(44rem,calc(100vw-2rem))] rounded-md border border-race-blue/10 bg-white p-0 text-zinc-950 shadow-2xl shadow-race-night/30 backdrop:bg-race-night/80">

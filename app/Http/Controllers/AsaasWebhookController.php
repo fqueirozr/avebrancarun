@@ -2,12 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Mail\ParticipantRegistrationUpdated;
 use App\Models\ParticipantRegistration;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 
 class AsaasWebhookController extends Controller
 {
@@ -50,7 +48,6 @@ class AsaasWebhookController extends Controller
                 'payment_status' => 'paid',
             ]);
 
-            Mail::to($registration->email)->send(new ParticipantRegistrationUpdated($registration));
         }
 
         return response()->noContent();

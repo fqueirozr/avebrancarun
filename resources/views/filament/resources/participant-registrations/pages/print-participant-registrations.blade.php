@@ -184,18 +184,18 @@
     <section class="print-list">
         <header class="print-list__header">
             <div>
-                <h2 class="print-list__title">Lista de entrega de kits</h2>
+                <h2 class="print-list__title">Lista de entrega de pacotes</h2>
                 <p class="print-list__meta">Gerada em {{ now()->format('d/m/Y H:i') }}</p>
             </div>
 
             <div class="print-list__count">
-                {{ $registrations->count() }} kits
+                {{ $registrations->count() }} pacotes
             </div>
         </header>
 
         @if ($registrations->isEmpty())
             <div class="print-list__empty">
-                Nenhum kit com pagamento confirmado para entrega.
+                Nenhum pacote com pagamento confirmado para entrega.
             </div>
         @else
             <table class="print-list__table">
@@ -204,9 +204,9 @@
                         <th>Protocolo</th>
                         <th>Atleta</th>
                         <th>Prova</th>
-                        <th>Kit</th>
+                        <th>Pacote</th>
                         <th>Camisa</th>
-                        <th>Camiseta avulsa</th>
+                        <th>Item avulso</th>
                         <th>Assinatura do recebedor</th>
                     </tr>
                 </thead>
@@ -238,14 +238,14 @@
 
         @if ($standaloneShirtOrders->isNotEmpty())
             <section class="print-list__section">
-                <h3 class="print-list__section-title">Camisetas avulsas sem inscrição</h3>
+                <h3 class="print-list__section-title">Itens avulsos sem inscrição</h3>
 
                 <table class="print-list__table">
                     <thead>
                         <tr>
                             <th>Pedido</th>
                             <th>Cliente</th>
-                            <th>Camiseta</th>
+                            <th>Item</th>
                             <th>Tamanho</th>
                             <th>Quantidade</th>
                             <th>Pagamento</th>

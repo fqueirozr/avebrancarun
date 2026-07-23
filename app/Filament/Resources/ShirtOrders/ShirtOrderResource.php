@@ -22,11 +22,11 @@ class ShirtOrderResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedShoppingCart;
 
-    protected static ?string $modelLabel = 'pedido de camiseta';
+    protected static ?string $modelLabel = 'pedido de item avulso';
 
-    protected static ?string $pluralModelLabel = 'pedidos de camisetas';
+    protected static ?string $pluralModelLabel = 'pedidos de itens avulsos';
 
-    protected static ?string $navigationLabel = 'Pedidos de camisetas';
+    protected static ?string $navigationLabel = 'Pedidos de itens avulsos';
 
     protected static string|UnitEnum|null $navigationGroup = 'Secretaria';
 

@@ -1,5 +1,6 @@
 <?php
 
+use App\Actions\CreateShirtOrder;
 use App\Filament\Resources\ShirtOrders\Pages\EditShirtOrder;
 use App\Filament\Resources\ShirtOrders\ShirtOrderResource;
 use App\Mail\ShirtOrderReceived;
@@ -122,7 +123,7 @@ it('renders the standalone shirt payment update email', function () {
 
     $mail = new ShirtOrderUpdated($shirtOrder->load('shirt'));
 
-    $mail->assertHasSubject('Atualização do pagamento da camiseta - Ave Branca Run');
+    $mail->assertHasSubject('Item avulso atualizado - Ave Branca Run');
     $mail->assertSeeInHtml('Camiseta Oficial');
     $mail->assertSeeInHtml('R$ 70,00');
     $mail->assertSeeInHtml('Pago');
@@ -164,19 +165,38 @@ it('registers a standalone shirt order and decrements stock', function () {
 
     $shirt = Shirt::factory()->create(['stock_quantity' => 5, 'price' => 35]);
 
-    $this->post(route('shirts.store'), [
+    $this->post(route('store.store'), [
         'shirt_id' => $shirt->id,
         'customer_name' => 'Maria Silva',
         'customer_email' => 'maria@example.com',
         'customer_phone' => '11999999999',
         'size' => 'M',
         'quantity' => 2,
-    ])->assertRedirect(route('shirts.index'));
+    ])->assertRedirect(route('store.index'));
 
     $this->assertDatabaseHas('shirt_orders', ['shirt_id' => $shirt->id, 'quantity' => 2, 'total_price' => 70]);
     expect($shirt->refresh()->stock_quantity)->toBe(3);
 
     Mail::assertSent(ShirtOrderReceived::class, 'maria@example.com');
+});
+
+it('uses the discounted item price when purchased with a registration', function () {
+    $registration = ParticipantRegistration::factory()->create();
+    $shirt = Shirt::factory()->create([
+        'price' => 50,
+        'registration_price' => 35,
+    ]);
+
+    $order = app(CreateShirtOrder::class)->handle($shirt, [
+        'customer_name' => 'Maria Silva',
+        'customer_email' => 'maria@example.com',
+        'customer_phone' => '11999999999',
+        'size' => 'M',
+        'quantity' => 2,
+    ], $registration);
+
+    expect((float) $order->unit_price)->toBe(35.0)
+        ->and((float) $order->total_price)->toBe(70.0);
 });
 
 it('renders the standalone shirt order as a receipt', function () {
@@ -194,7 +214,7 @@ it('renders the standalone shirt order as a receipt', function () {
 
     $mail = new ShirtOrderReceived($shirtOrder->load('shirt'));
 
-    $mail->assertHasSubject('Pedido de camiseta recebido - Ave Branca Run');
+    $mail->assertHasSubject('Pedido de item avulso recebido - Ave Branca Run');
     $mail->assertSeeInHtml('Camiseta Oficial');
     $mail->assertSeeInHtml('R$ 70,00');
     $mail->assertSeeInHtml('Pendente');

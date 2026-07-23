@@ -54,6 +54,19 @@ document.querySelectorAll('[data-mask]').forEach((input) => {
     applyMask();
 });
 
+document.querySelectorAll('[data-image-expand]').forEach((button) => {
+    button.addEventListener('click', () => {
+        const modal = document.getElementById('package-image-modal');
+        const image = modal?.querySelector('[data-expanded-image]');
+
+        if (modal instanceof HTMLDialogElement && image) {
+            image.src = button.dataset.imageSrc;
+            image.alt = button.dataset.imageAlt;
+            modal.showModal();
+        }
+    });
+});
+
 document.querySelectorAll('[data-registration-form]').forEach((form) => {
     const steps = Array.from(form.querySelectorAll('[data-registration-step]'));
     const guardianStep = form.querySelector('[data-guardian-step]');
@@ -94,8 +107,7 @@ document.querySelectorAll('[data-registration-form]').forEach((form) => {
         billing_address_number: 'Numero',
         billing_postal_code: 'CEP',
         race_modality_id: 'Prova',
-        kit_id: 'Kit',
-        pathfinder_code: 'Codigo do desbravador',
+        kit_id: 'Pacote',
         emergency_contact_name: 'Contato de emergencia',
         emergency_contact_phone: 'Telefone de emergencia',
     };
@@ -318,20 +330,6 @@ document.querySelectorAll('[data-registration-form]').forEach((form) => {
             }
 
             const shirtSizeField = form.querySelector('[data-shirt-size-field]');
-            const pathfinderCodeField = form.querySelector('[data-pathfinder-code-field]');
-
-            if (pathfinderCodeField) {
-                const pathfinderCodeInput = pathfinderCodeField.querySelector('input');
-
-                pathfinderCodeField.hidden = option.dataset.kitType !== 'pathfinder';
-                pathfinderCodeInput.disabled = pathfinderCodeField.hidden;
-                pathfinderCodeInput.required = !pathfinderCodeField.hidden;
-
-                if (pathfinderCodeField.hidden) {
-                    pathfinderCodeInput.value = '';
-                }
-            }
-
             if (shirtSizeField) {
                 const shirtSizeSelect = shirtSizeField.querySelector('select');
 
@@ -347,6 +345,45 @@ document.querySelectorAll('[data-registration-form]').forEach((form) => {
     });
 
     form.querySelector('input[name="kit_id"]:checked')?.dispatchEvent(new Event('change'));
+
+    const participantCpfInput = form.querySelector('input[name="participant_cpf"]');
+    const pathfinderPackages = Array.from(form.querySelectorAll('[data-pathfinder-package]'));
+    let pathfinderCheckTimer;
+
+    const syncPathfinderPackages = async () => {
+        const cpf = participantCpfInput?.value.replace(/\D/g, '') ?? '';
+        let eligible = false;
+
+        if (cpf.length === 11 && form.dataset.pathfinderCheckUrl) {
+            const response = await fetch(form.dataset.pathfinderCheckUrl, {
+                method: 'POST',
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': form.querySelector('input[name="_token"]').value,
+                },
+                body: JSON.stringify({ cpf }),
+            });
+
+            eligible = response.ok && (await response.json()).eligible === true;
+        }
+
+        pathfinderPackages.forEach((packageOption) => {
+            packageOption.hidden = !eligible;
+            const radio = packageOption.querySelector('input[name="kit_id"]');
+            radio.disabled = !eligible;
+
+            if (!eligible && radio.checked) {
+                radio.checked = false;
+            }
+        });
+    };
+
+    participantCpfInput?.addEventListener('input', () => {
+        clearTimeout(pathfinderCheckTimer);
+        pathfinderCheckTimer = setTimeout(syncPathfinderPackages, 300);
+    });
+    syncPathfinderPackages();
 
     specialKitAcknowledgement?.addEventListener('change', () => {
         specialKitConfirm.disabled = !specialKitAcknowledgement.checked;

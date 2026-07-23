@@ -19,7 +19,7 @@ class RaceModalityResource extends Resource
 {
     protected static ?string $model = RaceModality::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedFlag;
 
     protected static ?string $modelLabel = 'prova';
 

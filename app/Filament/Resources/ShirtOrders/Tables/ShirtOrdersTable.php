@@ -15,7 +15,7 @@ class ShirtOrdersTable
         return $table
             ->columns([
                 TextColumn::make('shirt.name')
-                    ->label('Camiseta')
+                    ->label('Item avulso')
                     ->searchable(),
                 TextColumn::make('participantRegistration.id')
                     ->label('Inscrição')

@@ -34,10 +34,6 @@ class RegisterParticipantRequest extends FormRequest
         $kitHasShirt = (bool) Kit::query()
             ->whereKey($this->input('kit_id'))
             ->value('has_shirt');
-        $isPathfinderKit = Kit::query()
-            ->whereKey($this->input('kit_id'))
-            ->where('type', Kit::TypePathfinder)
-            ->exists();
         $requiresCheckoutData = PaymentGatewaySetting::current()->isConfigured();
 
         return [
@@ -63,12 +59,6 @@ class RegisterParticipantRequest extends FormRequest
             'billing_postal_code' => [Rule::requiredIf($requiresCheckoutData), 'nullable', 'string', 'regex:/^\d{8}$/'],
             'race_modality_id' => ['required', Rule::exists('race_modalities', 'id')->where('is_active', true)],
             'kit_id' => ['required', Rule::exists('kits', 'id')->where('is_active', true)],
-            'pathfinder_code' => [
-                Rule::requiredIf($isPathfinderKit),
-                Rule::excludeIf(! $isPathfinderKit),
-                'string',
-                'regex:/^\d{4}$/',
-            ],
             'shirt_id' => ['nullable', Rule::exists('shirts', 'id')->where('is_active', true)],
             'extra_shirt_size' => [Rule::requiredIf($this->filled('shirt_id')), 'nullable', Rule::in(array_keys(ParticipantRegistration::shirtSizeOptions()))],
             'extra_shirt_quantity' => [Rule::requiredIf($this->filled('shirt_id')), 'nullable', 'integer', 'min:1', 'max:10'],
@@ -96,8 +86,7 @@ class RegisterParticipantRequest extends FormRequest
             'email.email' => 'Informe um e-mail válido.',
             'regex' => 'Informe um valor válido para :attribute.',
             'race_modality_id.exists' => 'Escolha uma prova ativa.',
-            'kit_id.exists' => 'Escolha um kit ativo.',
-            'pathfinder_code.regex' => 'Informe um código de desbravador válido com 4 dígitos.',
+            'kit_id.exists' => 'Escolha um pacote ativo.',
             'accepted' => 'Você precisa aceitar :attribute.',
         ];
     }
@@ -124,8 +113,7 @@ class RegisterParticipantRequest extends FormRequest
             'billing_province' => 'o bairro do pagador',
             'billing_postal_code' => 'o CEP do pagador',
             'race_modality_id' => 'a prova',
-            'kit_id' => 'o kit',
-            'pathfinder_code' => 'o código do desbravador',
+            'kit_id' => 'o pacote',
             'emergency_contact_name' => 'o nome do contato de emergência',
             'emergency_contact_phone' => 'o telefone do contato de emergência',
             'accepted_regulation' => 'o Regulamento',
@@ -187,19 +175,19 @@ class RegisterParticipantRequest extends FormRequest
                 }
 
                 if ($kit?->requiresRulesAcknowledgement() && ! $this->boolean('accepted_special_kit_rules')) {
-                    $validator->errors()->add('accepted_special_kit_rules', 'Você precisa ler e declarar ciência das regras deste kit.');
+                    $validator->errors()->add('accepted_special_kit_rules', 'Você precisa ler e declarar ciência das regras deste pacote.');
                 }
 
-                if ($kit?->type === Kit::TypePathfinder && filled($this->input('pathfinder_code'))) {
+                if ($kit?->type === Kit::TypePathfinder && filled($this->input('participant_cpf'))) {
                     $pathfinder = Pathfinder::query()
-                        ->where('code', $this->input('pathfinder_code'))
+                        ->where('cpf', $this->input('participant_cpf'))
                         ->where('is_active', true)
                         ->first();
 
                     if ($pathfinder === null) {
-                        $validator->errors()->add('pathfinder_code', 'Código de desbravador inválido ou inativo.');
+                        $validator->errors()->add('participant_cpf', 'Este CPF não está habilitado para o pacote de desbravadores.');
                     } elseif ($pathfinder->registration()->exists()) {
-                        $validator->errors()->add('pathfinder_code', 'Este código de desbravador já foi utilizado em uma inscrição.');
+                        $validator->errors()->add('participant_cpf', 'Este desbravador já possui uma inscrição.');
                     }
                 }
 

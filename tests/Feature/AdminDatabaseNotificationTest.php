@@ -46,7 +46,7 @@ it('notifies every admin about a standalone shirt order', function () {
     $notification = $admin->notifications()->sole();
 
     expect($notification->data)
-        ->title->toBe('Novo pedido de camiseta avulsa')
+        ->title->toBe('Novo pedido de item avulso')
         ->body->toContain('João Comprador')
         ->actions->toHaveCount(1)
         ->and($notification->data['actions'][0]['url'])

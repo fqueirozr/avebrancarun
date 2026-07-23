@@ -11,72 +11,81 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class RaceModalitiesTable
 {
     public static function configure(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn (Builder $query): Builder => $query->withCount('participantRegistrations'))
             ->columns([
                 TextColumn::make('sort_order')
                     ->label('Ordem')
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('name')
-                    ->label('Nome')
+                    ->label('Prova')
+                    ->description(fn (RaceModality $record): string => collect([
+                        $record->distance,
+                        $record->ageRangeLabel(),
+                    ])->filter()->join(' • '))
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->wrap(),
                 TextColumn::make('type')
-                    ->label('Tipo')
+                    ->label('Categoria')
                     ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'Infantil' => 'info',
+                        'Juvenil' => 'warning',
+                        'Adulto' => 'success',
+                        'Master' => 'primary',
+                        'PCD' => 'danger',
+                        default => 'gray',
+                    })
                     ->sortable(),
-                TextColumn::make('age_start')
-                    ->label('Faixa etária')
-                    ->formatStateUsing(fn (mixed $state, $record): string => $record->ageRangeLabel())
-                    ->searchable()
-                    ->toggleable(),
-                TextColumn::make('distance')
-                    ->label('Distância')
-                    ->searchable(),
                 TextColumn::make('race_date')
-                    ->label('Data')
+                    ->label('Largada')
                     ->date('d/m/Y')
+                    ->description(fn (RaceModality $record): ?string => filled($record->race_time)
+                        ? str($record->race_time)->substr(0, 5)->prepend('Às ')->toString()
+                        : null)
                     ->placeholder('A confirmar')
                     ->sortable()
                     ->toggleable(),
-                TextColumn::make('race_time')
-                    ->label('Horário')
-                    ->formatStateUsing(fn (?string $state): ?string => $state === null ? null : str($state)->substr(0, 5)->toString())
-                    ->placeholder('A confirmar')
-                    ->toggleable(),
-                TextColumn::make('google_maps_embed_url')
+                TextColumn::make('participant_registrations_count')
+                    ->label('Inscrições')
+                    ->formatStateUsing(fn (int $state, RaceModality $record): string => $record->max_participants === null
+                        ? (string) $state
+                        : "{$state} / {$record->max_participants}")
+                    ->description(fn (RaceModality $record): string => $record->max_participants === null ? 'Sem limite' : 'Vagas ocupadas')
+                    ->sortable()
+                    ->alignCenter(),
+                IconColumn::make('google_maps_embed_url')
                     ->label('Mapa')
-                    ->formatStateUsing(fn (?string $state): string => filled($state) ? 'Configurado' : 'Pendente')
-                    ->badge()
-                    ->toggleable(),
-                TextColumn::make('course_images')
-                    ->label('Fotos')
-                    ->formatStateUsing(fn (?array $state): string => count($state ?? []).' foto(s)')
-                    ->toggleable(),
-                TextColumn::make('max_participants')
-                    ->label('Limite de atletas')
-                    ->placeholder('Sem limite')
-                    ->sortable()
+                    ->boolean(fn (?string $state): bool => filled($state))
                     ->toggleable(),
                 IconColumn::make('is_active')
-                    ->label('Ativa')
+                    ->label('Disponível')
                     ->boolean()
                     ->sortable(),
             ])
             ->filters([
                 SelectFilter::make('type')
-                    ->label('Tipo')
+                    ->label('Categoria')
                     ->options(RaceModality::typeOptions()),
                 TernaryFilter::make('is_active')
-                    ->label('Ativa'),
+                    ->label('Disponível'),
             ])
             ->defaultSort('sort_order')
+            ->reorderable('sort_order')
+            ->emptyStateIcon('heroicon-o-flag')
+            ->emptyStateHeading('Nenhuma prova cadastrada')
+            ->emptyStateDescription('Cadastre a primeira prova para disponibilizá-la aos atletas.')
             ->recordActions([
-                EditAction::make(),
+                EditAction::make()
+                    ->label('Editar prova'),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

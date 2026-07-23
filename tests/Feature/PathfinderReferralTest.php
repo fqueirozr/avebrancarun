@@ -10,10 +10,10 @@ use Livewire\Livewire;
 
 uses(RefreshDatabase::class);
 
-it('generates a unique four digit code for a pathfinder', function () {
-    $pathfinder = Pathfinder::factory()->create(['code' => null]);
+it('stores a unique cpf for a pathfinder', function () {
+    $pathfinder = Pathfinder::factory()->create(['cpf' => '15350946056']);
 
-    expect($pathfinder->code)->toMatch('/^\d{4}$/');
+    expect($pathfinder->cpf)->toBe('15350946056');
 });
 
 it('calculates at most three pathfinder kit upgrades', function () {

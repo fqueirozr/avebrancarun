@@ -24,7 +24,7 @@ class ListPathfinders extends ListRecords
                 ->schema([
                     FileUpload::make('file')
                         ->label('Arquivo do Excel')
-                        ->helperText('Use a primeira coluna, com o cabeçalho opcional “Nome”.')
+                        ->helperText('Use as colunas Nome e CPF, nesta ordem. Os cabeçalhos são opcionais.')
                         ->disk('local')
                         ->directory('imports/pathfinders')
                         ->acceptedFileTypes(['text/csv', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'])

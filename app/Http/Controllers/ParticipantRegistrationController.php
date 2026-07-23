@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Actions\CreateShirtOrder;
+use App\Http\Requests\CheckPathfinderEligibilityRequest;
 use App\Http\Requests\RegisterParticipantRequest;
 use App\Http\Requests\StorePixReceiptRequest;
 use App\Mail\ParticipantRegistrationReceived;
-use App\Mail\ParticipantRegistrationUpdated;
 use App\Models\EventSetting;
 use App\Models\Kit;
 use App\Models\ParticipantRegistration;
@@ -19,6 +19,7 @@ use App\Payments\PaymentGateway;
 use App\Support\PixPayload;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Client\RequestException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -41,8 +42,7 @@ class ParticipantRegistrationController extends Controller
         $shirtId = $validated['shirt_id'] ?? null;
         $extraShirtSize = $validated['extra_shirt_size'] ?? null;
         $extraShirtQuantity = $validated['extra_shirt_quantity'] ?? null;
-        $pathfinderCode = $validated['pathfinder_code'] ?? null;
-        unset($validated['shirt_id'], $validated['extra_shirt_size'], $validated['extra_shirt_quantity'], $validated['pathfinder_code']);
+        unset($validated['shirt_id'], $validated['extra_shirt_size'], $validated['extra_shirt_quantity']);
         unset(
             $validated['accepted_regulation'],
             $validated['accepted_privacy_policy'],
@@ -51,7 +51,7 @@ class ParticipantRegistrationController extends Controller
             $validated['accepted_special_kit_rules'],
         );
         try {
-            [$registration, $raceModality, $kit] = DB::transaction(function () use ($request, $validated, $shirtId, $extraShirtSize, $extraShirtQuantity, $pathfinderCode): array {
+            [$registration, $raceModality, $kit] = DB::transaction(function () use ($request, $validated, $shirtId, $extraShirtSize, $extraShirtQuantity): array {
                 $eventSetting = EventSetting::query()->lockForUpdate()->first();
                 $raceModality = RaceModality::query()->lockForUpdate()->findOrFail($validated['race_modality_id']);
                 $kit = Kit::query()->lockForUpdate()->findOrFail($validated['kit_id']);
@@ -61,11 +61,11 @@ class ParticipantRegistrationController extends Controller
                 }
 
                 if (! $kit->is_active) {
-                    throw ValidationException::withMessages(['kit_id' => 'Escolha um kit ativo.']);
+                    throw ValidationException::withMessages(['kit_id' => 'Escolha um pacote ativo.']);
                 }
 
                 if ($kit->quantityLimitHasBeenReached()) {
-                    throw ValidationException::withMessages(['kit_id' => 'A quantidade disponível deste kit foi esgotada.']);
+                    throw ValidationException::withMessages(['kit_id' => 'A quantidade disponível deste pacote foi esgotada.']);
                 }
 
                 if (! $raceModality->acceptsBirthDate(Carbon::parse($validated['birth_date']), $eventSetting?->eventDateForAgeCalculation())) {
@@ -94,16 +94,16 @@ class ParticipantRegistrationController extends Controller
 
                 if ($kit->type === Kit::TypePathfinder) {
                     $pathfinder = Pathfinder::query()
-                        ->where('code', $pathfinderCode)
+                        ->where('cpf', $validated['participant_cpf'])
                         ->where('is_active', true)
                         ->lockForUpdate()
                         ->first();
 
                     if ($pathfinder === null || $pathfinder->registration()->exists()) {
                         throw ValidationException::withMessages([
-                            'pathfinder_code' => $pathfinder === null
-                                ? 'Código de desbravador inválido ou inativo.'
-                                : 'Este código de desbravador já foi utilizado em uma inscrição.',
+                            'participant_cpf' => $pathfinder === null
+                                ? 'Este CPF não está habilitado para o pacote de desbravadores.'
+                                : 'Este desbravador já possui uma inscrição.',
                         ]);
                     }
                 }
@@ -206,6 +206,17 @@ class ParticipantRegistrationController extends Controller
             ->with('status', "Inscrição enviada com sucesso. Protocolo: {$registration->protocol_number}. A confirmação de pagamento continua pendente.");
     }
 
+    public function checkPathfinderEligibility(CheckPathfinderEligibilityRequest $request): JsonResponse
+    {
+        $isEligible = Pathfinder::query()
+            ->where('cpf', $request->validated('cpf'))
+            ->where('is_active', true)
+            ->whereDoesntHave('registration')
+            ->exists();
+
+        return response()->json(['eligible' => $isEligible]);
+    }
+
     public function showPix(ParticipantRegistration $registration, PixPayload $pixPayload): View
     {
         $settings = PaymentGatewaySetting::current();
@@ -265,8 +276,6 @@ class ParticipantRegistrationController extends Controller
             $registration->update([
                 'payment_status' => 'paid',
             ]);
-
-            Mail::to($registration->email)->send(new ParticipantRegistrationUpdated($registration));
         }
 
         return to_route('registration')

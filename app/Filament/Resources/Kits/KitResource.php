@@ -21,11 +21,11 @@ class KitResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedShoppingBag;
 
-    protected static ?string $modelLabel = 'kit';
+    protected static ?string $modelLabel = 'pacote';
 
-    protected static ?string $pluralModelLabel = 'kits';
+    protected static ?string $pluralModelLabel = 'pacotes';
 
-    protected static ?string $navigationLabel = 'Kits';
+    protected static ?string $navigationLabel = 'Pacotes';
 
     protected static string|UnitEnum|null $navigationGroup = 'Configuração';
 

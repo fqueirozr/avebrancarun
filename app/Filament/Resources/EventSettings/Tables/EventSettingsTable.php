@@ -27,7 +27,7 @@ class EventSettingsTable
                     ->placeholder('Não informado')
                     ->toggleable(),
                 TextColumn::make('kit_information')
-                    ->label('Retirada de kit')
+                    ->label('Retirada de pacote')
                     ->formatStateUsing(fn (?string $state): ?string => self::plainText($state))
                     ->limit(50)
                     ->placeholder('Em definição')
