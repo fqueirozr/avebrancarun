@@ -99,7 +99,7 @@
                                     <span class="rounded-md bg-race-cyan/18 px-3 py-1 text-sm font-black text-race-ink">{{ $modality->type }}</span>
                                     <span class="text-right text-sm font-bold text-zinc-500">{{ $modality->ageRangeLabel() }}</span>
                                 </div>
-                                <p class="mt-7 text-5xl font-black text-race-night">{{ $modality->distance }}</p>
+                                <p class="mt-7 text-3xl font-black text-race-night sm:text-4xl">{{ $modality->distance }}</p>
                                 <p class="mt-4 text-base font-black text-zinc-800">{{ $modality->name }}</p>
                                 @if ($modality->google_maps_embed_url)
                                     <a href="#percurso-{{ $modality->id }}" class="mt-6 inline-flex rounded-md bg-race-blue px-4 py-2.5 text-sm font-black text-white transition group-hover:bg-race-night">

@@ -52,6 +52,7 @@ test('race landing page is available', function () {
         ->assertSeeText('12/10/2026 às 07:30')
         ->assertSeeText('Percurso adulto com retorno sinalizado.')
         ->assertSeeText('6 km')
+        ->assertSee('class="mt-7 text-3xl font-black text-race-night sm:text-4xl"', false)
         ->assertSee('src="'.asset('storage/kits/kit-corrida.jpg').'"', false)
         ->assertSee('alt="Foto do Kit Corrida"', false)
         ->assertSee('data-packages-showcase', false)
