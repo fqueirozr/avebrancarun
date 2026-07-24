@@ -14,6 +14,36 @@ class EditParticipantRegistration extends EditRecord
 {
     protected static string $resource = ParticipantRegistrationResource::class;
 
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    protected function mutateFormDataBeforeFill(array $data): array
+    {
+        foreach ([
+            'participant_cpf',
+            'guardian_cpf',
+            'phone',
+            'email',
+            'billing_document',
+            'billing_name',
+            'billing_address',
+            'billing_address_number',
+            'billing_province',
+            'billing_postal_code',
+            'emergency_contact_name',
+            'emergency_contact_phone',
+            'payment_gateway',
+            'payment_gateway_reference',
+            'payment_checkout_url',
+            'pix_receipt_path',
+        ] as $attribute) {
+            $data[$attribute] = $this->record->getAttribute($attribute);
+        }
+
+        return $data;
+    }
+
     protected function getHeaderActions(): array
     {
         return [

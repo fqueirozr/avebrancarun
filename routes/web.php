@@ -44,28 +44,36 @@ Route::get('/inscricao', function () {
         'shirts' => Shirt::query()->where('is_active', true)->orderBy('name')->get(),
     ]);
 })->name('registration');
-Route::post('/inscricao', [ParticipantRegistrationController::class, 'store'])->name('registration.store');
+Route::post('/inscricao', [ParticipantRegistrationController::class, 'store'])
+    ->middleware('throttle:30,1')
+    ->name('registration.store');
 Route::post('/inscricao/desbravador', [ParticipantRegistrationController::class, 'checkPathfinderEligibility'])
     ->middleware('throttle:30,1')
     ->name('registration.pathfinder.check');
 Route::get('/loja', [ShirtOrderController::class, 'index'])->name('store.index');
-Route::post('/loja', [ShirtOrderController::class, 'store'])->name('store.store');
+Route::post('/loja', [ShirtOrderController::class, 'store'])
+    ->middleware('throttle:30,1')
+    ->name('store.store');
 Route::redirect('/camiseta', '/loja');
 Route::redirect('/camisetas', '/loja');
 Route::get('/inscricao/{registration}/pix', [ParticipantRegistrationController::class, 'showPix'])
     ->middleware('signed')
     ->name('registration.pix.show');
 Route::post('/inscricao/{registration}/pix', [ParticipantRegistrationController::class, 'storePixReceipt'])
-    ->middleware('signed')
+    ->middleware(['signed', 'throttle:10,1'])
     ->name('registration.pix.store');
 Route::get('/atleta/{registration}', AthletePageController::class)
     ->middleware('signed')
     ->name('athlete.show');
-Route::post('/contato', [ContactMessageController::class, 'store'])->name('contact.store');
+Route::post('/contato', [ContactMessageController::class, 'store'])
+    ->middleware('throttle:10,1')
+    ->name('contact.store');
 Route::get('/inscricao/{registration}/pagamento/sucesso', [ParticipantRegistrationController::class, 'paymentSuccess'])
     ->middleware('signed')
     ->name('registration.payment.success');
 Route::get('/inscricao/pagamento/sucesso', [ParticipantRegistrationController::class, 'paymentSuccessNotice'])->name('registration.payment.success.notice');
 Route::get('/inscricao/pagamento/cancelado', [ParticipantRegistrationController::class, 'paymentCancel'])->name('registration.payment.cancel');
 Route::get('/inscricao/pagamento/expirado', [ParticipantRegistrationController::class, 'paymentExpired'])->name('registration.payment.expired');
-Route::post('/webhooks/asaas', AsaasWebhookController::class)->name('webhooks.asaas');
+Route::post('/webhooks/asaas', AsaasWebhookController::class)
+    ->middleware('throttle:120,1')
+    ->name('webhooks.asaas');

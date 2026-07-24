@@ -272,14 +272,10 @@ class ParticipantRegistrationController extends Controller
 
     public function paymentSuccess(ParticipantRegistration $registration): RedirectResponse
     {
-        if ($registration->payment_status !== 'paid') {
-            $registration->update([
-                'payment_status' => 'paid',
-            ]);
-        }
-
         return to_route('registration')
-            ->with('status', 'Pagamento recebido. Sua inscrição foi confirmada.');
+            ->with('status', $registration->payment_status === 'paid'
+                ? 'Pagamento recebido. Sua inscrição foi confirmada.'
+                : 'Retorno do checkout recebido. A inscrição será confirmada após a conciliação automática.');
     }
 
     public function paymentSuccessNotice(): RedirectResponse

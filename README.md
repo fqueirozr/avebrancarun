@@ -1,6 +1,6 @@
 # Ave Branca Run
 
-Sistema de inscrições e gestão da **Ave Branca Run**, desenvolvido em Laravel. A aplicação disponibiliza páginas públicas do evento, inscrição de atletas, checkout pelo Asaas, acompanhamento de pagamento, página individual do atleta, contato e um painel administrativo para gerenciar inscrições, modalidades, kits, resultados e configurações do evento.
+Sistema de inscrições, pagamentos e gestão da **Ave Branca Run**, desenvolvido em Laravel. A aplicação reúne site público, inscrição de atletas, Pix manual com comprovante, checkout opcional pelo Asaas, página individual do atleta, loja de itens avulsos e painel administrativo.
 
 ## Tecnologias
 
@@ -17,15 +17,17 @@ Sistema de inscrições e gestão da **Ave Branca Run**, desenvolvido em Laravel
 
 - Página pública com informações do evento, modalidades e kits;
 - inscrição de atletas adultos e menores, com aceite dos termos obrigatórios;
-- escolha de tamanho de camisa e controle de limite por evento, prova e kit;
-- checkout Asaas via Pix e cartão de crédito;
+- escolha de tamanho de camiseta conforme o pacote e controle de limite por evento, prova, pacote e estoque;
+- inclusão opcional de camiseta/item avulso na inscrição;
+- Pix manual com QR Code, copia e cola, comprovante privado e análise administrativa;
+- checkout Asaas opcional via Pix e cartão de crédito;
 - atualização automática do pagamento por webhook autenticado;
 - e-mails de recebimento e atualização da inscrição;
 - página do atleta acessada por URL assinada;
 - categorias etárias e rankings geral, por sexo e por categoria;
-- programa de indicação de desbravadores, com código individual e até três níveis de upgrade do kit;
+- elegibilidade de desbravadores por CPF previamente habilitado;
 - painel administrativo em `/admin`;
-- gestão de inscrições, resultados, modalidades, kits, desbravadores, contatos e configurações;
+- gestão de inscrições, resultados, provas, pacotes, camisetas, pedidos, desbravadores, contatos, e-mail e pagamento;
 - exportação das inscrições e impressão da lista de entrega de kits pagos, com campo de assinatura.
 
 ## Guia do painel administrativo
@@ -35,11 +37,17 @@ Depois de criar o primeiro usuário com `php artisan make:filament-user`, acesse
 1. dados do evento;
 2. provas e faixas etárias;
 3. kits e preços;
-4. desbravadores, quando o programa de indicação for utilizado;
-5. gateway de pagamento;
-6. usuários administrativos.
+4. desbravadores, quando o pacote correspondente for utilizado;
+5. camisetas/itens avulsos;
+6. Pix manual ou gateway de pagamento;
+7. envio de e-mails;
+8. usuários administrativos.
 
-As inscrições dependem de uma prova e de um kit já cadastrados. O passo a passo de cada formulário, incluindo formatos aceitos, campos obrigatórios e cuidados com dados pessoais, está em [Tutorial dos formulários administrativos](docs/tutorial-formularios-admin.md).
+As inscrições dependem de uma prova e de um pacote ativos. Consulte:
+
+- [Tutorial dos formulários administrativos](docs/tutorial-formularios-admin.md), com a finalidade e a regra de cada campo do painel;
+- [Tutorial das inscrições da prova](docs/tutorial-inscricoes-da-prova.md), com todas as etapas, validações, status e regras para o participante;
+- [Política de Privacidade](docs/politica-de-privacidade.md), versão integral correspondente ao texto apresentado no formulário.
 
 ## Requisitos
 
@@ -90,7 +98,7 @@ npm install
 npm run build
 ```
 
-> Os seeders criam configurações iniciais e dados de demonstração, inclusive usuários, inscrições, contatos e indicações. Use `php artisan migrate` sem `--seed` quando não quiser dados fictícios e cadastre os dados reais pelo painel. O comando `composer run setup` continua disponível como atalho quando o `.env` e o banco já estiverem preparados.
+> Os seeders criam configurações iniciais e dados de demonstração, inclusive usuários, inscrições, contatos e desbravadores. Use `php artisan migrate` sem `--seed` quando não quiser dados fictícios e cadastre os dados reais pelo painel. O comando `composer run setup` continua disponível como atalho quando o `.env` e o banco já estiverem preparados.
 
 5. Crie o usuário administrador:
 
@@ -147,7 +155,11 @@ MAIL_FROM_ADDRESS=contato@exemplo.com
 MAIL_FROM_NAME="${APP_NAME}"
 ```
 
-### Asaas
+### Pagamento
+
+O painel permite Pix manual ou checkout on-line. Quando o Pix manual está ativo, ele tem prioridade para inscrições com valor: o participante recebe QR Code/copia e cola, informa nome e CPF do pagador e envia comprovante de até 5 MB para análise. O arquivo é salvo no disco privado.
+
+Para checkout on-line, as URLs padrão do Asaas já estão no `.env.example`:
 
 As URLs padrão já estão no `.env.example`:
 
@@ -167,7 +179,8 @@ A API key **não é configurada no `.env`**. Depois de criar o administrador:
 3. selecione o ambiente `Sandbox` ou `Produção`;
 4. informe a API key gerada no Asaas em **Integrações > API Key**;
 5. escolha os meios de pagamento e o tempo de expiração;
-6. ative **Ativar checkout** e salve.
+6. deixe **Pix manual** desligado se quiser redirecionar ao Asaas;
+7. ative **Pagamento on-line** e salve.
 
 A API key é armazenada com cast criptografado. Preserve a mesma `APP_KEY` após começar a utilizar o sistema; trocá-la sem um processo de rotação impedirá a leitura dos dados criptografados.
 
@@ -302,4 +315,13 @@ tests/Feature/                Testes dos fluxos principais
 
 ## Privacidade
 
-O sistema trata dados pessoais de participantes e responsáveis, inclusive CPF, contato, endereço e informações relacionadas à saúde e segurança. Colete e exponha somente o necessário, restrinja o painel administrativo, proteja backups e credenciais e observe a Política de Privacidade e a LGPD. O Asaas deve receber apenas os dados necessários para criar e conciliar a cobrança.
+O sistema trata dados de atletas, responsáveis, pagadores, contatos de emergência, compradores e usuários administrativos. A [Política de Privacidade integral](docs/politica-de-privacidade.md) descreve controlador, categorias de dados, menores, finalidades e bases legais, pagamentos, compartilhamento, divulgação de resultados, retenção, segurança, direitos LGPD, cookies e atualizações.
+
+Na operação:
+
+- restrinja painel, comprovantes, exportações e backups a pessoas autorizadas;
+- não envie CPF, endereço, comprovante ou registros técnicos por e-mail;
+- compartilhe com Asaas, cronometragem, logística e demais operadores apenas o necessário;
+- mantenha a versão da política sincronizada com `ParticipantRegistration::PrivacyPolicyVersion`;
+- descarte com segurança listas e exportações após a finalidade;
+- preserve os registros de aceite e não os edite manualmente.

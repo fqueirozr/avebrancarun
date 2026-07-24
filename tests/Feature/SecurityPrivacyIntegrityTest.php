@@ -53,7 +53,7 @@ test('payment credentials are encrypted at rest and omitted from serialization',
         ->and($settings->toArray())->not->toHaveKey('api_key');
 });
 
-test('unsigned or tampered payment return links cannot alter payment state', function () {
+test('payment return links cannot confirm payment without an authenticated webhook', function () {
     $registration = ParticipantRegistration::factory()->create(['payment_status' => 'pending']);
 
     $this->get(route('registration.payment.success', $registration))->assertForbidden();
@@ -63,6 +63,9 @@ test('unsigned or tampered payment return links cannot alter payment state', fun
         now()->addMinutes(30),
         ['registration' => $registration],
     );
+
+    $this->get($validUrl)->assertRedirect(route('registration'));
+    expect($registration->refresh()->payment_status)->toBe('pending');
 
     $this->get($validUrl.'&registration=999999')->assertForbidden();
 
@@ -131,5 +134,26 @@ test('registration identity is not exposed by model serialization', function () 
     ]);
 
     expect($registration->toArray())
-        ->not->toHaveKey('registration_identity');
+        ->not->toHaveKeys([
+            'registration_identity',
+            'participant_cpf',
+            'billing_document',
+            'payment_gateway_reference',
+            'payment_checkout_url',
+            'pix_receipt_path',
+        ]);
 });
+
+test('public write endpoints are rate limited', function (string $routeName, string $expectedThrottle) {
+    $route = app('router')->getRoutes()->getByName($routeName);
+
+    expect($route)->not->toBeNull()
+        ->and($route->gatherMiddleware())->toContain($expectedThrottle);
+})->with([
+    'registration' => ['registration.store', 'throttle:30,1'],
+    'pathfinder lookup' => ['registration.pathfinder.check', 'throttle:30,1'],
+    'pix receipt' => ['registration.pix.store', 'throttle:10,1'],
+    'shirt order' => ['store.store', 'throttle:30,1'],
+    'contact' => ['contact.store', 'throttle:10,1'],
+    'webhook' => ['webhooks.asaas', 'throttle:120,1'],
+]);

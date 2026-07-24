@@ -801,7 +801,7 @@ test('a participant is redirected to checkout when payment gateway is configured
     ]);
 });
 
-test('checkout success return marks the registration as paid', function () {
+test('checkout success return waits for webhook confirmation', function () {
     Mail::fake();
 
     $registration = ParticipantRegistration::factory()->create([
@@ -819,12 +819,9 @@ test('checkout success return marks the registration as paid', function () {
         ->assertRedirectToRoute('registration')
         ->assertSessionHas('status');
 
-    expect($registration->refresh()->payment_status)->toBe('paid');
+    expect($registration->refresh()->payment_status)->toBe('pending');
 
-    Mail::assertSent(ParticipantRegistrationUpdated::class, function (ParticipantRegistrationUpdated $mail): bool {
-        return $mail->hasTo('maria@example.com')
-            && $mail->registration->payment_status === 'paid';
-    });
+    Mail::assertNothingSent();
 });
 
 test('paid registration requires a billing document for checkout', function () {

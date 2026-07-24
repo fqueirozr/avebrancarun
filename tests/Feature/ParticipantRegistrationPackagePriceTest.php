@@ -2,6 +2,9 @@
 
 use App\Models\Kit;
 use App\Models\ParticipantRegistration;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
+uses(RefreshDatabase::class);
 
 test('the registered package price is final', function (string $type) {
     $registration = new ParticipantRegistration;

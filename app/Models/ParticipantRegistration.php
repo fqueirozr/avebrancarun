@@ -67,12 +67,35 @@ class ParticipantRegistration extends Model
     /** @use HasFactory<ParticipantRegistrationFactory> */
     use HasFactory;
 
-    public const PrivacyPolicyVersion = '2026-07-10';
+    public const PrivacyPolicyVersion = '2026-07-23';
 
     public const SpecialKitRulesVersion = '2026-07-11';
 
     protected $hidden = [
         'registration_identity',
+        'participant_cpf',
+        'guardian_cpf',
+        'phone',
+        'email',
+        'billing_document',
+        'billing_name',
+        'billing_address',
+        'billing_address_number',
+        'billing_province',
+        'billing_postal_code',
+        'emergency_contact_name',
+        'emergency_contact_phone',
+        'regulation_acceptance_ip',
+        'regulation_acceptance_user_agent',
+        'privacy_policy_acceptance_ip',
+        'privacy_policy_acceptance_user_agent',
+        'data_confirmation_acceptance_ip',
+        'data_confirmation_acceptance_user_agent',
+        'special_kit_rules_acceptance_ip',
+        'special_kit_rules_acceptance_user_agent',
+        'payment_gateway_reference',
+        'payment_checkout_url',
+        'pix_receipt_path',
     ];
 
     /**

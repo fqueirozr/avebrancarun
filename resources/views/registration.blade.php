@@ -514,34 +514,46 @@
             </div>
             <div class="max-h-[70vh] overflow-y-auto bg-[#f7fbff] p-4 sm:p-6">
                 <div class="event-rich-content event-rich-content--modal rounded-md border border-race-cyan/15 bg-white p-5 shadow-sm shadow-amber-950/5 sm:p-6">
-                    <p><strong>Versão {{ \App\Models\ParticipantRegistration::PrivacyPolicyVersion }}.</strong> Esta Política de Privacidade descreve como a organização da Ave Branca Run trata dados pessoais no fluxo de inscrição, pagamento e operação do evento.</p>
+                    <p><strong>Versão {{ \App\Models\ParticipantRegistration::PrivacyPolicyVersion }}.</strong> Esta política explica como o organizador identificado pela razão social e CNPJ exibidos no site trata dados pessoais, conforme a Lei nº 13.709/2018 (LGPD). Solicitações devem ser enviadas aos canais oficiais do evento; poderemos confirmar a identidade do solicitante antes do atendimento.</p>
 
-                    <h3>1. Dados coletados</h3>
-                    <p>Coletamos dados de identificação e contato do atleta, como nome, data de nascimento, CPF, telefone, e-mail, prova escolhida e dados do responsável legal quando o atleta for menor de idade. O app não coleta nem valida laudo de PCD. Quando houver pagamento por Pix, coletamos o comprovante necessário para conferência.</p>
-                    <p>Também coletamos o contato de emergência informado para eventual suporte durante o evento.</p>
+                    <h3>1. Titulares e dados tratados</h3>
+                    <p>Tratamos dados de atletas, responsáveis legais, pagadores, contatos de emergência, compradores, remetentes de mensagens e usuários administrativos. Conforme o serviço, isso inclui nome, CPF/CNPJ, nascimento, sexo, telefone, e-mail, endereço de cobrança, prova, pacote, camiseta/item, protocolo, número de peito, pagamento, comprovante Pix, contato de emergência, resultados, mensagens e registros técnicos de aceites, como data, versão, IP e navegador.</p>
+                    <p>O aplicativo não solicita laudo de PCD nem armazena número completo de cartão, código de segurança ou senha bancária. Quem informar dados de outra pessoa declara possuir legitimidade e deve avisá-la sobre este tratamento.</p>
 
-                    <h3>2. Finalidades e bases de tratamento</h3>
-                    <p>Usamos os dados para criar e administrar a inscrição, identificar atletas, confirmar idade e autorização de menores, viabilizar pagamento, emitir comunicações essenciais sobre o evento, prestar suporte, organizar kits, apuração, segurança, atendimento emergencial, prevenção a fraudes, cumprimento de obrigações legais e defesa de direitos.</p>
-                    <p>O contato de emergência é usado somente para segurança do atleta e eventual suporte emergencial durante o evento.</p>
+                    <h3>2. Crianças e adolescentes</h3>
+                    <p>Para menores de 18 anos, nome e CPF do responsável legal são obrigatórios. O responsável confere os dados e realiza os aceites em nome do menor. O tratamento deve observar seu melhor interesse e ter acesso limitado ao necessário.</p>
 
-                    <h3>3. Pagamentos</h3>
-                    <p>O pagamento é realizado por Pix. O comprovante enviado é armazenado em área restrita e utilizado somente para conferência e confirmação da inscrição.</p>
+                    <h3>3. Finalidades e bases legais</h3>
+                    <p>Usamos os dados para validar e administrar inscrições, impedir duplicidade, verificar idade e elegibilidade, registrar representação e aceites, processar pagamentos, emitir comunicações, organizar prova, pacotes, itens, cronometragem, resultados e atendimento, proteger a vida e a segurança, prevenir fraudes, cumprir obrigações e exercer direitos.</p>
+                    <p>Conforme a finalidade, as bases podem incluir execução de contrato e procedimentos preliminares, obrigação legal ou regulatória, exercício regular de direitos, proteção da vida, legítimo interesse avaliado e consentimento quando adequado. O aceite desta política registra ciência e não transforma em consentimento tratamentos apoiados em outra base.</p>
 
-                    <h3>4. Compartilhamento</h3>
-                    <p>Podemos compartilhar dados, no limite necessário, com organizadores, prestadores de tecnologia e suporte, processadores de pagamento, equipe de cronometragem e resultados, logística de kit, comunicação operacional, equipes médicas ou emergenciais, seguradoras quando aplicável, autoridades públicas quando exigido e parceiros necessários à execução do evento. Não vendemos dados pessoais.</p>
+                    <h3>4. Pagamentos</h3>
+                    <p>No Pix manual, exibimos os dados do recebedor e guardamos o nome, CPF e comprovante do pagador em área privada para conferência. No pagamento on-line, enviamos ao Asaas somente os dados necessários para criar e conciliar a cobrança; o provedor também aplica sua própria política. Não armazenamos credenciais bancárias.</p>
 
-                    <h3>5. Resultados, imagens e divulgação pública</h3>
-                    <p>Resultados, fotos e vídeos do evento podem divulgar dados compatíveis com a natureza pública da prova, como nome do atleta, número de peito, categoria, equipe, tempo, classificação, fotos e vídeos captados durante o evento.</p>
+                    <h3>5. Compartilhamento</h3>
+                    <p>Podemos compartilhar o mínimo necessário com equipe autorizada, hospedagem, e-mail e suporte, Asaas e outros operadores de pagamento, cronometragem, resultados, fornecedores de pacotes e logística, equipes emergenciais, seguradoras, assessorias profissionais e autoridades quando houver fundamento válido. Não vendemos dados pessoais.</p>
 
-                    <h3>6. Retenção, exclusão e anonimização</h3>
-                    <p>Os dados serão mantidos pelo tempo necessário para inscrição, pagamento, suporte, obrigações legais, fiscais, regulatórias e contratuais, prevenção a fraudes, defesa de direitos e histórico do evento. Após esse período, os dados poderão ser excluídos, anonimizados ou mantidos apenas quando houver base legal para retenção.</p>
+                    <h3>6. Resultados, imagens e divulgação</h3>
+                    <p>Podem ser divulgados nome, número de peito, prova, categoria, equipe informada, tempo e classificação. Fotos e vídeos captados no evento podem ser usados nos limites do regulamento e da legislação. CPF, endereço, contato, dados do responsável, comprovantes e registros técnicos não devem aparecer em resultados públicos.</p>
 
-                    <h3>7. Direitos LGPD</h3>
-                    <p>Você pode solicitar confirmação de tratamento, acesso, correção, anonimização, bloqueio ou eliminação quando aplicável, portabilidade quando cabível, informações sobre compartilhamento, revogação de consentimento e revisão de decisões automatizadas caso venham a ser adotadas.</p>
-                    <p>Para exercer direitos ou pedir exclusão/anonimização após o prazo necessário, entre em contato pelo e-mail oficial da organização informado nos canais do evento. Para segurança, poderemos pedir dados mínimos para confirmar a identidade do solicitante antes de atender o pedido.</p>
+                    <h3>7. Decisões automáticas</h3>
+                    <p>O sistema aplica regras de idade, documento, duplicidade, vagas, pacote, preço, categoria e ranking. Elas não criam perfil comportamental. O titular pode pedir explicação e revisão de decisão automatizada que afete seus interesses, quando aplicável.</p>
 
-                    <h3>8. Segurança</h3>
-                    <p>Adotamos controles para reduzir acesso indevido e exposição desnecessária, incluindo validação dos formulários, proteção CSRF, acesso administrativo restrito e tratamento separado de informações de saúde e emergência.</p>
+                    <h3>8. Retenção e descarte</h3>
+                    <p>Os dados são mantidos pelo período necessário à inscrição, pagamento, operação, suporte e aos prazos legais, fiscais, contratuais e de defesa de direitos. Depois, serão eliminados, anonimizados ou mantidos de forma restrita quando existir fundamento legal. Backups podem conservar cópias até seu ciclo normal de substituição.</p>
+
+                    <h3>9. Segurança e incidentes</h3>
+                    <p>Adotamos validação, proteção CSRF, limitação de requisições, URLs assinadas, painel restrito, proteção de credenciais, arquivos privados e redução de dados em e-mails e logs. Se for confirmado incidente que possa causar risco ou dano relevante, o controlador deverá comunicar a ANPD e os titulares afetados em até três dias úteis, ressalvado prazo legal específico, e manter o registro do incidente pelo período regulamentar.</p>
+
+                    <h3>10. Direitos LGPD</h3>
+                    <p>Gratuitamente, o titular pode solicitar confirmação, acesso, correção, anonimização, bloqueio ou eliminação cabível, portabilidade quando aplicável, informação sobre compartilhamentos, eliminação de dados tratados com consentimento, informação sobre não consentir, revogação, oposição a tratamento irregular, revisão de decisão automatizada e petição à ANPD.</p>
+                    <p>Uma solicitação pode não gerar exclusão imediata quando a retenção for necessária por obrigação legal, execução do contrato, prevenção a fraude ou exercício de direitos. A organização informará a justificativa aplicável.</p>
+
+                    <h3>11. Cookies e serviços externos</h3>
+                    <p>Usamos cookies técnicos necessários à sessão, segurança e formulários, sem previsão de cookies publicitários nesta aplicação. Mapas, checkout e links externos possuem práticas próprias, que devem ser consultadas no respectivo fornecedor.</p>
+
+                    <h3>12. Atualizações</h3>
+                    <p>Esta política pode mudar por razões legais, operacionais ou tecnológicas. A versão vigente aparece neste formulário. Alterações materiais aplicáveis a novas inscrições exigem nova versão e, quando necessário, comunicação pelos canais disponíveis.</p>
                 </div>
             </div>
         </dialog>

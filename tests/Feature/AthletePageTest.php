@@ -32,7 +32,6 @@ test('athlete can see registration and pending race details without sensitive da
         'bib_number' => '421',
         'participant_cpf' => '52998224725',
         'billing_document' => '52998224725',
-        'health_notes' => 'Informação médica privada',
         'payment_gateway_reference' => 'pay_secret_123',
     ]);
 
@@ -45,7 +44,6 @@ test('athlete can see registration and pending race details without sensitive da
         ->assertSeeText('421')
         ->assertSeeText('Aguardando resultado')
         ->assertDontSee('52998224725')
-        ->assertDontSee('Informação médica privada')
         ->assertDontSee('pay_secret_123');
 });
 
