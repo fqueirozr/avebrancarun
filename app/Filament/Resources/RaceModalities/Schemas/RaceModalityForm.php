@@ -47,7 +47,8 @@ class RaceModalityForm
                             ->columnSpanFull()
                             ->maxLength(1000),
                     ])
-                    ->columns(2),
+                    ->columns(2)
+                    ->columnSpanFull(),
                 Section::make('Elegibilidade e disponibilidade')
                     ->description('Controle a faixa etária, as vagas e a ordem de exibição.')
                     ->icon(Heroicon::OutlinedUsers)
@@ -80,7 +81,8 @@ class RaceModalityForm
                             ->required()
                             ->columnSpanFull(),
                     ])
-                    ->columns(2),
+                    ->columns(2)
+                    ->columnSpanFull(),
                 Section::make('Data e percurso')
                     ->description('Reúna horário, mapa, orientações e imagens do trajeto.')
                     ->icon(Heroicon::OutlinedMap)
@@ -116,6 +118,7 @@ class RaceModalityForm
                             ->columnSpanFull(),
                     ])
                     ->columns(2)
+                    ->columnSpanFull()
                     ->collapsible(),
             ]);
     }

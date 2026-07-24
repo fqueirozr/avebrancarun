@@ -13,7 +13,7 @@
         @fonts
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="bg-[#f7fbff] text-zinc-950 antialiased">
+    <body class="min-h-screen bg-[radial-gradient(circle_at_top_left,_#e8f5ff_0,_#f7fbff_35%,_#f8fafc_100%)] text-zinc-950 antialiased">
         <header class="sticky top-0 z-50 border-b border-white/10 bg-race-night/95 text-white shadow-lg shadow-race-night/20 backdrop-blur">
             <nav class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-3 sm:px-8 sm:py-4" aria-label="Navegação principal">
                 <a href="{{ route('home') }}" class="flex min-w-0 items-center gap-3 rounded-md outline-none transition focus-visible:ring-3 focus-visible:ring-race-cyan/35" aria-label="Ir para a página inicial da Ave Branca Run">
@@ -46,16 +46,16 @@
             </nav>
         </header>
 
-        <main class="mx-auto grid max-w-7xl grid-cols-1 gap-8 px-5 py-10 sm:px-8 lg:grid-cols-[0.75fr_1.25fr] lg:py-14">
-            <aside class="lg:sticky lg:top-8 lg:self-start">
-                <div class="overflow-hidden rounded-md bg-race-night text-white shadow-xl shadow-amber-950/20">
+        <main class="mx-auto grid max-w-7xl grid-cols-1 gap-8 px-5 py-8 sm:px-8 sm:py-10 lg:grid-cols-[0.7fr_1.3fr] lg:gap-10 lg:py-14">
+            <aside class="grid content-start gap-5 lg:sticky lg:top-24 lg:self-start">
+                <div class="overflow-hidden rounded-3xl bg-race-night text-white shadow-2xl shadow-race-night/20 ring-1 ring-white/10">
                     <img
                         src="{{ asset('images/ave-branca-run-2026-hero-client.png') }}"
                         alt="Arte da Ave Branca Run com informações da corrida"
                         class="h-auto w-full bg-race-night object-contain"
                     >
-                    <div class="p-6">
-                        <p class="text-sm font-semibold text-race-cyan">Inscrição da corrida</p>
+                    <div class="p-6 sm:p-7">
+                        <p class="inline-flex rounded-full bg-race-cyan/15 px-3 py-1 text-xs font-black uppercase tracking-wide text-race-cyan">Inscrição da corrida</p>
                         <h1 class="mt-3 text-3xl font-black leading-tight">Ave Branca Run</h1>
                         <p class="mt-4 text-sm leading-6 text-white/78">
                             Preencha os dados do atleta, escolha a prova e conclua o pagamento por Pix.
@@ -63,18 +63,21 @@
                     </div>
                 </div>
 
-                <div class="mt-5 rounded-md border border-amber-200 bg-amber-50 p-5 text-amber-950">
-                    <p class="font-black">Pagamento por Pix</p>
+                <div class="rounded-2xl border border-amber-200/80 bg-amber-50/90 p-5 text-amber-950 shadow-sm backdrop-blur">
+                    <p class="flex items-center gap-2 font-black">
+                        <span class="grid size-9 place-items-center rounded-full bg-race-cyan/20 text-lg" aria-hidden="true">✓</span>
+                        Pagamento por Pix
+                    </p>
                     <p class="mt-2 text-sm leading-6">
                         Após a inscrição, você verá a chave Pix e poderá enviar o comprovante para análise.
                     </p>
                 </div>
             </aside>
 
-            <section class="rounded-md border border-zinc-200 bg-white p-5 shadow-sm sm:p-7">
+            <section class="overflow-hidden rounded-3xl border border-white/80 bg-white/95 p-5 shadow-2xl shadow-race-night/8 ring-1 ring-zinc-200/70 backdrop-blur sm:p-8">
                 <div class="border-b border-zinc-200 pb-6">
-                    <p class="text-sm font-bold uppercase tracking-normal text-race-blue">Formulário</p>
-                    <h2 class="mt-2 text-3xl font-black leading-tight">Dados para inscrição</h2>
+                    <p class="text-xs font-black uppercase tracking-[0.16em] text-race-blue">Formulário</p>
+                    <h2 class="mt-2 text-3xl font-black leading-tight tracking-tight sm:text-4xl">Dados para inscrição</h2>
                     <p class="mt-3 text-sm leading-6 text-zinc-600">
                         Os campos abaixo já organizam as informações essenciais para a etapa de inscrição.
                     </p>
@@ -107,18 +110,18 @@
                 <form id="registration-form" action="{{ route('registration.store') }}" method="POST" class="mt-7 grid grid-cols-1 gap-5" data-registration-form data-pathfinder-check-url="{{ route('registration.pathfinder.check') }}">
                     @csrf
 
-                    <div class="grid gap-3 rounded-md border border-race-cyan/25 bg-[#f7fbff] p-4" data-registration-progress>
+                    <div class="sticky top-20 z-20 grid gap-3 rounded-2xl border border-race-cyan/30 bg-white/95 p-4 shadow-lg shadow-race-night/8 backdrop-blur sm:p-5" data-registration-progress>
                         <div class="flex items-center justify-between gap-3">
                             <p class="text-sm font-black text-race-ink" data-registration-progress-label>Etapa 1 de 6</p>
                             <p class="text-xs font-bold uppercase tracking-normal text-race-blue" data-registration-progress-title>Atleta</p>
                         </div>
-                        <div class="h-2 overflow-hidden rounded-full bg-white">
-                            <div class="h-full rounded-full bg-race-cyan transition-all" style="width: 16.6667%" data-registration-progress-bar></div>
+                        <div class="h-2.5 overflow-hidden rounded-full bg-zinc-100 ring-1 ring-zinc-200">
+                            <div class="h-full rounded-full bg-gradient-to-r from-race-cyan to-amber-400 shadow-sm transition-all duration-300" style="width: 16.6667%" data-registration-progress-bar></div>
                         </div>
                     </div>
 
-                    <fieldset class="grid min-w-0 gap-5 border-b border-zinc-200 pb-6" data-registration-step data-step-title="Atleta">
-                        <legend class="mb-4 text-base font-black text-zinc-950">Atleta</legend>
+                    <fieldset class="grid min-w-0 gap-5 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6" data-registration-step data-step-title="Atleta">
+                        <legend class="rounded-full bg-race-night px-4 py-1.5 text-sm font-black text-white shadow-sm">Atleta</legend>
 
                         <div class="grid min-w-0 grid-cols-1 gap-5 md:grid-cols-2">
                             <label class="grid min-w-0 gap-2">
@@ -190,8 +193,8 @@
                         </div>
                     </fieldset>
 
-                    <fieldset class="grid min-w-0 gap-5 border-b border-zinc-200 pb-6" data-registration-step data-guardian-step data-step-title="Responsavel legal">
-                        <legend class="mb-4 text-base font-black text-zinc-950">Responsável Legal</legend>
+                    <fieldset class="grid min-w-0 gap-5 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6" data-registration-step data-guardian-step data-step-title="Responsavel legal">
+                        <legend class="rounded-full bg-race-night px-4 py-1.5 text-sm font-black text-white shadow-sm">Responsável Legal</legend>
 
                         <div class="grid min-w-0 grid-cols-1 gap-5 md:grid-cols-2">
                             <label class="grid min-w-0 gap-2">
@@ -213,8 +216,8 @@
                     </fieldset>
 
                     @if (\App\Models\PaymentGatewaySetting::current()->isConfigured() && ! \App\Models\PaymentGatewaySetting::current()->hasManualPix())
-                    <fieldset class="grid min-w-0 gap-5 border-b border-zinc-200 pb-6" data-registration-step data-step-title="Pagador">
-                        <legend class="mb-4 text-base font-black text-zinc-950">Pagador</legend>
+                    <fieldset class="grid min-w-0 gap-5 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6" data-registration-step data-step-title="Pagador">
+                        <legend class="rounded-full bg-race-night px-4 py-1.5 text-sm font-black text-white shadow-sm">Pagador</legend>
 
                         <div class="grid min-w-0 grid-cols-1 gap-5 md:grid-cols-2">
                             <label class="grid min-w-0 gap-2">
@@ -270,8 +273,8 @@
                     </fieldset>
                     @endif
 
-                    <fieldset class="grid min-w-0 gap-3 border-b border-zinc-200 pb-6" data-registration-step data-step-title="Prova">
-                        <legend class="mb-4 text-base font-black text-zinc-950">Prova</legend>
+                    <fieldset class="grid min-w-0 gap-3 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6" data-registration-step data-step-title="Prova">
+                        <legend class="rounded-full bg-race-night px-4 py-1.5 text-sm font-black text-white shadow-sm">Prova</legend>
                         <div class="grid grid-cols-1 gap-3 md:grid-cols-2" data-modality-options>
                             @forelse ($modalities as $modality)
                                 @php($modalityIsFull = $modality->participantLimitHasBeenReached())
@@ -299,8 +302,8 @@
                         @enderror
                     </fieldset>
 
-                    <fieldset class="grid min-w-0 gap-3 border-b border-zinc-200 pb-6" data-registration-step data-step-title="Pacote">
-                        <legend class="mb-4 text-base font-black text-zinc-950">Pacote</legend>
+                    <fieldset class="grid min-w-0 gap-3 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6" data-registration-step data-step-title="Pacote">
+                        <legend class="rounded-full bg-race-night px-4 py-1.5 text-sm font-black text-white shadow-sm">Pacote</legend>
                         <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
                             @forelse ($kits as $kit)
                                 <label @if ($kit->type === \App\Models\Kit::TypePathfinder) data-pathfinder-package hidden @endif class="rounded-md border border-zinc-200 text-sm transition has-checked:border-race-cyan has-checked:bg-amber-50">
@@ -369,8 +372,8 @@
                         @endif
                     </fieldset>
 
-                    <fieldset class="grid min-w-0 gap-5" data-registration-step data-step-title="Observacoes">
-                        <legend class="mb-4 text-base font-black text-zinc-950">Contato de emergência</legend>
+                    <fieldset class="grid min-w-0 gap-5 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6" data-registration-step data-step-title="Observacoes">
+                        <legend class="rounded-full bg-race-night px-4 py-1.5 text-sm font-black text-white shadow-sm">Contato de emergência</legend>
 
                         <div class="grid min-w-0 grid-cols-1 gap-5 md:grid-cols-2">
                             <label class="grid min-w-0 gap-2">
@@ -392,8 +395,8 @@
 
                     </fieldset>
 
-                    <fieldset class="grid min-w-0 gap-4 border-t border-zinc-200 pt-6" data-registration-step data-step-title="Conferencia">
-                        <legend class="mb-1 text-base font-black text-zinc-950">Declarações obrigatórias</legend>
+                    <fieldset class="grid min-w-0 gap-4 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6" data-registration-step data-step-title="Conferencia">
+                        <legend class="rounded-full bg-race-night px-4 py-1.5 text-sm font-black text-white shadow-sm">Declarações obrigatórias</legend>
 
                         <div class="rounded-md border border-race-cyan/25 bg-[#f7fbff] p-4">
                             <p class="font-black text-race-ink">Confira os dados informados</p>
@@ -444,15 +447,15 @@
 
                     </fieldset>
 
-                    <div class="flex flex-wrap justify-end gap-3 rounded-md bg-zinc-50 p-5" data-registration-actions>
+                    <div class="sticky bottom-3 z-20 flex flex-wrap justify-end gap-3 rounded-2xl border border-zinc-200/80 bg-white/95 p-4 shadow-xl shadow-race-night/10 backdrop-blur sm:p-5" data-registration-actions>
                         <div class="flex flex-wrap gap-3 sm:justify-end">
-                            <button type="button" class="rounded-md border border-zinc-300 bg-white px-5 py-3 text-sm font-black text-zinc-800 transition hover:bg-zinc-50" data-registration-prev>
+                            <button type="button" class="rounded-xl border border-zinc-300 bg-white px-5 py-3 text-sm font-black text-zinc-800 shadow-sm transition hover:-translate-y-0.5 hover:border-zinc-400 hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-race-cyan/30" data-registration-prev>
                                 Voltar
                             </button>
-                            <button type="button" class="rounded-md bg-race-blue px-5 py-3 text-sm font-black text-white transition hover:bg-race-ink" data-registration-next>
+                            <button type="button" class="rounded-xl bg-race-blue px-6 py-3 text-sm font-black text-white shadow-lg shadow-race-blue/20 transition hover:-translate-y-0.5 hover:bg-race-ink focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-race-cyan/30" data-registration-next>
                                 Próximo
                             </button>
-                            <button type="submit" @disabled($modalities->isEmpty() || $kits->isEmpty() || $eventSetting->registrationDeadlineHasPassed() || $eventSetting->registrationLimitHasBeenReached()) class="rounded-md bg-race-blue px-5 py-3 text-sm font-black text-white transition hover:bg-race-ink disabled:cursor-not-allowed disabled:bg-zinc-400" data-registration-submit>
+                            <button type="submit" @disabled($modalities->isEmpty() || $kits->isEmpty() || $eventSetting->registrationDeadlineHasPassed() || $eventSetting->registrationLimitHasBeenReached()) class="rounded-xl bg-race-blue px-6 py-3 text-sm font-black text-white shadow-lg shadow-race-blue/20 transition hover:-translate-y-0.5 hover:bg-race-ink focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-race-cyan/30 disabled:cursor-not-allowed disabled:translate-y-0 disabled:bg-zinc-400 disabled:shadow-none" data-registration-submit>
                                 Enviar inscrição
                             </button>
                         </div>
