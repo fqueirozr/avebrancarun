@@ -202,12 +202,33 @@ it('registers a standalone shirt order and decrements stock', function () {
     Mail::assertSent(ShirtOrderReceived::class, 'maria@example.com');
 });
 
+it('shows the customer cpf in the standalone order admin form', function () {
+    $this->actingAs(User::factory()->create());
+
+    $shirtOrder = ShirtOrder::factory()->create([
+        'shirt_id' => Shirt::factory(),
+        'customer_name' => 'Maria Silva',
+        'customer_cpf' => '52998224725',
+        'customer_email' => 'maria@example.com',
+        'customer_phone' => '11999999999',
+        'size' => 'M',
+        'quantity' => 1,
+        'unit_price' => 35,
+        'total_price' => 35,
+        'payment_status' => 'pending',
+    ]);
+
+    Livewire::test(EditShirtOrder::class, ['record' => $shirtOrder->getRouteKey()])
+        ->assertSchemaStateSet(['customer_cpf' => '52998224725']);
+});
+
 it('requires cpf and every shirt size for a standalone store order', function () {
     $shirt = Shirt::factory()->create();
 
     $this->post(route('store.store'), [
         'shirt_id' => $shirt->id,
         'customer_name' => 'Maria Silva',
+        'customer_cpf' => '52998224725',
         'customer_email' => 'maria@example.com',
         'customer_phone' => '11999999999',
         'quantity' => 1,
@@ -278,6 +299,7 @@ it('allows an authenticated admin to print the standalone shirt delivery list', 
     ShirtOrder::factory()->create([
         'shirt_id' => $shirt->id,
         'customer_name' => 'Maria Silva',
+        'customer_cpf' => '52998224725',
         'customer_email' => 'maria@example.com',
         'customer_phone' => '11999999999',
         'size' => 'M',
@@ -304,6 +326,7 @@ it('allows an authenticated admin to print the standalone shirt delivery list', 
         ->assertSuccessful()
         ->assertSee('Lista de entrega de camisetas avulsas')
         ->assertSee('Maria Silva')
+        ->assertSee('52998224725')
         ->assertSee('Camiseta Oficial')
         ->assertSee('Assinatura do recebedor')
         ->assertDontSee('maria@example.com')

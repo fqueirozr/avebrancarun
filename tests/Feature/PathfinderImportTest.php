@@ -30,11 +30,11 @@ it('reports whether a cpf may use the pathfinder package', function () {
 
     $this->postJson(route('registration.pathfinder.check'), ['cpf' => '153.509.460-56'])
         ->assertSuccessful()
-        ->assertJson(['eligible' => true]);
+        ->assertJson(['is_pathfinder' => true, 'eligible' => true]);
 
     ParticipantRegistration::factory()->create(['pathfinder_id' => $pathfinder->id]);
 
     $this->postJson(route('registration.pathfinder.check'), ['cpf' => '15350946056'])
         ->assertSuccessful()
-        ->assertJson(['eligible' => false]);
+        ->assertJson(['is_pathfinder' => true, 'eligible' => false]);
 });

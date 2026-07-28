@@ -23,6 +23,9 @@ class ShirtOrdersTable
                 TextColumn::make('customer_name')
                     ->label('Nome do cliente')
                     ->searchable(),
+                TextColumn::make('customer_cpf')
+                    ->label('CPF do cliente')
+                    ->searchable(),
                 TextColumn::make('customer_email')
                     ->label('E-mail do cliente')
                     ->searchable(),
@@ -50,12 +53,12 @@ class ShirtOrdersTable
                     ->searchable(),
                 TextColumn::make('created_at')
                     ->label('Criado em')
-                    ->dateTime()
+                    ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
                     ->label('Atualizado em')
-                    ->dateTime()
+                    ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])

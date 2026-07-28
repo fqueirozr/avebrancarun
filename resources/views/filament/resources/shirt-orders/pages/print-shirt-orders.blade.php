@@ -49,6 +49,7 @@
                     <tr>
                         <th>Pedido</th>
                         <th>Cliente</th>
+                        <th>CPF</th>
                         <th>Camiseta</th>
                         <th>Tamanho</th>
                         <th>Quantidade</th>
@@ -61,6 +62,7 @@
                         <tr>
                             <td>#{{ $shirtOrder->id }}</td>
                             <td>{{ $shirtOrder->customer_name }}</td>
+                            <td>{{ $shirtOrder->customer_cpf ?? 'Não informado' }}</td>
                             <td>{{ $shirtOrder->shirt?->name ?? 'Não informada' }}</td>
                             <td>{{ $shirtOrder->sizeSummary() }}</td>
                             <td>{{ $shirtOrder->quantity }}</td>

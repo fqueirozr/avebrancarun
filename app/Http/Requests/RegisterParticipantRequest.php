@@ -191,6 +191,17 @@ class RegisterParticipantRequest extends FormRequest
                     }
                 }
 
+                if ($kit?->type !== Kit::TypePathfinder && filled($this->input('participant_cpf'))) {
+                    $isPathfinder = Pathfinder::query()
+                        ->where('cpf', $this->input('participant_cpf'))
+                        ->where('is_active', true)
+                        ->exists();
+
+                    if ($isPathfinder) {
+                        $validator->errors()->add('kit_id', 'Este CPF deve utilizar apenas o pacote de desbravadores.');
+                    }
+                }
+
                 if (filled($this->input('billing_name')) && ! preg_match('/\pL+\s+\pL+/u', (string) $this->input('billing_name'))) {
                     $validator->errors()->add('billing_name', 'Informe o nome completo do pagador.');
                 }

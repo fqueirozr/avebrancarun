@@ -110,7 +110,7 @@ document.querySelectorAll('[data-registration-form]').forEach((form) => {
     let currentStepIndex = 0;
 
     const fieldLabels = {
-        athlete_name: 'Nome do atleta',
+        athlete_name: 'Nome completo do atleta',
         shirt_size: 'Tamanho da camisa',
         participant_cpf: 'CPF do atleta',
         birth_date: 'Data de nascimento',
@@ -374,12 +374,14 @@ document.querySelectorAll('[data-registration-form]').forEach((form) => {
     form.querySelector('input[name="kit_id"]:checked')?.dispatchEvent(new Event('change'));
 
     const participantCpfInput = form.querySelector('input[name="participant_cpf"]');
+    const packageOptions = Array.from(form.querySelectorAll('[data-package-option]'));
     const pathfinderPackages = Array.from(form.querySelectorAll('[data-pathfinder-package]'));
     let pathfinderCheckTimer;
 
     const syncPathfinderPackages = async () => {
         const cpf = participantCpfInput?.value.replace(/\D/g, '') ?? '';
         let eligible = false;
+        let isPathfinder = false;
 
         if (cpf.length === 11 && form.dataset.pathfinderCheckUrl) {
             const response = await fetch(form.dataset.pathfinderCheckUrl, {
@@ -392,15 +394,20 @@ document.querySelectorAll('[data-registration-form]').forEach((form) => {
                 body: JSON.stringify({ cpf }),
             });
 
-            eligible = response.ok && (await response.json()).eligible === true;
+            if (response.ok) {
+                const result = await response.json();
+                eligible = result.eligible === true;
+                isPathfinder = result.is_pathfinder === true;
+            }
         }
 
-        pathfinderPackages.forEach((packageOption) => {
-            packageOption.hidden = !eligible;
+        packageOptions.forEach((packageOption) => {
+            const isPathfinderPackage = packageOption.hasAttribute('data-pathfinder-package');
+            packageOption.hidden = isPathfinder ? !isPathfinderPackage : isPathfinderPackage;
             const radio = packageOption.querySelector('input[name="kit_id"]');
-            radio.disabled = !eligible;
+            radio.disabled = isPathfinderPackage ? !eligible : isPathfinder;
 
-            if (!eligible && radio.checked) {
+            if (radio.disabled && radio.checked) {
                 radio.checked = false;
             }
         });

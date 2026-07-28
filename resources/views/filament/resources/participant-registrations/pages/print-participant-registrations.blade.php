@@ -203,6 +203,7 @@
                     <tr>
                         <th>Protocolo</th>
                         <th>Atleta</th>
+                        <th>CPF</th>
                         <th>Prova</th>
                         <th>Pacote</th>
                         <th>Camisa</th>
@@ -215,6 +216,7 @@
                         <tr>
                             <td>{{ $registration->protocol_number }}</td>
                             <td>{{ $registration->athlete_name }}</td>
+                            <td>{{ $registration->participant_cpf }}</td>
                             <td>{{ $registration->modality }}</td>
                             <td>{{ $registration->kit?->name ?? 'Não informado' }}</td>
                             <td>{{ $registration->shirt_size }}</td>
@@ -245,6 +247,7 @@
                         <tr>
                             <th>Pedido</th>
                             <th>Cliente</th>
+                            <th>CPF</th>
                             <th>Item</th>
                             <th>Tamanho</th>
                             <th>Quantidade</th>
@@ -257,6 +260,7 @@
                             <tr>
                                 <td>#{{ $shirtOrder->id }}</td>
                                 <td>{{ $shirtOrder->customer_name }}</td>
+                                <td>{{ $shirtOrder->customer_cpf ?? 'Não informado' }}</td>
                                 <td>{{ $shirtOrder->shirt?->name ?? 'Não informada' }}</td>
                                 <td>{{ $shirtOrder->sizeSummary() }}</td>
                                 <td>{{ $shirtOrder->quantity }}</td>

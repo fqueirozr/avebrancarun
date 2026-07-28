@@ -208,13 +208,16 @@ class ParticipantRegistrationController extends Controller
 
     public function checkPathfinderEligibility(CheckPathfinderEligibilityRequest $request): JsonResponse
     {
-        $isEligible = Pathfinder::query()
+        $pathfinder = Pathfinder::query()
             ->where('cpf', $request->validated('cpf'))
             ->where('is_active', true)
-            ->whereDoesntHave('registration')
-            ->exists();
+            ->withExists('registration')
+            ->first();
 
-        return response()->json(['eligible' => $isEligible]);
+        return response()->json([
+            'is_pathfinder' => $pathfinder !== null,
+            'eligible' => $pathfinder !== null && ! $pathfinder->registration_exists,
+        ]);
     }
 
     public function showPix(ParticipantRegistration $registration, PixPayload $pixPayload): View

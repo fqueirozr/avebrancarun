@@ -125,7 +125,7 @@
 
                         <div class="grid min-w-0 grid-cols-1 gap-5 md:grid-cols-2">
                             <label class="grid min-w-0 gap-2">
-                                <span class="text-sm font-bold leading-5 text-zinc-800">Nome do atleta</span>
+                                <span class="text-sm font-bold leading-5 text-zinc-800">Nome completo do atleta</span>
                                 <input type="text" name="athlete_name" value="{{ old('athlete_name') }}" class="min-w-0 rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-race-cyan focus:ring-3 focus:ring-amber-100" placeholder="Nome completo" required>
                                 @error('athlete_name')
                                     <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
@@ -306,7 +306,7 @@
                         <legend class="rounded-full bg-race-night px-4 py-1.5 text-sm font-black text-white shadow-sm">Pacote</legend>
                         <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
                             @forelse ($kits as $kit)
-                                <label @if ($kit->type === \App\Models\Kit::TypePathfinder) data-pathfinder-package hidden @endif class="rounded-md border border-zinc-200 text-sm transition has-checked:border-race-cyan has-checked:bg-amber-50">
+                                <label data-package-option @if ($kit->type === \App\Models\Kit::TypePathfinder) data-pathfinder-package hidden @endif class="rounded-md border border-zinc-200 text-sm transition has-checked:border-race-cyan has-checked:bg-amber-50">
                                     <span class="flex items-start gap-3 px-4 py-3">
                                         <input type="radio" name="kit_id" value="{{ $kit->id }}" @checked((int) old('kit_id') === $kit->id) @if ($kit->requiresRulesAcknowledgement()) data-special-kit data-kit-name="{{ $kit->name }}" @endif data-has-shirt="{{ $kit->has_shirt ? 'true' : 'false' }}" data-kit-type="{{ $kit->type }}" class="mt-1 size-4 accent-race-cyan" required>
                                         <span class="grid gap-1">

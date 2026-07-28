@@ -36,7 +36,7 @@ class ParticipantRegistrationForm
                 Section::make('Dados do atleta')
                     ->schema([
                         TextInput::make('athlete_name')
-                            ->label('Nome do atleta')
+                            ->label('Nome completo do atleta')
                             ->required()
                             ->maxLength(255)
                             ->columnSpanFull(),

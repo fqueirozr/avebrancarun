@@ -26,6 +26,9 @@ class ShirtOrderForm
                     ->required(),
                 TextInput::make('customer_cpf')
                     ->label('CPF do cliente')
+                    ->afterStateHydrated(fn (TextInput $component, ?ShirtOrder $record): TextInput => $component->state(
+                        $record?->customer_cpf,
+                    ))
                     ->maxLength(11),
                 TextInput::make('customer_email')
                     ->label('E-mail do cliente')

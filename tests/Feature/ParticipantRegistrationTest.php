@@ -221,6 +221,18 @@ test('pathfinder registration stores the pathfinder identified by athlete cpf', 
     expect(ParticipantRegistration::query()->sole()->pathfinder->is($pathfinder))->toBeTrue();
 });
 
+test('pathfinder cpf can only register with the pathfinder package', function () {
+    $raceModality = RaceModality::factory()->create();
+    $regularKit = Kit::factory()->create();
+    $pathfinder = Pathfinder::factory()->create(['cpf' => '15350946056']);
+
+    $this->post(route('registration.store'), validRegistrationPayload($raceModality, $regularKit, [
+        'participant_cpf' => $pathfinder->cpf,
+    ]))->assertSessionHasErrors('kit_id');
+
+    expect(ParticipantRegistration::query()->count())->toBe(0);
+});
+
 test('pathfinder cpf cannot be used by more than one registration', function () {
     $raceModality = RaceModality::factory()->create();
     $kit = Kit::factory()->create([
@@ -1119,6 +1131,7 @@ test('an authenticated admin can print kits with linked and standalone shirts', 
 
     $registration = ParticipantRegistration::factory()->create([
         'athlete_name' => 'Maria Silva',
+        'participant_cpf' => '52998224725',
         'shirt_size' => 'GG',
         'email' => 'maria@example.com',
         'payment_status' => 'paid',
@@ -1144,6 +1157,7 @@ test('an authenticated admin can print kits with linked and standalone shirts', 
         'shirt_id' => $standaloneShirt->id,
         'participant_registration_id' => null,
         'customer_name' => 'Carlos Comprador',
+        'customer_cpf' => '15350946056',
         'customer_email' => 'carlos@example.com',
         'customer_phone' => '11888888888',
         'size' => 'G',
@@ -1163,6 +1177,7 @@ test('an authenticated admin can print kits with linked and standalone shirts', 
         ->assertSuccessful()
         ->assertSee('Lista de entrega de pacotes')
         ->assertSee('Maria Silva')
+        ->assertSee('52998224725')
         ->assertSee('Kit Desbravador')
         ->assertSee('GG')
         ->assertSee('Item avulso')
@@ -1171,6 +1186,7 @@ test('an authenticated admin can print kits with linked and standalone shirts', 
         ->assertSee('2 un.')
         ->assertSee('Itens avulsos sem inscrição')
         ->assertSee('Carlos Comprador')
+        ->assertSee('15350946056')
         ->assertSee('Camiseta Sem Inscrição')
         ->assertSee('Assinatura do recebedor')
         ->assertDontSee('maria@example.com')
