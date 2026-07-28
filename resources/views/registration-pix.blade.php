@@ -72,7 +72,8 @@
                     </label>
                     <label class="grid gap-2">
                         <span class="text-sm font-bold text-zinc-800">Comprovante do Pix</span>
-                        <input type="file" name="pix_receipt" accept=".jpg,.jpeg,.png,.pdf" class="rounded-md border border-zinc-300 bg-white px-4 py-3 text-sm" required>
+                        <input type="file" name="pix_receipt" accept=".jpg,.jpeg,.png,.pdf" data-max-file-size="5242880" data-max-file-message="O comprovante não pode ter mais de 5 MB." class="rounded-md border border-zinc-300 bg-white px-4 py-3 text-sm" required>
+                        <span hidden data-file-size-error class="text-sm font-semibold text-red-700"></span>
                         <span class="text-xs text-zinc-500">JPG, PNG ou PDF, com até 5 MB.</span>
                         @error('pix_receipt')<span class="text-sm font-semibold text-red-700">{{ $message }}</span>@enderror
                     </label>

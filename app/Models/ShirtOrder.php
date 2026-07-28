@@ -8,11 +8,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['shirt_id', 'participant_registration_id', 'customer_name', 'customer_email', 'customer_phone', 'size', 'quantity', 'unit_price', 'total_price', 'payment_status'])]
+#[Fillable(['shirt_id', 'participant_registration_id', 'customer_name', 'customer_cpf', 'customer_email', 'customer_phone', 'size', 'sizes', 'quantity', 'unit_price', 'total_price', 'payment_status'])]
 class ShirtOrder extends Model
 {
     /** @use HasFactory<ShirtOrderFactory> */
     use HasFactory;
+
+    protected $hidden = ['customer_cpf'];
 
     /** @return array<string, string> */
     public static function paymentStatusOptions(): array
@@ -30,8 +32,21 @@ class ShirtOrder extends Model
         return $this->belongsTo(ParticipantRegistration::class);
     }
 
+    public function sizeSummary(): string
+    {
+        $sizes = $this->sizes ?: array_fill(0, $this->quantity, $this->size);
+
+        if (count(array_unique($sizes)) === 1) {
+            return $sizes[0];
+        }
+
+        return collect($sizes)
+            ->map(fn (string $size, int $index): string => ($index + 1).": {$size}")
+            ->implode('; ');
+    }
+
     protected function casts(): array
     {
-        return ['quantity' => 'integer', 'unit_price' => 'decimal:2', 'total_price' => 'decimal:2'];
+        return ['sizes' => 'array', 'quantity' => 'integer', 'unit_price' => 'decimal:2', 'total_price' => 'decimal:2'];
     }
 }

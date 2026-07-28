@@ -62,7 +62,7 @@
                             <td>#{{ $shirtOrder->id }}</td>
                             <td>{{ $shirtOrder->customer_name }}</td>
                             <td>{{ $shirtOrder->shirt?->name ?? 'Não informada' }}</td>
-                            <td>{{ $shirtOrder->size }}</td>
+                            <td>{{ $shirtOrder->sizeSummary() }}</td>
                             <td>{{ $shirtOrder->quantity }}</td>
                             <td>{{ match ($shirtOrder->payment_status) { 'paid' => 'Pago', 'cancelled' => 'Cancelado', default => 'Pendente' } }}</td>
                             <td class="print-list__signature"></td>

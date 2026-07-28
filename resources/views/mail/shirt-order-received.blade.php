@@ -13,7 +13,7 @@ Recebemos seu pedido de item avulso da **Ave Branca Run**.
 <x-mail::table>
 | Item | Tamanho | Quantidade | Valor unitário | Total |
 | :--- | :---: | ---: | ---: | ---: |
-| {{ $shirtOrder->shirt->name }} | {{ $shirtOrder->size }} | {{ $shirtOrder->quantity }} | R$ {{ number_format((float) $shirtOrder->unit_price, 2, ',', '.') }} | R$ {{ number_format((float) $shirtOrder->total_price, 2, ',', '.') }} |
+| {{ $shirtOrder->shirt->name }} | {{ $shirtOrder->sizeSummary() }} | {{ $shirtOrder->quantity }} | R$ {{ number_format((float) $shirtOrder->unit_price, 2, ',', '.') }} | R$ {{ number_format((float) $shirtOrder->total_price, 2, ',', '.') }} |
 </x-mail::table>
 
 Este e-mail serve como recibo do pedido. A confirmação do pagamento será informada separadamente.

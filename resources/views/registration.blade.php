@@ -334,7 +334,10 @@
                             <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
                         @enderror
                         <label class="grid gap-2" data-shirt-size-field hidden>
-                            <span class="text-sm font-bold text-zinc-800">Tamanho da camisa</span>
+                            <span class="flex flex-wrap items-center justify-between gap-2 text-sm font-bold text-zinc-800">
+                                Tamanho da camisa
+                                <button type="button" data-modal-open="shirt-size-guide-modal" class="font-black text-race-blue underline decoration-race-cyan underline-offset-3">Ver medidas</button>
+                            </span>
                             <select name="shirt_size" class="rounded-md border border-zinc-300 bg-white px-4 py-3 text-base outline-none transition focus:border-race-cyan focus:ring-3 focus:ring-amber-100" required>
                                 <option value="">Selecione o tamanho</option>
                                 @foreach (\App\Models\ParticipantRegistration::shirtSizeOptions() as $value => $label)
@@ -358,15 +361,19 @@
                                         <option value="{{ $shirt->id }}" @selected((int) old('shirt_id') === $shirt->id)>{{ $shirt->name }} — R$ {{ number_format($shirt->priceForRegistration(), 2, ',', '.') }}</option>
                                     @endforeach
                                 </select>
-                                <div class="grid gap-3 sm:grid-cols-2">
+                                <div class="grid gap-3">
                                     <select name="extra_shirt_size" class="rounded-md border border-zinc-300 px-4 py-3">
                                         <option value="">Tamanho</option>
                                         @foreach (\App\Models\ParticipantRegistration::shirtSizeOptions() as $size)
                                             <option value="{{ $size }}" @selected(old('extra_shirt_size') === $size)>{{ $size }}</option>
                                         @endforeach
                                     </select>
-                                    <input type="number" name="extra_shirt_quantity" value="{{ old('extra_shirt_quantity', 1) }}" min="1" max="10" class="rounded-md border border-zinc-300 px-4 py-3" aria-label="Quantidade de camisetas">
+                                    <label class="grid gap-2">
+                                        <span class="text-sm font-bold text-zinc-800">Quantidade fixa por inscrição</span>
+                                        <input type="number" name="extra_shirt_quantity" value="1" readonly class="rounded-md border border-zinc-200 bg-zinc-100 px-4 py-3 font-bold text-zinc-700" aria-readonly="true">
+                                    </label>
                                 </div>
+                                <button type="button" data-modal-open="shirt-size-guide-modal" class="justify-self-start text-sm font-black text-race-blue underline decoration-race-cyan underline-offset-3">Consultar guia de medidas</button>
                                 <a href="{{ route('store.index') }}" class="text-sm font-bold text-race-blue underline">Ou compre separadamente na loja</a>
                             </div>
                         @endif
@@ -482,6 +489,19 @@
                     <button type="button" data-modal-close class="rounded-md border border-zinc-300 bg-white px-4 py-2 text-sm font-black text-zinc-800">Voltar</button>
                     <button type="button" data-special-kit-confirm class="rounded-md bg-race-blue px-4 py-2 text-sm font-black text-white disabled:cursor-not-allowed disabled:bg-zinc-400">Confirmar ciência</button>
                 </div>
+            </div>
+        </dialog>
+
+        <dialog id="shirt-size-guide-modal" class="m-auto max-h-[92vh] w-[min(72rem,calc(100vw-2rem))] overflow-hidden rounded-2xl bg-white p-0 shadow-2xl backdrop:bg-race-night/85">
+            <div class="flex items-center justify-between gap-4 bg-race-night p-4 text-white sm:px-6">
+                <div>
+                    <p class="text-xs font-black uppercase tracking-wider text-race-cyan">Camisetas</p>
+                    <h2 class="text-xl font-black">Guia de tamanhos e medidas</h2>
+                </div>
+                <button type="button" data-modal-close class="rounded-md border border-white/20 px-4 py-2 text-sm font-black">Fechar</button>
+            </div>
+            <div class="max-h-[78vh] overflow-auto bg-race-mist p-3 sm:p-6">
+                <img src="{{ asset('images/guia-tamanhos-camisetas.png') }}" alt="Guia com medidas de tórax e comprimento das camisetas adultas e infantis" class="h-auto w-full rounded-xl bg-white">
             </div>
         </dialog>
 

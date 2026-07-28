@@ -224,7 +224,7 @@
                                 @else
                                     <div class="print-list__shirt-items">
                                         @foreach ($registration->shirtOrders as $shirtOrder)
-                                            <span>{{ $shirtOrder->shirt?->name ?? 'Camiseta' }} — tam. {{ $shirtOrder->size }} — {{ $shirtOrder->quantity }} un.</span>
+                                            <span>{{ $shirtOrder->shirt?->name ?? 'Camiseta' }} — tam. {{ $shirtOrder->sizeSummary() }} — {{ $shirtOrder->quantity }} un.</span>
                                         @endforeach
                                     </div>
                                 @endif
@@ -258,7 +258,7 @@
                                 <td>#{{ $shirtOrder->id }}</td>
                                 <td>{{ $shirtOrder->customer_name }}</td>
                                 <td>{{ $shirtOrder->shirt?->name ?? 'Não informada' }}</td>
-                                <td>{{ $shirtOrder->size }}</td>
+                                <td>{{ $shirtOrder->sizeSummary() }}</td>
                                 <td>{{ $shirtOrder->quantity }}</td>
                                 <td>{{ match ($shirtOrder->payment_status) { 'paid' => 'Pago', 'cancelled' => 'Cancelado', default => 'Pendente' } }}</td>
                                 <td class="print-list__signature"></td>

@@ -54,6 +54,26 @@ document.querySelectorAll('[data-mask]').forEach((input) => {
     applyMask();
 });
 
+document.querySelectorAll('[data-max-file-size]').forEach((input) => {
+    const error = input.parentElement?.querySelector('[data-file-size-error]');
+
+    input.addEventListener('change', () => {
+        const fileIsTooLarge = input.files?.[0]?.size > Number(input.dataset.maxFileSize);
+
+        input.setCustomValidity(fileIsTooLarge ? input.dataset.maxFileMessage : '');
+
+        if (error) {
+            error.textContent = fileIsTooLarge ? input.dataset.maxFileMessage : '';
+            error.hidden = !fileIsTooLarge;
+        }
+
+        if (fileIsTooLarge) {
+            input.value = '';
+            input.reportValidity();
+        }
+    });
+});
+
 document.querySelectorAll('[data-image-expand]').forEach((button) => {
     button.addEventListener('click', () => {
         const modal = document.getElementById('package-image-modal');
@@ -108,6 +128,9 @@ document.querySelectorAll('[data-registration-form]').forEach((form) => {
         billing_postal_code: 'CEP',
         race_modality_id: 'Prova',
         kit_id: 'Pacote',
+        shirt_id: 'Item avulso',
+        extra_shirt_size: 'Tamanho do item avulso',
+        extra_shirt_quantity: 'Quantidade do item avulso',
         emergency_contact_name: 'Contato de emergencia',
         emergency_contact_phone: 'Telefone de emergencia',
     };
@@ -209,6 +232,10 @@ document.querySelectorAll('[data-registration-form]').forEach((form) => {
 
         if (field.type === 'checkbox') {
             return field.checked ? 'Sim' : 'Nao';
+        }
+
+        if (field instanceof HTMLSelectElement) {
+            return field.selectedOptions[0]?.textContent.trim() ?? '';
         }
 
         return field.value.trim();
@@ -462,6 +489,56 @@ document.querySelectorAll('[data-modal-open]').forEach((button) => {
             modal.showModal();
         }
     });
+});
+
+document.querySelectorAll('[data-shirt-sizes]').forEach((sizesField) => {
+    const form = sizesField.closest('form');
+    const quantityInput = form?.querySelector('[data-shirt-quantity]');
+    const sizeList = sizesField.querySelector('[data-shirt-size-list]');
+    const oldSizes = JSON.parse(sizesField.dataset.oldSizes || '[]');
+    const sizeOptions = JSON.parse(sizesField.dataset.sizeOptions || '[]');
+
+    if (!(quantityInput instanceof HTMLInputElement) || !(sizeList instanceof HTMLElement)) {
+        return;
+    }
+
+    const renderSizes = () => {
+        const existingSizes = Array.from(sizeList.querySelectorAll('select')).map((select) => select.value);
+        const quantity = Math.min(10, Math.max(1, Number.parseInt(quantityInput.value, 10) || 1));
+
+        sizeList.replaceChildren();
+
+        for (let index = 0; index < quantity; index += 1) {
+            const label = document.createElement('label');
+            const title = document.createElement('span');
+            const select = document.createElement('select');
+            const placeholder = document.createElement('option');
+
+            label.className = 'grid gap-2 sm:grid-cols-[8rem_1fr] sm:items-center';
+            title.className = 'text-sm font-semibold text-zinc-700';
+            title.textContent = `Camiseta ${index + 1}`;
+            select.name = 'sizes[]';
+            select.required = true;
+            select.className = 'rounded-md border border-zinc-300 px-4 py-3 outline-none focus:border-race-cyan focus:ring-3 focus:ring-race-cyan/20';
+            placeholder.value = '';
+            placeholder.textContent = 'Selecione o tamanho';
+            select.append(placeholder);
+
+            sizeOptions.forEach((size) => {
+                const option = document.createElement('option');
+                option.value = size;
+                option.textContent = size;
+                option.selected = size === (existingSizes[index] ?? oldSizes[index] ?? '');
+                select.append(option);
+            });
+
+            label.append(title, select);
+            sizeList.append(label);
+        }
+    };
+
+    quantityInput.addEventListener('input', renderSizes);
+    renderSizes();
 });
 
 document.querySelectorAll('dialog').forEach((modal) => {

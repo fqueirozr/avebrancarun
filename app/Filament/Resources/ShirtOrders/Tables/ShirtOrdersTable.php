@@ -31,6 +31,7 @@ class ShirtOrdersTable
                     ->searchable(),
                 TextColumn::make('size')
                     ->label('Tamanho')
+                    ->formatStateUsing(fn ($record): string => $record->sizeSummary())
                     ->searchable(),
                 TextColumn::make('quantity')
                     ->label('Quantidade')

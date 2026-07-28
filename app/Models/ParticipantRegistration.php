@@ -152,8 +152,8 @@ class ParticipantRegistration extends Model
     public static function shirtSizeOptions(): array
     {
         return array_combine(
-            ['PP', 'P', 'M', 'G', 'GG', 'XGG'],
-            ['PP', 'P', 'M', 'G', 'GG', 'XGG'],
+            ['6', '8', '10', '12', '14', 'PP', 'P', 'M', 'G', 'GG', 'XG'],
+            ['6', '8', '10', '12', '14', 'PP', 'P', 'M', 'G', 'GG', 'XG'],
         );
     }
 

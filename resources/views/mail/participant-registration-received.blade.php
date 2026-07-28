@@ -28,7 +28,7 @@ Recebemos sua inscrição para a **Ave Branca Run**. Agora ela está em análise
 | Item | Tamanho | Quantidade | Valor unitário | Total |
 | :--- | :---: | ---: | ---: | ---: |
 @foreach ($registration->shirtOrders as $shirtOrder)
-| {{ $shirtOrder->shirt->name }} | {{ $shirtOrder->size }} | {{ $shirtOrder->quantity }} | R$ {{ number_format((float) $shirtOrder->unit_price, 2, ',', '.') }} | R$ {{ number_format((float) $shirtOrder->total_price, 2, ',', '.') }} |
+| {{ $shirtOrder->shirt->name }} | {{ $shirtOrder->sizeSummary() }} | {{ $shirtOrder->quantity }} | R$ {{ number_format((float) $shirtOrder->unit_price, 2, ',', '.') }} | R$ {{ number_format((float) $shirtOrder->total_price, 2, ',', '.') }} |
 @endforeach
 </x-mail::table>
 @endif

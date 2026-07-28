@@ -16,6 +16,21 @@ use Livewire\Livewire;
 
 uses(RefreshDatabase::class);
 
+it('shows a shirt photo from the public disk in the store', function () {
+    $shirt = Shirt::factory()->create([
+        'name' => 'Camiseta Oficial',
+        'photo_path' => 'shirts/camiseta-oficial.png',
+    ]);
+
+    $this->get(route('store.index'))
+        ->assertSuccessful()
+        ->assertSee(
+            'src="'.Storage::disk('public')->url($shirt->photo_path).'"',
+            false,
+        )
+        ->assertSee('alt="Foto de Camiseta Oficial"', false);
+});
+
 it('updates linked shirt payments when the registration payment changes', function () {
     $registration = ParticipantRegistration::factory()->create(['payment_status' => 'pending']);
     $shirt = Shirt::factory()->create();
@@ -115,6 +130,7 @@ it('renders the standalone shirt payment update email', function () {
         'customer_email' => 'maria@example.com',
         'customer_phone' => '11999999999',
         'size' => 'M',
+        'sizes' => ['M', 'G'],
         'quantity' => 2,
         'unit_price' => 35,
         'total_price' => 70,
@@ -168,16 +184,48 @@ it('registers a standalone shirt order and decrements stock', function () {
     $this->post(route('store.store'), [
         'shirt_id' => $shirt->id,
         'customer_name' => 'Maria Silva',
+        'customer_cpf' => '529.982.247-25',
         'customer_email' => 'maria@example.com',
         'customer_phone' => '11999999999',
-        'size' => 'M',
+        'sizes' => ['M', 'G'],
         'quantity' => 2,
     ])->assertRedirect(route('store.index'));
 
-    $this->assertDatabaseHas('shirt_orders', ['shirt_id' => $shirt->id, 'quantity' => 2, 'total_price' => 70]);
+    $shirtOrder = ShirtOrder::query()->whereBelongsTo($shirt)->firstOrFail();
+
+    expect($shirtOrder->customer_cpf)->toBe('52998224725')
+        ->and($shirtOrder->sizes)->toBe(['M', 'G'])
+        ->and($shirtOrder->quantity)->toBe(2)
+        ->and((float) $shirtOrder->total_price)->toBe(70.0);
     expect($shirt->refresh()->stock_quantity)->toBe(3);
 
     Mail::assertSent(ShirtOrderReceived::class, 'maria@example.com');
+});
+
+it('requires cpf and every shirt size for a standalone store order', function () {
+    $shirt = Shirt::factory()->create();
+
+    $this->post(route('store.store'), [
+        'shirt_id' => $shirt->id,
+        'customer_name' => 'Maria Silva',
+        'customer_email' => 'maria@example.com',
+        'customer_phone' => '11999999999',
+        'quantity' => 1,
+    ])->assertSessionHasErrors(['customer_cpf', 'sizes']);
+});
+
+it('requires one size for each standalone shirt', function () {
+    $shirt = Shirt::factory()->create();
+
+    $this->post(route('store.store'), [
+        'shirt_id' => $shirt->id,
+        'customer_name' => 'Maria Silva',
+        'customer_cpf' => '52998224725',
+        'customer_email' => 'maria@example.com',
+        'customer_phone' => '11999999999',
+        'sizes' => ['M'],
+        'quantity' => 2,
+    ])->assertSessionHasErrors('sizes');
 });
 
 it('uses the discounted item price when purchased with a registration', function () {

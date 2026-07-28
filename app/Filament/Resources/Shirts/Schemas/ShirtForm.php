@@ -16,7 +16,12 @@ class ShirtForm
             ->components([
                 TextInput::make('name')->label('Nome')->required()->maxLength(255),
                 Textarea::make('description')->label('Descrição')->columnSpanFull()->maxLength(2000),
-                FileUpload::make('photo_path')->label('Foto')->image()->directory('shirts'),
+                FileUpload::make('photo_path')
+                    ->label('Foto')
+                    ->image()
+                    ->disk('public')
+                    ->directory('shirts')
+                    ->visibility('public'),
                 TextInput::make('price')
                     ->label('Valor na loja')
                     ->helperText('Valor do item comprado separadamente.')

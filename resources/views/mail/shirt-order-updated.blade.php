@@ -14,7 +14,7 @@ Temos uma atualização sobre seu item avulso da **Ave Branca Run**.
 <x-mail::table>
 | Item | Tamanho | Quantidade | Total |
 | :--- | :---: | ---: | ---: |
-| {{ $shirtOrder->shirt->name }} | {{ $shirtOrder->size }} | {{ $shirtOrder->quantity }} | R$ {{ number_format((float) $shirtOrder->total_price, 2, ',', '.') }} |
+| {{ $shirtOrder->shirt->name }} | {{ $shirtOrder->sizeSummary() }} | {{ $shirtOrder->quantity }} | R$ {{ number_format((float) $shirtOrder->total_price, 2, ',', '.') }} |
 </x-mail::table>
 
 @if ($shirtOrder->payment_status === 'cancelled')

@@ -61,7 +61,7 @@ class RegisterParticipantRequest extends FormRequest
             'kit_id' => ['required', Rule::exists('kits', 'id')->where('is_active', true)],
             'shirt_id' => ['nullable', Rule::exists('shirts', 'id')->where('is_active', true)],
             'extra_shirt_size' => [Rule::requiredIf($this->filled('shirt_id')), 'nullable', Rule::in(array_keys(ParticipantRegistration::shirtSizeOptions()))],
-            'extra_shirt_quantity' => [Rule::requiredIf($this->filled('shirt_id')), 'nullable', 'integer', 'min:1', 'max:10'],
+            'extra_shirt_quantity' => [Rule::requiredIf($this->filled('shirt_id')), 'nullable', 'integer', 'in:1'],
             'emergency_contact_name' => ['nullable', 'string', 'max:255'],
             'emergency_contact_phone' => ['nullable', 'string', 'regex:/^\d{10,11}$/'],
             'accepted_regulation' => ['accepted'],

@@ -78,6 +78,25 @@ test('shirt size is required when the selected kit includes a shirt', function (
     ]))->assertSessionHasErrors('shirt_size');
 });
 
+test('child and XG shirt sizes are accepted while XGG is rejected', function (string $size, bool $isValid) {
+    Mail::fake();
+    $raceModality = RaceModality::factory()->create();
+    $kit = Kit::factory()->create(['price' => 0, 'has_shirt' => true]);
+
+    $response = $this->post(route('registration.store'), validRegistrationPayload($raceModality, $kit, [
+        'shirt_size' => $size,
+    ]));
+
+    $isValid
+        ? $response->assertSessionDoesntHaveErrors('shirt_size')
+        : $response->assertSessionHasErrors('shirt_size');
+})->with([
+    'child size 6' => ['6', true],
+    'child size 14' => ['14', true],
+    'adult size XG' => ['XG', true],
+    'removed size XGG' => ['XGG', false],
+]);
+
 test('shirt size is discarded when the selected kit does not include a shirt', function () {
     Mail::fake();
     $raceModality = RaceModality::factory()->create();
@@ -91,6 +110,18 @@ test('shirt size is discarded when the selected kit does not include a shirt', f
         'kit_id' => $kit->id,
         'shirt_size' => null,
     ]);
+});
+
+test('an extra shirt quantity cannot be changed during registration', function () {
+    $raceModality = RaceModality::factory()->create();
+    $kit = Kit::factory()->create(['price' => 0]);
+    $shirt = Shirt::factory()->create();
+
+    $this->post(route('registration.store'), validRegistrationPayload($raceModality, $kit, [
+        'shirt_id' => $shirt->id,
+        'extra_shirt_size' => 'M',
+        'extra_shirt_quantity' => 2,
+    ]))->assertSessionHasErrors('extra_shirt_quantity');
 });
 
 test('payer data is optional when checkout is not active', function () {
@@ -733,6 +764,25 @@ test('payer data confirmation is required when submitting a pix receipt', functi
     ])->assertSessionHasErrors('payer_data_confirmed');
 
     expect($registration->fresh()->payment_status)->toBe('pending');
+});
+
+test('pix receipts larger than five megabytes are rejected', function () {
+    Storage::fake('local');
+
+    PaymentGatewaySetting::factory()->create([
+        'manual_pix_enabled' => true,
+        'pix_key' => 'financeiro@example.com',
+    ]);
+
+    $registration = ParticipantRegistration::factory()->create(['payment_status' => 'pending']);
+    $url = URL::temporarySignedRoute('registration.pix.store', now()->addHour(), ['registration' => $registration]);
+
+    $this->post($url, [
+        'billing_name' => 'Maria Silva',
+        'billing_document' => '529.982.247-25',
+        'pix_receipt' => UploadedFile::fake()->create('comprovante.pdf', 5121, 'application/pdf'),
+        'payer_data_confirmed' => '1',
+    ])->assertSessionHasErrors('pix_receipt');
 });
 
 test('a participant is redirected to checkout when payment gateway is configured', function () {

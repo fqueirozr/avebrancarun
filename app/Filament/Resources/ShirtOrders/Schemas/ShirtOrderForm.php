@@ -24,6 +24,9 @@ class ShirtOrderForm
                 TextInput::make('customer_name')
                     ->label('Nome do cliente')
                     ->required(),
+                TextInput::make('customer_cpf')
+                    ->label('CPF do cliente')
+                    ->maxLength(11),
                 TextInput::make('customer_email')
                     ->label('E-mail do cliente')
                     ->email()

@@ -69,7 +69,7 @@ class ParticipantRegistrationExporter extends Exporter
             ExportColumn::make('standalone_items')
                 ->label('Itens avulsos')
                 ->state(fn (ParticipantRegistration $record): string => $record->shirtOrders
-                    ->map(fn ($order): string => ($order->shirt?->name ?? 'Item').' ('.$order->size.') × '.$order->quantity.' — R$ '.number_format((float) $order->total_price, 2, ',', '.'))
+                    ->map(fn ($order): string => ($order->shirt?->name ?? 'Item').' ('.$order->sizeSummary().') × '.$order->quantity.' — R$ '.number_format((float) $order->total_price, 2, ',', '.'))
                     ->join('; '))
                 ->formatStateUsing(fn (?string $state): string => self::safeSpreadsheetText($state)),
             ExportColumn::make('registration_total')

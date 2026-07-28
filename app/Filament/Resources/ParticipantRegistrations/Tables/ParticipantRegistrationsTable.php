@@ -24,7 +24,7 @@ class ParticipantRegistrationsTable
     {
         return $table
             ->poll('10s')
-            ->modifyQueryUsing(fn (Builder $query): Builder => $query->with('shirtOrders.shirt'))
+            ->modifyQueryUsing(fn (Builder $query): Builder => $query->with(['kit', 'raceModality', 'shirtOrders.shirt']))
             ->columns([
                 TextColumn::make('protocol_number')
                     ->label('Protocolo')
@@ -32,6 +32,10 @@ class ParticipantRegistrationsTable
                     ->sortable(),
                 TextColumn::make('athlete_name')
                     ->label('Atleta')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('bib_number')
+                    ->label('Nº peito')
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('modality')
@@ -44,10 +48,14 @@ class ParticipantRegistrationsTable
                     ->searchable()
                     ->sortable()
                     ->toggleable(),
+                TextColumn::make('shirt_size')
+                    ->label('Camiseta')
+                    ->badge()
+                    ->placeholder('Sem camiseta'),
                 TextColumn::make('standalone_shirts')
                     ->label('Item avulso')
                     ->state(fn (ParticipantRegistration $record): string => $record->shirtOrders
-                        ->map(fn ($shirtOrder): string => ($shirtOrder->shirt?->name ?? 'Item').' ('.$shirtOrder->size.') × '.$shirtOrder->quantity)
+                        ->map(fn ($shirtOrder): string => ($shirtOrder->shirt?->name ?? 'Item').' ('.$shirtOrder->sizeSummary().') × '.$shirtOrder->quantity)
                         ->join(', '))
                     ->placeholder('Não adquirida')
                     ->wrap()
@@ -67,6 +75,11 @@ class ParticipantRegistrationsTable
                 TextColumn::make('phone')
                     ->label('Telefone')
                     ->searchable(),
+                TextColumn::make('birth_date')
+                    ->label('Nascimento')
+                    ->date('d/m/Y')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('email')
                     ->label('E-mail')
                     ->searchable()
