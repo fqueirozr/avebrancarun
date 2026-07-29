@@ -93,7 +93,8 @@
                     </label>
                     <label class="grid gap-2">
                         <span class="text-sm font-bold text-zinc-800">CPF</span>
-                        <input name="customer_cpf" value="{{ old('customer_cpf') }}" inputmode="numeric" data-mask="cpf" placeholder="000.000.000-00" class="rounded-md border border-zinc-300 px-4 py-3 outline-none focus:border-race-cyan focus:ring-3 focus:ring-race-cyan/20" required>
+                        <input name="customer_cpf" value="{{ old('customer_cpf') }}" inputmode="numeric" data-mask="cpf" data-validate-cpf aria-describedby="customer-cpf-feedback" placeholder="000.000.000-00" class="rounded-md border border-zinc-300 px-4 py-3 outline-none focus:border-race-cyan focus:ring-3 focus:ring-race-cyan/20" required>
+                        <span id="customer-cpf-feedback" data-cpf-feedback class="text-sm font-semibold text-red-700" hidden></span>
                         @error('customer_cpf')<span class="text-sm font-semibold text-red-700">{{ $message }}</span>@enderror
                     </label>
                     <label class="grid gap-2">

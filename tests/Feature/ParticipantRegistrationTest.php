@@ -660,6 +660,21 @@ test('the registration receipt includes an added standalone shirt', function () 
     $mail->assertSeeInHtml('serve como recibo da inscrição');
 });
 
+test('the registration receipt includes the payment link when available', function () {
+    $registration = ParticipantRegistration::factory()->create([
+        'kit_id' => Kit::factory()->create(['price' => 50]),
+    ]);
+    $paymentUrl = 'https://checkout.example/registration_123';
+
+    $mail = new ParticipantRegistrationReceived(
+        $registration->load('kit', 'shirtOrders.shirt'),
+        $paymentUrl,
+    );
+
+    $mail->assertSeeInHtml('Realizar pagamento');
+    $mail->assertSeeInHtml($paymentUrl, false);
+});
+
 test('registrations receive unique random four digit bib numbers', function () {
     $registrations = ParticipantRegistration::factory()->count(25)->create();
     $bibNumbers = $registrations->pluck('bib_number');
@@ -863,6 +878,67 @@ test('a participant is redirected to checkout when payment gateway is configured
         'payment_gateway_reference' => 'checkout_123',
         'payment_checkout_url' => 'https://checkout.example/checkout_123',
     ]);
+
+    Mail::assertSent(ParticipantRegistrationReceived::class, function (ParticipantRegistrationReceived $mail): bool {
+        return str_contains($mail->paymentUrl ?? '', "/inscricao/{$mail->registration->id}/pagamento");
+    });
+});
+
+test('the registration payment link redirects to checkout while payment is pending', function () {
+    $registration = ParticipantRegistration::factory()->create([
+        'payment_status' => 'pending',
+        'payment_checkout_url' => 'https://checkout.example/checkout_123',
+    ]);
+
+    $this->get(URL::temporarySignedRoute(
+        'registration.payment.show',
+        now()->addHour(),
+        ['registration' => $registration],
+    ))->assertRedirect('https://checkout.example/checkout_123');
+});
+
+test('the registration payment link only shows the current non-pending status', function (string $status, string $statusLabel) {
+    $registration = ParticipantRegistration::factory()->create([
+        'payment_status' => $status,
+        'payment_checkout_url' => 'https://checkout.example/checkout_123',
+    ]);
+
+    $this->get(URL::temporarySignedRoute(
+        'registration.payment.show',
+        now()->addHour(),
+        ['registration' => $registration],
+    ))
+        ->assertSuccessful()
+        ->assertSee('Status da inscrição')
+        ->assertSee($statusLabel)
+        ->assertDontSee('https://checkout.example/checkout_123')
+        ->assertDontSee('Chave Pix')
+        ->assertDontSee('Enviar comprovante');
+})->with([
+    'under review' => ['under_review', 'Em análise'],
+    'paid' => ['paid', 'Pago'],
+    'cancelled' => ['cancelled', 'Cancelado'],
+]);
+
+test('the registration pix link hides payment data when payment is no longer pending', function () {
+    PaymentGatewaySetting::factory()->create([
+        'manual_pix_enabled' => true,
+        'pix_key' => 'financeiro@example.com',
+    ]);
+    $registration = ParticipantRegistration::factory()->create([
+        'payment_status' => 'paid',
+    ]);
+
+    $this->get(URL::temporarySignedRoute(
+        'registration.pix.show',
+        now()->addHour(),
+        ['registration' => $registration],
+    ))
+        ->assertSuccessful()
+        ->assertSee('Pago')
+        ->assertDontSee('financeiro@example.com')
+        ->assertDontSee('Pix copia e cola')
+        ->assertDontSee('Enviar comprovante');
 });
 
 test('checkout success return waits for webhook confirmation', function () {

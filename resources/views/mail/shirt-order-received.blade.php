@@ -18,6 +18,12 @@ Recebemos seu pedido de item avulso da **Ave Branca Run**.
 
 Este e-mail serve como recibo do pedido. A confirmação do pagamento será informada separadamente.
 
+@if ($paymentUrl)
+<x-mail::button :url="$paymentUrl" color="success">
+Realizar pagamento
+</x-mail::button>
+@endif
+
 Obrigado,<br>
 {{ config('app.name') }}
 </x-mail::message>

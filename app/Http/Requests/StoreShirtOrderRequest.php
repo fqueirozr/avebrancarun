@@ -45,6 +45,10 @@ class StoreShirtOrderRequest extends FormRequest
                 if (is_array($this->input('sizes')) && count($this->input('sizes')) !== $this->integer('quantity')) {
                     $validator->errors()->add('sizes', 'Informe o tamanho de cada camiseta selecionada.');
                 }
+
+                if (filled($this->input('customer_cpf')) && ! $this->hasValidCpf((string) $this->input('customer_cpf'))) {
+                    $validator->errors()->add('customer_cpf', 'Informe um CPF válido.');
+                }
             },
         ];
     }
@@ -65,5 +69,28 @@ class StoreShirtOrderRequest extends FormRequest
                 $field => preg_replace('/\D+/', '', (string) $this->input($field)),
             ]);
         }
+    }
+
+    private function hasValidCpf(string $cpf): bool
+    {
+        if (strlen($cpf) !== 11 || preg_match('/^(\d)\1{10}$/', $cpf)) {
+            return false;
+        }
+
+        for ($digit = 9; $digit < 11; $digit++) {
+            $sum = 0;
+
+            for ($position = 0; $position < $digit; $position++) {
+                $sum += (int) $cpf[$position] * (($digit + 1) - $position);
+            }
+
+            $expectedDigit = ((10 * $sum) % 11) % 10;
+
+            if ((int) $cpf[$digit] !== $expectedDigit) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

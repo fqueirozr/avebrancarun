@@ -19,7 +19,10 @@ class ParticipantRegistrationReceived extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct(public ParticipantRegistration $registration) {}
+    public function __construct(
+        public ParticipantRegistration $registration,
+        public ?string $paymentUrl = null,
+    ) {}
 
     /**
      * Get the message envelope.

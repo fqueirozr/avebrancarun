@@ -38,16 +38,23 @@ class ShirtOrderController extends Controller
         $shirtOrder = DB::transaction(fn () => $action->handle($shirt, $data));
         $shirtOrder->load('shirt');
 
-        Mail::to($shirtOrder->customer_email)->send(new ShirtOrderReceived($shirtOrder));
-
         $settings = PaymentGatewaySetting::current();
 
         if ($settings->hasManualPix()) {
-            return redirect()->to(URL::temporarySignedRoute(
+            $paymentUrl = URL::temporarySignedRoute(
                 'store.pix.show',
                 now()->addDays(7),
                 ['shirtOrder' => $shirtOrder],
-            ));
+            );
+            $emailPaymentUrl = URL::temporarySignedRoute(
+                'store.payment.show',
+                now()->addDays(7),
+                ['shirtOrder' => $shirtOrder],
+            );
+
+            Mail::to($shirtOrder->customer_email)->send(new ShirtOrderReceived($shirtOrder, $emailPaymentUrl));
+
+            return redirect()->to($paymentUrl);
         }
 
         if ($settings->isConfigured()) {
@@ -65,15 +72,27 @@ class ShirtOrderController extends Controller
                     'payment_checkout_url' => $checkout->checkoutUrl,
                 ]);
 
+                $emailPaymentUrl = URL::temporarySignedRoute(
+                    'store.payment.show',
+                    now()->addDays(7),
+                    ['shirtOrder' => $shirtOrder],
+                );
+
+                Mail::to($shirtOrder->customer_email)->send(new ShirtOrderReceived($shirtOrder, $emailPaymentUrl));
+
                 return redirect()->away($checkout->checkoutUrl);
             } catch (Throwable $exception) {
                 report($exception);
+
+                Mail::to($shirtOrder->customer_email)->send(new ShirtOrderReceived($shirtOrder));
 
                 return to_route('store.index')->withErrors([
                     'checkout' => 'O pedido foi registrado, mas não foi possível abrir o checkout. Tente novamente em instantes.',
                 ]);
             }
         }
+
+        Mail::to($shirtOrder->customer_email)->send(new ShirtOrderReceived($shirtOrder));
 
         return to_route('store.index')->with('status', 'Pedido de item avulso registrado com sucesso. O recibo foi enviado por e-mail.');
     }
@@ -82,6 +101,10 @@ class ShirtOrderController extends Controller
     {
         $settings = PaymentGatewaySetting::current();
         abort_unless($settings->hasManualPix() && $shirtOrder->participant_registration_id === null, 404);
+
+        if ($shirtOrder->payment_status !== 'pending') {
+            return $this->paymentStatusView($shirtOrder);
+        }
 
         $eventSettings = EventSetting::current();
         $payload = $pixPayload->generate(
@@ -111,6 +134,14 @@ class ShirtOrderController extends Controller
             404,
         );
 
+        if ($shirtOrder->payment_status !== 'pending') {
+            return redirect()->to(URL::temporarySignedRoute(
+                'store.payment.show',
+                now()->addMinutes(30),
+                ['shirtOrder' => $shirtOrder],
+            ));
+        }
+
         $path = $request->file('pix_receipt')->store('pix-receipts/shirt-orders', 'local');
 
         $shirtOrder->update([
@@ -123,6 +154,40 @@ class ShirtOrderController extends Controller
 
         return to_route('store.index')
             ->with('status', 'Comprovante enviado. O pagamento do pedido está em análise.');
+    }
+
+    public function showPayment(ShirtOrder $shirtOrder): View|RedirectResponse
+    {
+        abort_if($shirtOrder->participant_registration_id !== null, 404);
+
+        if ($shirtOrder->payment_status !== 'pending') {
+            return $this->paymentStatusView($shirtOrder);
+        }
+
+        if (filled($shirtOrder->payment_checkout_url)) {
+            return redirect()->away($shirtOrder->payment_checkout_url);
+        }
+
+        if (PaymentGatewaySetting::current()->hasManualPix()) {
+            return redirect()->to(URL::temporarySignedRoute(
+                'store.pix.show',
+                now()->addMinutes(30),
+                ['shirtOrder' => $shirtOrder],
+            ));
+        }
+
+        return $this->paymentStatusView($shirtOrder);
+    }
+
+    private function paymentStatusView(ShirtOrder $shirtOrder): View
+    {
+        return view('payment-status', [
+            'title' => 'Status do pedido',
+            'reference' => (string) $shirtOrder->id,
+            'paymentStatus' => ShirtOrder::paymentStatusOptions()[$shirtOrder->payment_status] ?? 'Pendente',
+            'backUrl' => route('store.index'),
+            'backLabel' => 'Voltar para a loja',
+        ]);
     }
 
     public function paymentReturn(string $status): RedirectResponse

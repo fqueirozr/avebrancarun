@@ -40,6 +40,12 @@ Recebemos sua inscrição para a **Ave Branca Run**. Agora ela está em análise
 
 Este e-mail serve como recibo da inscrição e dos itens acima. A confirmação final será enviada assim que o pagamento for definido. Por segurança, dados pessoais e informações de saúde não são exibidos neste e-mail.
 
+@if ($paymentUrl)
+<x-mail::button :url="$paymentUrl" color="success">
+Realizar pagamento
+</x-mail::button>
+@endif
+
 <x-mail::button :url="URL::signedRoute('athlete.show', ['registration' => $registration])">
 Ver minha inscrição
 </x-mail::button>

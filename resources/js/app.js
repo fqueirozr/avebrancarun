@@ -6,6 +6,24 @@ const maskCpf = (value) => onlyDigits(value)
     .replace(/(\d{3})(\d)/, '$1.$2')
     .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
 
+const isValidCpf = (value) => {
+    const cpf = onlyDigits(value);
+
+    if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) {
+        return false;
+    }
+
+    return [9, 10].every((digitIndex) => {
+        const sum = cpf
+            .slice(0, digitIndex)
+            .split('')
+            .reduce((total, digit, position) => total + Number(digit) * ((digitIndex + 1) - position), 0);
+        const expectedDigit = ((10 * sum) % 11) % 10;
+
+        return Number(cpf[digitIndex]) === expectedDigit;
+    });
+};
+
 const maskCpfCnpj = (value) => {
     const digits = onlyDigits(value).slice(0, 14);
 
@@ -52,6 +70,28 @@ document.querySelectorAll('[data-mask]').forEach((input) => {
 
     input.addEventListener('input', applyMask);
     applyMask();
+});
+
+document.querySelectorAll('[data-validate-cpf]').forEach((input) => {
+    const feedback = input.parentElement?.querySelector('[data-cpf-feedback]');
+
+    const validateCpf = () => {
+        const cpf = onlyDigits(input.value);
+        const cpfIsComplete = cpf.length === 11;
+        const cpfIsValid = cpfIsComplete && isValidCpf(cpf);
+        const message = cpfIsComplete && ! cpfIsValid ? 'Informe um CPF válido.' : '';
+
+        input.setCustomValidity(message);
+        input.setAttribute('aria-invalid', message ? 'true' : 'false');
+
+        if (feedback) {
+            feedback.textContent = message;
+            feedback.hidden = ! message;
+        }
+    };
+
+    input.addEventListener('input', validateCpf);
+    validateCpf();
 });
 
 document.querySelectorAll('[data-max-file-size]').forEach((input) => {

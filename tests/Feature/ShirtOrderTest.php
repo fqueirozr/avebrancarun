@@ -151,6 +151,26 @@ it('renders the standalone shirt payment update email', function () {
     $mail->assertSeeInHtml('Pago');
 });
 
+it('renders the payment link in the standalone shirt order receipt', function () {
+    $shirtOrder = ShirtOrder::factory()->create([
+        'shirt_id' => Shirt::factory(['name' => 'Camiseta Oficial']),
+        'customer_name' => 'Maria Silva',
+        'customer_email' => 'maria@example.com',
+        'customer_phone' => '11999999999',
+        'size' => 'M',
+        'sizes' => ['M'],
+        'quantity' => 1,
+        'unit_price' => 35,
+        'total_price' => 35,
+    ]);
+    $paymentUrl = 'https://checkout.example/shirt_123';
+
+    $mail = new ShirtOrderReceived($shirtOrder->load('shirt'), $paymentUrl);
+
+    $mail->assertSeeInHtml('Realizar pagamento');
+    $mail->assertSeeInHtml($paymentUrl, false);
+});
+
 it('shows the linked registration payment receipt in the shirt form', function () {
     config(['app.env' => 'local']);
     Storage::fake('local');
@@ -276,6 +296,95 @@ it('redirects a standalone order to the active payment gateway checkout', functi
     expect($shirtOrder->payment_gateway)->toBe('fake')
         ->and($shirtOrder->payment_gateway_reference)->toBe('shirt_checkout_123')
         ->and($shirtOrder->payment_checkout_url)->toBe('https://checkout.example/shirt_checkout_123');
+
+    Mail::assertSent(ShirtOrderReceived::class, function (ShirtOrderReceived $mail): bool {
+        return str_contains($mail->paymentUrl ?? '', "/loja/pedido/{$mail->shirtOrder->id}/pagamento");
+    });
+});
+
+it('redirects the store payment link to checkout while payment is pending', function () {
+    $shirtOrder = ShirtOrder::factory()->create([
+        'shirt_id' => Shirt::factory(),
+        'customer_name' => 'Maria Silva',
+        'customer_email' => 'maria@example.com',
+        'customer_phone' => '11999999999',
+        'size' => 'M',
+        'sizes' => ['M'],
+        'quantity' => 1,
+        'unit_price' => 35,
+        'total_price' => 35,
+        'payment_status' => 'pending',
+        'payment_checkout_url' => 'https://checkout.example/shirt_checkout_123',
+    ]);
+
+    $this->get(URL::temporarySignedRoute(
+        'store.payment.show',
+        now()->addHour(),
+        ['shirtOrder' => $shirtOrder],
+    ))->assertRedirect('https://checkout.example/shirt_checkout_123');
+});
+
+it('only shows the current store payment status when it is not pending', function (string $status, string $statusLabel) {
+    $shirtOrder = ShirtOrder::factory()->create([
+        'shirt_id' => Shirt::factory(),
+        'customer_name' => 'Maria Silva',
+        'customer_email' => 'maria@example.com',
+        'customer_phone' => '11999999999',
+        'size' => 'M',
+        'sizes' => ['M'],
+        'quantity' => 1,
+        'unit_price' => 35,
+        'total_price' => 35,
+        'payment_status' => $status,
+        'payment_checkout_url' => 'https://checkout.example/shirt_checkout_123',
+    ]);
+
+    $this->get(URL::temporarySignedRoute(
+        'store.payment.show',
+        now()->addHour(),
+        ['shirtOrder' => $shirtOrder],
+    ))
+        ->assertSuccessful()
+        ->assertSee('Status do pedido')
+        ->assertSee($statusLabel)
+        ->assertDontSee('https://checkout.example/shirt_checkout_123')
+        ->assertDontSee('Chave Pix')
+        ->assertDontSee('Enviar comprovante');
+})->with([
+    'under review' => ['under_review', 'Em análise'],
+    'paid' => ['paid', 'Pago'],
+    'cancelled' => ['cancelled', 'Cancelado'],
+]);
+
+it('hides store pix data when payment is no longer pending', function () {
+    PaymentGatewaySetting::factory()->create([
+        'manual_pix_enabled' => true,
+        'pix_key' => 'financeiro@example.com',
+    ]);
+    $shirtOrder = ShirtOrder::factory()->create([
+        'shirt_id' => Shirt::factory(),
+        'customer_name' => 'Maria Silva',
+        'customer_email' => 'maria@example.com',
+        'customer_phone' => '11999999999',
+        'size' => 'M',
+        'sizes' => ['M'],
+        'quantity' => 1,
+        'unit_price' => 35,
+        'total_price' => 35,
+        'payment_status' => 'paid',
+        'participant_registration_id' => null,
+    ]);
+
+    $this->get(URL::temporarySignedRoute(
+        'store.pix.show',
+        now()->addHour(),
+        ['shirtOrder' => $shirtOrder],
+    ))
+        ->assertSuccessful()
+        ->assertSee('Pago')
+        ->assertDontSee('financeiro@example.com')
+        ->assertDontSee('Pix copia e cola')
+        ->assertDontSee('Enviar comprovante');
 });
 
 it('stores a manual pix receipt for a standalone order', function () {
@@ -348,6 +457,20 @@ it('requires cpf and every shirt size for a standalone store order', function ()
         'customer_phone' => '11999999999',
         'quantity' => 1,
     ])->assertSessionHasErrors(['customer_cpf', 'sizes']);
+});
+
+it('rejects an invalid cpf for a standalone store order', function () {
+    $shirt = Shirt::factory()->create();
+
+    $this->post(route('store.store'), [
+        'shirt_id' => $shirt->id,
+        'customer_name' => 'Maria Silva',
+        'customer_cpf' => '111.111.111-11',
+        'customer_email' => 'maria@example.com',
+        'customer_phone' => '11999999999',
+        'sizes' => ['M'],
+        'quantity' => 1,
+    ])->assertSessionHasErrors('customer_cpf');
 });
 
 it('requires one size for each standalone shirt', function () {

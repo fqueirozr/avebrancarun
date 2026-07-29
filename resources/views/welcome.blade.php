@@ -15,7 +15,7 @@
     </head>
     <body class="bg-race-mist text-zinc-950 antialiased">
         <header class="absolute inset-x-0 top-0 z-30">
-            <nav class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-5 sm:px-8" aria-label="Navegação principal">
+            <nav class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-5 py-5 sm:px-8 md:flex-nowrap" aria-label="Navegação principal">
                 <a href="{{ route('home') }}" class="flex min-w-0 items-center gap-3">
                     <img
                         src="{{ asset('images/ave-branca-run-logo.png') }}"
@@ -24,12 +24,12 @@
                     >
                 </a>
 
-                <div class="hidden items-center gap-1 rounded-md border border-white/15 bg-race-night/35 p-1 text-sm font-bold text-white/80 shadow-lg shadow-race-night/20 backdrop-blur-xl md:flex">
-                    <a href="#provas" class="rounded-md px-4 py-2 transition hover:bg-white/10 hover:text-white">Provas</a>
-                    <a href="#programacao" class="rounded-md px-4 py-2 transition hover:bg-white/10 hover:text-white">Evento</a>
-                    <a href="{{ route('store.index') }}" class="rounded-md px-4 py-2 transition hover:bg-white/10 hover:text-white">Loja</a>
-                    <a href="{{ route('faq') }}" class="rounded-md px-4 py-2 transition hover:bg-white/10 hover:text-white">FAQ</a>
-                    <a href="#contato" class="rounded-md px-4 py-2 transition hover:bg-white/10 hover:text-white">Contato</a>
+                <div class="order-3 flex w-full items-center gap-1 overflow-x-auto rounded-md border border-white/15 bg-race-night/35 p-1 text-sm font-bold text-white/80 shadow-lg shadow-race-night/20 backdrop-blur-xl md:order-none md:w-auto">
+                    <a href="#provas" class="shrink-0 rounded-md px-4 py-2 transition hover:bg-white/10 hover:text-white">Provas</a>
+                    <a href="#programacao" class="shrink-0 rounded-md px-4 py-2 transition hover:bg-white/10 hover:text-white">Evento</a>
+                    <a href="{{ route('store.index') }}" class="shrink-0 rounded-md px-4 py-2 transition hover:bg-white/10 hover:text-white">Loja</a>
+                    <a href="{{ route('faq') }}" class="shrink-0 rounded-md px-4 py-2 transition hover:bg-white/10 hover:text-white">FAQ</a>
+                    <a href="#contato" class="shrink-0 rounded-md px-4 py-2 transition hover:bg-white/10 hover:text-white">Contato</a>
                 </div>
 
                 <a href="{{ route('registration') }}" class="shrink-0 rounded-md bg-race-cyan px-4 py-2.5 text-sm font-black text-race-night shadow-lg shadow-race-night/20 transition hover:-translate-y-0.5 hover:bg-race-ice focus:outline-none focus:ring-3 focus:ring-race-cyan/40">
@@ -384,14 +384,23 @@
                                 ['name' => 'Educação Adventista', 'url' => 'https://www.educacaoadventista.org.br/', 'logo' => 'images/supporters/educacao-adventista.png', 'logoClass' => 'max-h-20 max-w-[10rem]'],
                                 ['name' => 'Clube de Desbravadores', 'url' => 'https://www.adventistas.org/pt/desbravadores/', 'logo' => 'images/supporters/desbravadores.webp', 'logoClass' => 'max-h-28 max-w-[8rem]'],
                                 ['name' => 'T7', 'url' => 'https://t7.org.br/', 'logo' => 'images/supporters/t7.png', 'logoClass' => 'max-h-16 max-w-[11rem]'],
+                                ['name' => 'Tornado Atletismo-DF', 'url' => null, 'logo' => 'images/supporters/tornado-atletismo-df.jpg', 'logoClass' => 'max-h-32 max-w-[10rem]'],
+                                ['name' => 'LACH Locação e Eventos', 'url' => null, 'logo' => 'images/supporters/lach-locacao-eventos.jpeg', 'logoClass' => 'max-h-32 max-w-[11rem]'],
                             ];
                         @endphp
 
                         @foreach ($supporters as $supporter)
-                            <a href="{{ $supporter['url'] }}" target="_blank" rel="noopener noreferrer" aria-label="Visitar o site de {{ $supporter['name'] }}" class="group race-panel flex min-h-44 flex-col items-center justify-center gap-4 p-5 text-center transition hover:-translate-y-1 hover:border-race-cyan/60 hover:shadow-xl hover:shadow-race-night/10 focus:outline-none focus:ring-3 focus:ring-race-cyan/35 reveal-on-scroll" data-reveal>
-                                <img src="{{ asset($supporter['logo']) }}" alt="Logo {{ $supporter['name'] }}" class="h-auto w-auto object-contain transition duration-300 group-hover:scale-105 {{ $supporter['logoClass'] }}">
-                                <span class="text-sm font-black leading-5 text-race-night">{{ $supporter['name'] }}</span>
-                            </a>
+                            @if ($supporter['url'])
+                                <a href="{{ $supporter['url'] }}" target="_blank" rel="noopener noreferrer" aria-label="Visitar o site de {{ $supporter['name'] }}" class="group race-panel flex min-h-44 flex-col items-center justify-center gap-4 p-5 text-center transition hover:-translate-y-1 hover:border-race-cyan/60 hover:shadow-xl hover:shadow-race-night/10 focus:outline-none focus:ring-3 focus:ring-race-cyan/35 reveal-on-scroll" data-reveal>
+                                    <img src="{{ asset($supporter['logo']) }}" alt="Logo {{ $supporter['name'] }}" class="h-auto w-auto object-contain transition duration-300 group-hover:scale-105 {{ $supporter['logoClass'] }}">
+                                    <span class="text-sm font-black leading-5 text-race-night">{{ $supporter['name'] }}</span>
+                                </a>
+                            @else
+                                <div class="race-panel flex min-h-44 flex-col items-center justify-center gap-4 p-5 text-center reveal-on-scroll" data-reveal>
+                                    <img src="{{ asset($supporter['logo']) }}" alt="Logo {{ $supporter['name'] }}" class="h-auto w-auto object-contain {{ $supporter['logoClass'] }}">
+                                    <span class="text-sm font-black leading-5 text-race-night">{{ $supporter['name'] }}</span>
+                                </div>
+                            @endif
                         @endforeach
                     </div>
                 </div>

@@ -19,7 +19,10 @@ class ShirtOrderReceived extends Mailable
      */
     public $theme = 'ave-branca';
 
-    public function __construct(public ShirtOrder $shirtOrder) {}
+    public function __construct(
+        public ShirtOrder $shirtOrder,
+        public ?string $paymentUrl = null,
+    ) {}
 
     /**
      * Get the message envelope.

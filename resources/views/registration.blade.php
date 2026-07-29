@@ -134,7 +134,8 @@
 
                             <label class="grid min-w-0 gap-2">
                                 <span class="text-sm font-bold leading-5 text-zinc-800">CPF do atleta</span>
-                                <input type="text" name="participant_cpf" value="{{ old('participant_cpf') }}" inputmode="numeric" data-mask="cpf" class="min-w-0 rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-race-cyan focus:ring-3 focus:ring-amber-100" placeholder="000.000.000-00" required>
+                                <input type="text" name="participant_cpf" value="{{ old('participant_cpf') }}" inputmode="numeric" data-mask="cpf" data-validate-cpf aria-describedby="participant-cpf-feedback" class="min-w-0 rounded-md border border-zinc-300 px-4 py-3 text-base outline-none transition focus:border-race-cyan focus:ring-3 focus:ring-amber-100" placeholder="000.000.000-00" required>
+                                <span id="participant-cpf-feedback" data-cpf-feedback class="text-sm font-semibold text-red-700" hidden></span>
                                 @error('participant_cpf')
                                     <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
                                 @enderror

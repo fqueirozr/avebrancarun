@@ -37,6 +37,8 @@ test('race landing page is available', function () {
     $this->get('/')
         ->assertSuccessful()
         ->assertSeeText('Ave Branca Run')
+        ->assertSee('class="order-3 flex w-full', false)
+        ->assertDontSee('hidden items-center gap-1', false)
         ->assertSeeText('12/10/2026')
         ->assertSeeText('Parque Municipal')
         ->assertSeeText('Camiseta, número de peito e medalha')
@@ -66,6 +68,10 @@ test('race landing page is available', function () {
         ->assertSeeText('Pagamento rápido e seguro para concluir sua inscrição.')
         ->assertDontSeeText('Crédito/PIX')
         ->assertDontSeeText('Asaas')
+        ->assertSeeText('Tornado Atletismo-DF')
+        ->assertSee('src="'.asset('images/supporters/tornado-atletismo-df.jpg').'"', false)
+        ->assertSeeText('LACH Locação e Eventos')
+        ->assertSee('src="'.asset('images/supporters/lach-locacao-eventos.jpeg').'"', false)
         ->assertSeeText('Responsável: Instituto Esportivo Ave Branca — CNPJ 12.345.678/0001-95');
 });
 

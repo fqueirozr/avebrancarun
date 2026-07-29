@@ -160,13 +160,20 @@ class ParticipantRegistrationController extends Controller
         $registration->load('kit', 'shirtOrders.shirt');
 
         if ((float) $kit->price > 0 && PaymentGatewaySetting::current()->hasManualPix()) {
-            Mail::to($registration->email)->send(new ParticipantRegistrationReceived($registration));
-
-            return redirect()->to(URL::temporarySignedRoute(
+            $paymentUrl = URL::temporarySignedRoute(
                 'registration.pix.show',
                 now()->addDays(7),
                 ['registration' => $registration],
-            ));
+            );
+            $emailPaymentUrl = URL::temporarySignedRoute(
+                'registration.payment.show',
+                now()->addDays(7),
+                ['registration' => $registration],
+            );
+
+            Mail::to($registration->email)->send(new ParticipantRegistrationReceived($registration, $emailPaymentUrl));
+
+            return redirect()->to($paymentUrl);
         }
 
         if ($this->shouldCreateCheckout($kit)) {
@@ -186,7 +193,13 @@ class ParticipantRegistrationController extends Controller
                     'payment_checkout_url' => $checkout->checkoutUrl,
                 ]);
 
-                Mail::to($registration->email)->send(new ParticipantRegistrationReceived($registration));
+                $emailPaymentUrl = URL::temporarySignedRoute(
+                    'registration.payment.show',
+                    now()->addDays(7),
+                    ['registration' => $registration],
+                );
+
+                Mail::to($registration->email)->send(new ParticipantRegistrationReceived($registration, $emailPaymentUrl));
 
                 return redirect()->away($checkout->checkoutUrl);
             } catch (Throwable $exception) {
@@ -225,6 +238,10 @@ class ParticipantRegistrationController extends Controller
         $settings = PaymentGatewaySetting::current();
         abort_unless($settings->hasManualPix(), 404);
 
+        if ($registration->payment_status !== 'pending') {
+            return $this->paymentStatusView($registration);
+        }
+
         $registration->loadMissing('kit');
         abort_if($registration->kit === null, 404);
 
@@ -255,6 +272,14 @@ class ParticipantRegistrationController extends Controller
     {
         abort_unless(PaymentGatewaySetting::current()->hasManualPix(), 404);
 
+        if ($registration->payment_status !== 'pending') {
+            return redirect()->to(URL::temporarySignedRoute(
+                'registration.payment.show',
+                now()->addMinutes(30),
+                ['registration' => $registration],
+            ));
+        }
+
         $path = $request->file('pix_receipt')->store('pix-receipts', 'local');
 
         $registration->update([
@@ -271,6 +296,42 @@ class ParticipantRegistrationController extends Controller
             now()->addDays(7),
             ['registration' => $registration],
         ))->with('status', 'Comprovante enviado. Sua inscrição está em análise.');
+    }
+
+    public function showPayment(ParticipantRegistration $registration): View|RedirectResponse
+    {
+        if ($registration->payment_status !== 'pending') {
+            return $this->paymentStatusView($registration);
+        }
+
+        if (filled($registration->payment_checkout_url)) {
+            return redirect()->away($registration->payment_checkout_url);
+        }
+
+        if (PaymentGatewaySetting::current()->hasManualPix()) {
+            return redirect()->to(URL::temporarySignedRoute(
+                'registration.pix.show',
+                now()->addMinutes(30),
+                ['registration' => $registration],
+            ));
+        }
+
+        return $this->paymentStatusView($registration);
+    }
+
+    private function paymentStatusView(ParticipantRegistration $registration): View
+    {
+        return view('payment-status', [
+            'title' => 'Status da inscrição',
+            'reference' => $registration->protocol_number,
+            'paymentStatus' => $registration->paymentStatusLabel(),
+            'backUrl' => URL::temporarySignedRoute(
+                'athlete.show',
+                now()->addDays(7),
+                ['registration' => $registration],
+            ),
+            'backLabel' => 'Ver minha inscrição',
+        ]);
     }
 
     public function paymentSuccess(ParticipantRegistration $registration): RedirectResponse
