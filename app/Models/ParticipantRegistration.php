@@ -61,7 +61,6 @@ use Illuminate\Support\Carbon;
     'payment_checkout_url',
     'pix_receipt_path',
     'pix_receipt_submitted_at',
-    'payment_reminder_sent_at',
 ])]
 class ParticipantRegistration extends Model
 {
@@ -301,7 +300,6 @@ class ParticipantRegistration extends Model
             'sex_rank' => 'integer',
             'category_rank' => 'integer',
             'pix_receipt_submitted_at' => 'datetime',
-            'payment_reminder_sent_at' => 'datetime',
         ];
     }
 }
