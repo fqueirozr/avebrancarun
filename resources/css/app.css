@@ -171,6 +171,156 @@
     .event-rich-content--modal table {
         @apply text-base;
     }
+
+    .premium-registration {
+        background-color: #f4f8fc;
+        background-image:
+            radial-gradient(circle at 8% 8%, rgb(245 181 27 / 14%), transparent 24rem),
+            radial-gradient(circle at 92% 18%, rgb(7 89 165 / 12%), transparent 30rem),
+            linear-gradient(145deg, #f8fbff 0%, #eef5fb 52%, #f9fafb 100%);
+    }
+
+    .premium-registration > header {
+        box-shadow:
+            0 1px 0 rgb(255 255 255 / 8%) inset,
+            0 18px 50px rgb(2 7 18 / 20%);
+    }
+
+    .premium-registration main > aside > div:first-child {
+        position: relative;
+        isolation: isolate;
+        box-shadow:
+            0 30px 80px rgb(2 7 18 / 24%),
+            0 0 0 1px rgb(245 181 27 / 10%);
+    }
+
+    .premium-registration main > aside > div:first-child::after {
+        position: absolute;
+        inset: 0;
+        z-index: -1;
+        border-radius: inherit;
+        background: linear-gradient(135deg, rgb(245 181 27 / 16%), transparent 42%);
+        content: '';
+        pointer-events: none;
+    }
+
+    .premium-registration main > section {
+        border-color: rgb(255 255 255 / 92%);
+        background:
+            linear-gradient(rgb(255 255 255 / 96%), rgb(255 255 255 / 96%)) padding-box,
+            linear-gradient(135deg, rgb(245 181 27 / 55%), rgb(7 89 165 / 25%), transparent 70%) border-box;
+        box-shadow:
+            0 35px 90px rgb(7 24 45 / 12%),
+            0 1px 0 rgb(255 255 255) inset;
+    }
+
+    .premium-registration [data-registration-progress] {
+        border-color: rgb(245 181 27 / 30%);
+        background: rgb(255 255 255 / 88%);
+        box-shadow:
+            0 18px 45px rgb(7 24 45 / 13%),
+            0 1px 0 rgb(255 255 255) inset;
+    }
+
+    .premium-registration [data-registration-step] {
+        position: relative;
+        border-color: rgb(7 89 165 / 12%);
+        background: linear-gradient(145deg, #fff 0%, #fff 72%, rgb(238 247 255 / 55%) 100%);
+        box-shadow:
+            0 18px 45px rgb(7 24 45 / 7%),
+            0 1px 0 rgb(255 255 255) inset;
+        transition:
+            border-color 250ms ease,
+            box-shadow 250ms ease,
+            transform 250ms ease;
+    }
+
+    .premium-registration [data-registration-step]:focus-within {
+        border-color: rgb(245 181 27 / 48%);
+        box-shadow:
+            0 24px 55px rgb(7 24 45 / 11%),
+            0 0 0 4px rgb(245 181 27 / 8%);
+    }
+
+    .premium-registration [data-registration-step] > legend {
+        border: 1px solid rgb(245 181 27 / 24%);
+        background: linear-gradient(135deg, #020712, #0b2745);
+        box-shadow:
+            0 8px 20px rgb(2 7 18 / 20%),
+            0 1px 0 rgb(255 255 255 / 12%) inset;
+        letter-spacing: 0.015em;
+    }
+
+    .premium-registration [data-registration-step] input:not([type='radio']):not([type='checkbox']),
+    .premium-registration [data-registration-step] select,
+    .premium-registration [data-registration-step] textarea {
+        min-height: 3.25rem;
+        border-color: rgb(161 161 170 / 52%);
+        background-color: rgb(255 255 255 / 92%);
+        box-shadow:
+            0 1px 2px rgb(2 7 18 / 4%),
+            0 1px 0 rgb(255 255 255) inset;
+    }
+
+    .premium-registration [data-registration-step] input:not([type='radio']):not([type='checkbox']):hover,
+    .premium-registration [data-registration-step] select:hover,
+    .premium-registration [data-registration-step] textarea:hover {
+        border-color: rgb(7 89 165 / 42%);
+    }
+
+    .premium-registration [data-registration-step] input:not([type='radio']):not([type='checkbox']):focus,
+    .premium-registration [data-registration-step] select:focus,
+    .premium-registration [data-registration-step] textarea:focus {
+        border-color: #f5b51b;
+        box-shadow:
+            0 0 0 4px rgb(245 181 27 / 14%),
+            0 8px 22px rgb(7 24 45 / 8%);
+    }
+
+    .premium-registration [data-registration-step] label:has(> input[type='radio']),
+    .premium-registration [data-registration-step] label:has(input[type='checkbox']) {
+        cursor: pointer;
+    }
+
+    .premium-registration [data-registration-step] label:has(> input[type='radio']):hover,
+    .premium-registration [data-package-option]:hover {
+        border-color: rgb(245 181 27 / 55%);
+        box-shadow: 0 12px 28px rgb(7 24 45 / 8%);
+        transform: translateY(-1px);
+    }
+
+    .premium-registration [data-registration-step] label:has(> input[type='radio']:checked),
+    .premium-registration [data-package-option]:has(input[type='radio']:checked) {
+        border-color: rgb(245 181 27 / 85%);
+        background: linear-gradient(135deg, rgb(255 251 235), rgb(255 255 255));
+        box-shadow:
+            0 14px 35px rgb(7 24 45 / 9%),
+            0 0 0 3px rgb(245 181 27 / 10%);
+    }
+
+    .premium-registration button[type='submit'] {
+        position: relative;
+        overflow: hidden;
+        box-shadow:
+            0 18px 38px rgb(7 89 165 / 24%),
+            0 1px 0 rgb(255 255 255 / 24%) inset;
+    }
+
+    .premium-registration button[type='submit']::after {
+        position: absolute;
+        top: -50%;
+        left: -35%;
+        width: 24%;
+        height: 200%;
+        background: linear-gradient(90deg, transparent, rgb(255 255 255 / 35%), transparent);
+        content: '';
+        transform: rotate(18deg);
+        transition: left 550ms ease;
+    }
+
+    .premium-registration button[type='submit']:hover::after {
+        left: 115%;
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -183,5 +333,10 @@
 
     .reveal-on-scroll {
         opacity: 1;
+    }
+
+    .premium-registration [data-registration-step],
+    .premium-registration button[type='submit']::after {
+        transition: none;
     }
 }

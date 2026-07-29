@@ -23,15 +23,17 @@ class CreateShirtOrder
             $shirt->decrement('stock_quantity', $data['quantity']);
         }
 
-        $unitPrice = $registration === null ? (float) $shirt->price : $shirt->priceForRegistration();
+        $baseUnitPrice = $registration === null ? (float) $shirt->price : $shirt->priceForRegistration();
+        $totalPrice = collect($sizes)
+            ->sum(fn (string $size): float => $baseUnitPrice + $shirt->surchargeForSize($size));
 
         return $shirt->orders()->create([
             ...$data,
             'size' => $sizes[0],
             'sizes' => $sizes,
             'participant_registration_id' => $registration?->id,
-            'unit_price' => $unitPrice,
-            'total_price' => $unitPrice * $data['quantity'],
+            'unit_price' => $baseUnitPrice,
+            'total_price' => $totalPrice,
             'payment_status' => $registration?->payment_status ?? 'pending',
         ]);
     }

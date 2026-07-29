@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['name', 'description', 'photo_path', 'price', 'registration_price', 'stock_quantity', 'is_active'])]
+#[Fillable(['name', 'description', 'photo_path', 'price', 'registration_price', 'size_2xl_surcharge', 'size_3xl_surcharge', 'stock_quantity', 'is_active'])]
 class Shirt extends Model
 {
     /** @use HasFactory<ShirtFactory> */
@@ -24,11 +24,22 @@ class Shirt extends Model
         return (float) ($this->registration_price ?? $this->price);
     }
 
+    public function surchargeForSize(string $size): float
+    {
+        return match ($size) {
+            '2XG' => (float) $this->size_2xl_surcharge,
+            '3XG' => (float) $this->size_3xl_surcharge,
+            default => 0.0,
+        };
+    }
+
     protected function casts(): array
     {
         return [
             'price' => 'decimal:2',
             'registration_price' => 'decimal:2',
+            'size_2xl_surcharge' => 'decimal:2',
+            'size_3xl_surcharge' => 'decimal:2',
             'stock_quantity' => 'integer',
             'is_active' => 'boolean',
         ];

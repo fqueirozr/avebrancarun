@@ -61,6 +61,7 @@ use Illuminate\Support\Carbon;
     'payment_checkout_url',
     'pix_receipt_path',
     'pix_receipt_submitted_at',
+    'payment_reminder_sent_at',
 ])]
 class ParticipantRegistration extends Model
 {
@@ -152,8 +153,8 @@ class ParticipantRegistration extends Model
     public static function shirtSizeOptions(): array
     {
         return array_combine(
-            ['6', '8', '10', '12', '14', 'PP', 'P', 'M', 'G', 'GG', 'XG'],
-            ['6', '8', '10', '12', '14', 'PP', 'P', 'M', 'G', 'GG', 'XG'],
+            ['6', '8', '10', '12', '14', 'PP', 'P', 'M', 'G', 'GG', 'XG', '2XG', '3XG'],
+            ['6', '8', '10', '12', '14', 'PP', 'P', 'M', 'G', 'GG', 'XG', '2XG', '3XG'],
         );
     }
 
@@ -228,7 +229,9 @@ class ParticipantRegistration extends Model
 
     public function priceFor(Kit $kit): float
     {
-        return (float) $kit->price + (float) $this->shirtOrders()->sum('total_price');
+        return (float) $kit->price
+            + ($kit->has_shirt ? $kit->surchargeForSize($this->shirt_size) : 0)
+            + (float) $this->shirtOrders()->sum('total_price');
     }
 
     public static function generateUniqueBibNumber(): string
@@ -298,6 +301,7 @@ class ParticipantRegistration extends Model
             'sex_rank' => 'integer',
             'category_rank' => 'integer',
             'pix_receipt_submitted_at' => 'datetime',
+            'payment_reminder_sent_at' => 'datetime',
         ];
     }
 }

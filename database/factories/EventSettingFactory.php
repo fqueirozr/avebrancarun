@@ -32,6 +32,9 @@ class EventSettingFactory extends Factory
             'baggage_storage_information' => fake()->paragraph(),
             'timing_information' => 'O tempo máximo para as provas de 3 km e 6 km é de 1h30.',
             'special_registrations_information' => fake()->paragraph(),
+            'faq_items' => [
+                ['question' => 'Qual é o prazo de inscrição?', 'answer' => '<p>Consulte o prazo informado nesta página.</p>'],
+            ],
             'regulation' => '<p>Regulamento – Ave Branca Run 2026</p><p>Data: 20 de setembro de 2026, às 7h30, no Taguaparque.</p>',
         ];
     }

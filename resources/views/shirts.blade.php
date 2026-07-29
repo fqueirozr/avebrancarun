@@ -65,6 +65,12 @@
                                     @if ($shirt->description)
                                         <span class="text-sm font-semibold leading-6 text-zinc-600">{{ $shirt->description }}</span>
                                     @endif
+                                    @if ((float) $shirt->size_2xl_surcharge > 0 || (float) $shirt->size_3xl_surcharge > 0)
+                                        <span class="text-xs font-semibold text-zinc-600">
+                                            2XG: + R$ {{ number_format((float) $shirt->size_2xl_surcharge, 2, ',', '.') }}
+                                            · 3XG: + R$ {{ number_format((float) $shirt->size_3xl_surcharge, 2, ',', '.') }}
+                                        </span>
+                                    @endif
                                 </span>
                             </label>
                         @empty

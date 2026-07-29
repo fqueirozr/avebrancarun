@@ -383,6 +383,51 @@ it('uses the discounted item price when purchased with a registration', function
         ->and((float) $order->total_price)->toBe(70.0);
 });
 
+it('adds the configured surcharge for each large standalone shirt', function () {
+    $shirt = Shirt::factory()->create([
+        'price' => 35,
+        'size_2xl_surcharge' => 10,
+        'size_3xl_surcharge' => 15,
+    ]);
+
+    $order = app(CreateShirtOrder::class)->handle($shirt, [
+        'customer_name' => 'Maria Silva',
+        'customer_email' => 'maria@example.com',
+        'customer_phone' => '11999999999',
+        'sizes' => ['M', '2XG', '3XG'],
+        'quantity' => 3,
+    ]);
+
+    expect((float) $order->unit_price)->toBe(35.0)
+        ->and((float) $order->total_price)->toBe(130.0);
+});
+
+it('rejects a pix receipt larger than five megabytes', function () {
+    PaymentGatewaySetting::factory()->create([
+        'manual_pix_enabled' => true,
+        'pix_key' => 'financeiro@example.com',
+    ]);
+    $shirtOrder = ShirtOrder::factory()->create([
+        'shirt_id' => Shirt::factory(),
+        'participant_registration_id' => null,
+        'customer_name' => 'Maria Silva',
+        'customer_email' => 'maria@example.com',
+        'customer_phone' => '11999999999',
+        'size' => 'M',
+        'quantity' => 1,
+        'unit_price' => 35,
+        'total_price' => 35,
+    ]);
+    $url = URL::temporarySignedRoute('store.pix.store', now()->addHour(), ['shirtOrder' => $shirtOrder]);
+
+    $this->post($url, [
+        'billing_name' => 'Maria Silva',
+        'billing_document' => '52998224725',
+        'pix_receipt' => UploadedFile::fake()->create('comprovante.pdf', 5121, 'application/pdf'),
+        'payer_data_confirmed' => '1',
+    ])->assertSessionHasErrors('pix_receipt');
+});
+
 it('renders the standalone shirt order as a receipt', function () {
     $shirt = Shirt::factory()->create(['name' => 'Camiseta Oficial', 'price' => 35]);
     $shirtOrder = ShirtOrder::factory()->create([

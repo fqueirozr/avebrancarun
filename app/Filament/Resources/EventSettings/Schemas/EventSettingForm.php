@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\EventSettings\Schemas;
 
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
@@ -65,6 +66,26 @@ class EventSettingForm
                             ->maxLength(255),
                     ])
                     ->columns(2)
+                    ->columnSpanFull(),
+                Section::make('Perguntas frequentes')
+                    ->description('As informações importantes acima aparecem automaticamente na página. Adicione aqui outras perguntas e respostas.')
+                    ->schema([
+                        Repeater::make('faq_items')
+                            ->label('Perguntas adicionais')
+                            ->schema([
+                                TextInput::make('question')
+                                    ->label('Pergunta')
+                                    ->required()
+                                    ->maxLength(255),
+                                RichEditor::make('answer')
+                                    ->label('Resposta')
+                                    ->required(),
+                            ])
+                            ->addActionLabel('Adicionar pergunta')
+                            ->collapsible()
+                            ->cloneable()
+                            ->columnSpanFull(),
+                    ])
                     ->columnSpanFull(),
                 Section::make('Informações da prova')
                     ->schema([

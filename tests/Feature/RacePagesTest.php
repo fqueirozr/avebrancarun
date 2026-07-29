@@ -72,6 +72,7 @@ test('race landing page is available', function () {
 test('registration page is available', function () {
     EventSetting::factory()->create([
         'regulation' => '<p>Regulamento oficial da prova</p>',
+        'kit_information' => '<p>Retirada no local do evento</p>',
     ]);
 
     RaceModality::factory()->create([
@@ -86,11 +87,15 @@ test('registration page is available', function () {
         'photo_path' => 'kits/kit-corrida.jpg',
         'description' => 'Camiseta e número de peito.',
         'price' => 50,
+        'size_2xl_surcharge' => 5,
+        'size_3xl_surcharge' => 10,
         'type' => Kit::TypePcd60,
+        'rules' => '<p>Apresente documento comprobatório</p>',
     ]);
 
     $this->get('/inscricao')
         ->assertSuccessful()
+        ->assertSee('class="premium-registration', false)
         ->assertSeeText('Dados para inscrição')
         ->assertSee('data-registration-progress', false)
         ->assertSee('rounded-3xl border border-white/80', false)
@@ -101,14 +106,28 @@ test('registration page is available', function () {
         ->assertSee('data-race-date="2026-09-20"', false)
         ->assertSeeText('Informe a data de nascimento do atleta para visualizar as provas disponíveis para a idade dele.')
         ->assertSeeText('Kit Corrida')
+        ->assertSee('data-package-list', false)
+        ->assertSeeText('Selecionar')
+        ->assertSeeText('Imagem')
+        ->assertSeeText('Valor')
+        ->assertSeeText('Mais informações')
         ->assertSeeText('Camiseta e número de peito.')
         ->assertSeeText('R$ 50,00')
+        ->assertSeeText('Ver detalhes')
+        ->assertSee('data-premium-size-options', false)
+        ->assertSee('data-modal-open="registration-kit-details-', false)
+        ->assertSee('id="registration-kit-details-', false)
+        ->assertSee('alt="Foto do Kit Corrida"', false)
+        ->assertSeeText('Adicionais por tamanho')
+        ->assertSeeText('2XG + R$ 5,00; 3XG + R$ 10,00')
+        ->assertSeeText('Apresente documento comprobatório')
+        ->assertSeeText('Informações de retirada')
+        ->assertSeeText('Retirada no local do evento')
         ->assertSeeText('Pacote com desconto especial. O preço exibido já inclui o desconto.')
         ->assertSee('data-special-kit', false)
         ->assertSee('id="special-kit-rules-modal"', false)
         ->assertSeeText('Regras do pacote especial')
         ->assertSeeText('Li e estou ciente das regras deste pacote.')
-        ->assertDontSee('Foto do Kit Corrida')
         ->assertSee('data-modal-open="registration-regulation-modal"', false)
         ->assertSee('data-modal-open="registration-privacy-policy-modal"', false)
         ->assertSeeText('Regulamento oficial da prova')

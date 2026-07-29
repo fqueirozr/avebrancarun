@@ -13,6 +13,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'photo_path',
     'description',
     'price',
+    'size_2xl_surcharge',
+    'size_3xl_surcharge',
     'type',
     'rules',
     'max_quantity',
@@ -46,6 +48,15 @@ class Kit extends Model
     public function requiresRulesAcknowledgement(): bool
     {
         return $this->type !== self::TypeStandard;
+    }
+
+    public function surchargeForSize(?string $size): float
+    {
+        return match ($size) {
+            '2XG' => (float) $this->size_2xl_surcharge,
+            '3XG' => (float) $this->size_3xl_surcharge,
+            default => 0.0,
+        };
     }
 
     public function quantityLimitHasBeenReached(): bool
@@ -105,6 +116,8 @@ class Kit extends Model
     {
         return [
             'price' => 'decimal:2',
+            'size_2xl_surcharge' => 'decimal:2',
+            'size_3xl_surcharge' => 'decimal:2',
             'max_quantity' => 'integer',
             'has_shirt' => 'boolean',
             'is_active' => 'boolean',

@@ -358,20 +358,43 @@ document.querySelectorAll('[data-registration-form]').forEach((form) => {
 
             const shirtSizeField = form.querySelector('[data-shirt-size-field]');
             if (shirtSizeField) {
-                const shirtSizeSelect = shirtSizeField.querySelector('select');
+                const shirtSizeOptions = shirtSizeField.querySelectorAll('input[name="shirt_size"]');
 
                 shirtSizeField.hidden = option.dataset.hasShirt !== 'true';
-                shirtSizeSelect.disabled = shirtSizeField.hidden;
-                shirtSizeSelect.required = !shirtSizeField.hidden;
+                shirtSizeOptions.forEach((shirtSizeOption) => {
+                    shirtSizeOption.disabled = shirtSizeField.hidden;
+                    shirtSizeOption.required = !shirtSizeField.hidden;
 
-                if (shirtSizeField.hidden) {
-                    shirtSizeSelect.value = '';
-                }
+                    if (shirtSizeField.hidden) {
+                        shirtSizeOption.checked = false;
+                    }
+                });
             }
         });
     });
 
     form.querySelector('input[name="kit_id"]:checked')?.dispatchEvent(new Event('change'));
+
+    const extraShirts = form.querySelectorAll('[data-extra-shirt]');
+    const extraShirtSizes = form.querySelectorAll('[data-extra-shirt-size]');
+    const extraShirtSizeGroup = form.querySelector('[data-extra-shirt-size-group]');
+    const syncExtraShirtSize = () => {
+        const selectedExtraShirt = form.querySelector('[data-extra-shirt]:checked');
+        const hasExtraShirt = selectedExtraShirt?.value !== '';
+
+        extraShirtSizeGroup?.classList.toggle('opacity-45', !hasExtraShirt);
+        extraShirtSizes.forEach((extraShirtSize) => {
+            extraShirtSize.disabled = !hasExtraShirt;
+            extraShirtSize.required = hasExtraShirt;
+
+            if (!hasExtraShirt) {
+                extraShirtSize.checked = false;
+            }
+        });
+    };
+
+    extraShirts.forEach((extraShirt) => extraShirt.addEventListener('change', syncExtraShirtSize));
+    syncExtraShirtSize();
 
     const participantCpfInput = form.querySelector('input[name="participant_cpf"]');
     const packageOptions = Array.from(form.querySelectorAll('[data-package-option]'));

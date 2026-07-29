@@ -22,6 +22,8 @@ class KitFactory extends Factory
             'photo_path' => null,
             'description' => 'Camiseta oficial, medalha para concluintes, número de peito e chip de cronometragem quando aplicável.',
             'price' => 139.90,
+            'size_2xl_surcharge' => 0,
+            'size_3xl_surcharge' => 0,
             'type' => Kit::TypeStandard,
             'rules' => null,
             'has_shirt' => true,

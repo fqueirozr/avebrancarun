@@ -13,7 +13,7 @@
         @fonts
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="min-h-screen bg-[radial-gradient(circle_at_top_left,_#e8f5ff_0,_#f7fbff_35%,_#f8fafc_100%)] text-zinc-950 antialiased">
+    <body class="premium-registration min-h-screen bg-[radial-gradient(circle_at_top_left,_#e8f5ff_0,_#f7fbff_35%,_#f8fafc_100%)] text-zinc-950 antialiased">
         <header class="sticky top-0 z-50 border-b border-white/10 bg-race-night/95 text-white shadow-lg shadow-race-night/20 backdrop-blur">
             <nav class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-3 sm:px-8 sm:py-4" aria-label="Navegação principal">
                 <a href="{{ route('home') }}" class="flex min-w-0 items-center gap-3 rounded-md outline-none transition focus-visible:ring-3 focus-visible:ring-race-cyan/35" aria-label="Ir para a página inicial da Ave Branca Run">
@@ -304,28 +304,58 @@
 
                     <fieldset class="grid min-w-0 gap-3 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6" data-registration-step data-step-title="Pacote">
                         <legend class="rounded-full bg-race-night px-4 py-1.5 text-sm font-black text-white shadow-sm">Pacote</legend>
-                        <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
+                        <div class="grid gap-2.5" data-package-list>
                             @forelse ($kits as $kit)
-                                <label data-package-option @if ($kit->type === \App\Models\Kit::TypePathfinder) data-pathfinder-package hidden @endif class="rounded-md border border-zinc-200 text-sm transition has-checked:border-race-cyan has-checked:bg-amber-50">
-                                    <span class="flex items-start gap-3 px-4 py-3">
-                                        <input type="radio" name="kit_id" value="{{ $kit->id }}" @checked((int) old('kit_id') === $kit->id) @if ($kit->requiresRulesAcknowledgement()) data-special-kit data-kit-name="{{ $kit->name }}" @endif data-has-shirt="{{ $kit->has_shirt ? 'true' : 'false' }}" data-kit-type="{{ $kit->type }}" class="mt-1 size-4 accent-race-cyan" required>
+                                <div data-package-option @if ($kit->type === \App\Models\Kit::TypePathfinder) data-pathfinder-package hidden @endif class="grid grid-cols-[1.2fr_0.8fr] overflow-hidden rounded-xl border border-race-blue/15 bg-white text-xs shadow-sm transition sm:grid-cols-[1.15fr_0.65fr_0.75fr_0.9fr] sm:divide-x sm:divide-race-blue/10">
+                                    <label class="flex cursor-pointer items-center gap-2.5 border-b border-race-blue/10 p-3 sm:border-b-0">
+                                        <input type="radio" name="kit_id" value="{{ $kit->id }}" @checked((int) old('kit_id') === $kit->id) @if ($kit->requiresRulesAcknowledgement()) data-special-kit data-kit-name="{{ $kit->name }}" @endif data-has-shirt="{{ $kit->has_shirt ? 'true' : 'false' }}" data-kit-type="{{ $kit->type }}" class="size-4 shrink-0 accent-race-cyan" required>
                                         <span class="grid gap-1">
-                                            <span class="font-bold">{{ $kit->name }}</span>
-                                            <span class="font-black text-race-blue">R$ {{ number_format((float) $kit->price, 2, ',', '.') }}</span>
-                                            @if (in_array($kit->type, [\App\Models\Kit::TypePcd60, \App\Models\Kit::TypeSocial], true))
-                                                <span class="font-semibold text-race-blue">Pacote com desconto especial. O preço exibido já inclui o desconto.</span>
+                                            <span class="text-[0.62rem] font-black uppercase tracking-[0.14em] text-race-blue">Selecionar</span>
+                                            <span class="text-sm font-black leading-tight text-race-ink">{{ $kit->name }}</span>
+                                            @if ((float) $kit->size_2xl_surcharge > 0 || (float) $kit->size_3xl_surcharge > 0)
+                                                <span class="text-[0.65rem] font-semibold leading-tight text-zinc-500">Adicional em tamanhos especiais</span>
                                             @endif
-                                            @if ($kit->description)
-                                                <span class="line-clamp-2 text-zinc-600">{{ $kit->description }}</span>
+                                            @if (in_array($kit->type, [\App\Models\Kit::TypePcd60, \App\Models\Kit::TypeSocial], true))
+                                                <span class="text-[0.65rem] font-semibold leading-tight text-race-blue">Pacote com desconto especial. O preço exibido já inclui o desconto.</span>
                                             @endif
                                             @if ($kit->requiresRulesAcknowledgement())
                                                 <span hidden data-kit-rules-template>{{ \Filament\Forms\Components\RichEditor\RichContentRenderer::make($kit->rules ?: 'Regras em definição.') }}</span>
                                             @endif
                                         </span>
-                                    </span>
-                                </label>
+                                    </label>
+                                    <div class="grid min-h-20 overflow-hidden border-b border-l border-race-blue/10 bg-race-mist sm:min-h-20 sm:border-b-0 sm:border-l-0">
+                                        <span class="sr-only">Imagem</span>
+                                        @if ($kit->photo_path)
+                                            <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($kit->photo_path) }}" alt="Foto do {{ $kit->name }}" class="h-full max-h-24 w-full object-cover">
+                                        @else
+                                            <div class="grid place-items-center gap-1 bg-linear-to-br from-race-mist to-race-ice p-2 text-race-blue">
+                                                <svg viewBox="0 0 24 24" fill="none" class="size-7" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M20 12v8H4v-8M2 7h20v5H2zM12 7v13M12 7H7.5a2.5 2.5 0 1 1 0-5C11 2 12 7 12 7Zm0 0h4.5a2.5 2.5 0 1 0 0-5C13 2 12 7 12 7Z"/></svg>
+                                                <span class="text-[0.6rem] font-black uppercase tracking-wide">Imagem</span>
+                                            </div>
+                                        @endif
+                                    </div>
+                                    <div class="grid content-center gap-0.5 p-3">
+                                        <span class="text-[0.62rem] font-black uppercase tracking-[0.14em] text-zinc-500">Valor</span>
+                                        <span class="text-base font-black text-race-blue">R$ {{ number_format((float) $kit->price, 2, ',', '.') }}</span>
+                                        @if ((float) $kit->size_2xl_surcharge > 0 || (float) $kit->size_3xl_surcharge > 0)
+                                            <span class="text-[0.62rem] font-semibold leading-4 text-zinc-600">
+                                                2XG + R$ {{ number_format((float) $kit->size_2xl_surcharge, 2, ',', '.') }};
+                                                3XG + R$ {{ number_format((float) $kit->size_3xl_surcharge, 2, ',', '.') }}
+                                            </span>
+                                        @endif
+                                    </div>
+                                    <div class="grid content-center gap-1.5 border-l border-race-blue/10 p-3">
+                                        <span class="text-[0.62rem] font-black uppercase tracking-[0.14em] text-zinc-500">Mais informações</span>
+                                        @if ($kit->description)
+                                            <span class="line-clamp-1 text-[0.65rem] font-semibold text-zinc-600">{{ $kit->description }}</span>
+                                        @endif
+                                        <button type="button" data-modal-open="registration-kit-details-{{ $kit->id }}" class="justify-self-start rounded-lg bg-race-night px-2.5 py-1.5 text-[0.65rem] font-black text-white shadow-sm transition hover:bg-race-blue focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-race-cyan/30">
+                                            Ver detalhes
+                                        </button>
+                                    </div>
+                                </div>
                             @empty
-                                <div class="rounded-md border border-amber-200 bg-amber-50 p-4 text-sm font-semibold text-amber-950 md:col-span-2">
+                                <div class="rounded-md border border-amber-200 bg-amber-50 p-4 text-sm font-semibold text-amber-950">
                                     Nenhum pacote ativo no momento.
                                 </div>
                             @endforelse
@@ -333,48 +363,74 @@
                         @error('kit_id')
                             <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
                         @enderror
-                        <label class="grid gap-2" data-shirt-size-field hidden>
-                            <span class="flex flex-wrap items-center justify-between gap-2 text-sm font-bold text-zinc-800">
-                                Tamanho da camisa
+                        <div class="grid gap-3 rounded-xl border border-race-blue/15 bg-linear-to-br from-white to-race-ice/50 p-3 shadow-sm sm:p-4" data-shirt-size-field hidden>
+                            <span class="flex flex-wrap items-center justify-between gap-2">
+                                <span>
+                                    <span class="block text-[0.68rem] font-black uppercase tracking-[0.16em] text-race-blue">Camiseta do pacote</span>
+                                    <span class="block text-base font-black text-race-ink">Escolha o tamanho</span>
+                                </span>
                                 <button type="button" data-modal-open="shirt-size-guide-modal" class="font-black text-race-blue underline decoration-race-cyan underline-offset-3">Ver medidas</button>
                             </span>
-                            <select name="shirt_size" class="rounded-md border border-zinc-300 bg-white px-4 py-3 text-base outline-none transition focus:border-race-cyan focus:ring-3 focus:ring-amber-100" required>
-                                <option value="">Selecione o tamanho</option>
+                            <div class="grid grid-cols-3 gap-2 sm:grid-cols-5" data-premium-size-options>
                                 @foreach (\App\Models\ParticipantRegistration::shirtSizeOptions() as $value => $label)
-                                    <option value="{{ $value }}" @selected(old('shirt_size') === $value)>{{ $label }}</option>
+                                    <label class="grid min-h-10 cursor-pointer place-items-center rounded-lg border border-race-blue/15 bg-white px-2 py-1.5 text-center text-sm font-black text-race-ink shadow-sm transition has-checked:border-race-cyan has-checked:bg-amber-50 has-checked:text-race-blue has-checked:ring-2 has-checked:ring-race-cyan/15 hover:border-race-cyan">
+                                        <input type="radio" name="shirt_size" value="{{ $value }}" @checked(old('shirt_size') === $value) class="sr-only" required disabled>
+                                        <span>{{ $label }}</span>
+                                    </label>
                                 @endforeach
-                            </select>
+                            </div>
                             <span class="text-xs text-zinc-600">Usado exclusivamente para a separação e entrega do pacote.</span>
                             @error('shirt_size')
                                 <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
                             @enderror
-                        </label>
+                        </div>
                         @error('accepted_special_kit_rules')
                             <span class="text-sm font-semibold text-red-700">{{ $message }}</span>
                         @enderror
                         @if ($shirts->isNotEmpty())
-                            <div class="grid gap-3 rounded-md border border-zinc-200 bg-zinc-50 p-4">
-                                <p class="font-black text-zinc-950">Item avulso adicional (opcional)</p>
-                                <select name="shirt_id" class="rounded-md border border-zinc-300 px-4 py-3">
-                                    <option value="">Não adicionar item</option>
-                                    @foreach ($shirts as $shirt)
-                                        <option value="{{ $shirt->id }}" @selected((int) old('shirt_id') === $shirt->id)>{{ $shirt->name }} — R$ {{ number_format($shirt->priceForRegistration(), 2, ',', '.') }}</option>
-                                    @endforeach
-                                </select>
-                                <div class="grid gap-3">
-                                    <select name="extra_shirt_size" class="rounded-md border border-zinc-300 px-4 py-3">
-                                        <option value="">Tamanho</option>
-                                        @foreach (\App\Models\ParticipantRegistration::shirtSizeOptions() as $size)
-                                            <option value="{{ $size }}" @selected(old('extra_shirt_size') === $size)>{{ $size }}</option>
-                                        @endforeach
-                                    </select>
-                                    <label class="grid gap-2">
-                                        <span class="text-sm font-bold text-zinc-800">Quantidade fixa por inscrição</span>
-                                        <input type="number" name="extra_shirt_quantity" value="1" readonly class="rounded-md border border-zinc-200 bg-zinc-100 px-4 py-3 font-bold text-zinc-700" aria-readonly="true">
-                                    </label>
+                            <div class="grid gap-3 rounded-xl border border-race-blue/15 bg-linear-to-br from-race-night to-race-ink p-3 text-white shadow-lg shadow-race-night/15 sm:p-4">
+                                <div>
+                                    <p class="text-[0.68rem] font-black uppercase tracking-[0.16em] text-race-cyan">Adicional premium</p>
+                                    <p class="text-base font-black">Item avulso adicional <span class="text-xs font-semibold text-white/60">(opcional)</span></p>
                                 </div>
-                                <button type="button" data-modal-open="shirt-size-guide-modal" class="justify-self-start text-sm font-black text-race-blue underline decoration-race-cyan underline-offset-3">Consultar guia de medidas</button>
-                                <a href="{{ route('store.index') }}" class="text-sm font-bold text-race-blue underline">Ou compre separadamente na loja</a>
+                                <div class="grid gap-3 sm:grid-cols-2" data-extra-shirt-options>
+                                    <label class="flex min-h-18 cursor-pointer items-center gap-2.5 rounded-lg border border-white/15 bg-white/8 p-2.5 transition has-checked:border-race-cyan has-checked:bg-race-cyan/15 has-checked:ring-2 has-checked:ring-race-cyan/15 hover:border-race-cyan/60">
+                                        <input type="radio" name="shirt_id" value="" @checked(! old('shirt_id')) data-extra-shirt class="size-4 shrink-0 accent-race-cyan">
+                                        <span class="text-sm font-black">Não adicionar item</span>
+                                    </label>
+                                    @foreach ($shirts as $shirt)
+                                        <label class="grid min-h-18 cursor-pointer grid-cols-[auto_3.5rem_1fr] items-center gap-2.5 overflow-hidden rounded-lg border border-white/15 bg-white/8 p-2.5 transition has-checked:border-race-cyan has-checked:bg-race-cyan/15 has-checked:ring-2 has-checked:ring-race-cyan/15 hover:border-race-cyan/60">
+                                            <input type="radio" name="shirt_id" value="{{ $shirt->id }}" @checked((int) old('shirt_id') === $shirt->id) data-extra-shirt class="size-4 shrink-0 accent-race-cyan">
+                                            @if ($shirt->photo_path)
+                                                <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($shirt->photo_path) }}" alt="Foto de {{ $shirt->name }}" class="size-14 rounded-md bg-white object-cover">
+                                            @else
+                                                <span class="grid size-14 place-items-center rounded-md bg-white/10 text-race-cyan" aria-hidden="true">
+                                                    <svg viewBox="0 0 24 24" fill="none" class="size-6" stroke="currentColor" stroke-width="1.5"><path d="m8 4 4 2 4-2 4 3-2 4-2-1v10H8V10l-2 1-2-4 4-3Z"/></svg>
+                                                </span>
+                                            @endif
+                                            <span class="grid gap-1">
+                                                <span class="text-sm font-black leading-tight">{{ $shirt->name }}</span>
+                                                <span class="text-xs font-black text-race-cyan">R$ {{ number_format($shirt->priceForRegistration(), 2, ',', '.') }}</span>
+                                            </span>
+                                        </label>
+                                    @endforeach
+                                </div>
+                                <div class="grid gap-2.5 rounded-lg border border-white/10 bg-white/6 p-3" data-extra-shirt-size-group>
+                                    <div class="flex flex-wrap items-center justify-between gap-2">
+                                        <p class="font-black">Tamanho do item avulso</p>
+                                        <button type="button" data-modal-open="shirt-size-guide-modal" class="text-sm font-black text-race-cyan underline underline-offset-3">Consultar medidas</button>
+                                    </div>
+                                    <div class="grid grid-cols-3 gap-2 sm:grid-cols-5">
+                                        @foreach (\App\Models\ParticipantRegistration::shirtSizeOptions() as $size)
+                                            <label class="grid min-h-10 cursor-pointer place-items-center rounded-md border border-white/15 bg-white/8 px-2 py-1.5 text-center text-sm font-black transition has-checked:border-race-cyan has-checked:bg-race-cyan has-checked:text-race-night hover:border-race-cyan/60">
+                                                <input type="radio" name="extra_shirt_size" value="{{ $size }}" @checked(old('extra_shirt_size') === $size) data-extra-shirt-size class="sr-only" disabled>
+                                                <span>{{ $size }}</span>
+                                            </label>
+                                        @endforeach
+                                    </div>
+                                </div>
+                                <input type="hidden" name="extra_shirt_quantity" value="1">
+                                <a href="{{ route('store.index') }}" class="justify-self-start text-sm font-bold text-race-cyan underline underline-offset-3">Ou compre separadamente na loja</a>
                             </div>
                         @endif
                     </fieldset>
@@ -470,6 +526,57 @@
                 </form>
             </section>
         </main>
+
+        @foreach ($kits as $kit)
+            <dialog id="registration-kit-details-{{ $kit->id }}" aria-labelledby="registration-kit-details-title-{{ $kit->id }}" class="m-auto max-h-[92vh] w-[min(60rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-race-blue/10 bg-white p-0 text-zinc-950 shadow-2xl shadow-race-night/30 backdrop:bg-race-night/80">
+                <div class="flex items-start justify-between gap-5 bg-race-night p-5 text-white sm:p-6">
+                    <div>
+                        <p class="text-xs font-black uppercase tracking-wider text-race-cyan">Pacote do atleta</p>
+                        <h2 id="registration-kit-details-title-{{ $kit->id }}" class="mt-1 text-2xl font-black leading-tight">{{ $kit->name }}</h2>
+                    </div>
+                    <button type="button" data-modal-close class="rounded-md border border-white/20 bg-white/10 px-3 py-2 text-sm font-black transition hover:bg-white/20">Fechar</button>
+                </div>
+                <div class="max-h-[78vh] overflow-y-auto bg-race-mist p-4 sm:p-6">
+                    <div class="grid overflow-hidden rounded-xl bg-white shadow-lg lg:grid-cols-[0.9fr_1.1fr]">
+                        @if ($kit->photo_path)
+                            <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($kit->photo_path) }}" alt="Foto do {{ $kit->name }}" class="h-full max-h-[32rem] w-full bg-race-mist object-cover">
+                        @else
+                            <div class="grid min-h-64 place-items-center bg-linear-to-br from-race-mist to-race-ice text-race-blue">
+                                <svg viewBox="0 0 24 24" fill="none" class="size-20" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M20 12v8H4v-8M2 7h20v5H2zM12 7v13M12 7H7.5a2.5 2.5 0 1 1 0-5C11 2 12 7 12 7Zm0 0h4.5a2.5 2.5 0 1 0 0-5C13 2 12 7 12 7Z"/></svg>
+                            </div>
+                        @endif
+                        <div class="grid content-start gap-5 p-5 sm:p-7">
+                            <div class="flex flex-wrap items-center justify-between gap-3">
+                                <span class="rounded-full bg-race-cyan/20 px-3 py-1 text-xs font-black text-race-blue">{{ $kit->has_shirt ? 'Camiseta inclusa' : 'Sem camiseta' }}</span>
+                                <strong class="text-2xl font-black text-race-blue">R$ {{ number_format((float) $kit->price, 2, ',', '.') }}</strong>
+                            </div>
+                            <p class="font-semibold leading-7 text-zinc-700">{{ $kit->description ?: 'Tudo o que você precisa para viver a experiência da prova.' }}</p>
+                            @if ((float) $kit->size_2xl_surcharge > 0 || (float) $kit->size_3xl_surcharge > 0)
+                                <div>
+                                    <p class="mb-2 text-sm font-black uppercase tracking-wide text-race-blue">Adicionais por tamanho</p>
+                                    <p class="text-sm font-semibold leading-6 text-zinc-700">
+                                        2XG + R$ {{ number_format((float) $kit->size_2xl_surcharge, 2, ',', '.') }};
+                                        3XG + R$ {{ number_format((float) $kit->size_3xl_surcharge, 2, ',', '.') }}
+                                    </p>
+                                </div>
+                            @endif
+                            @if ($kit->rules)
+                                <div>
+                                    <p class="mb-2 text-sm font-black uppercase tracking-wide text-race-blue">Regras do pacote</p>
+                                    <div class="event-rich-content text-sm leading-6">{{ \Filament\Forms\Components\RichEditor\RichContentRenderer::make($kit->rules) }}</div>
+                                </div>
+                            @endif
+                            @if ($eventSetting->kit_information)
+                                <div>
+                                    <p class="mb-2 text-sm font-black uppercase tracking-wide text-race-blue">Informações de retirada</p>
+                                    <div class="event-rich-content text-sm leading-6">{{ \Filament\Forms\Components\RichEditor\RichContentRenderer::make($eventSetting->kit_information) }}</div>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            </dialog>
+        @endforeach
 
         <dialog id="special-kit-rules-modal" aria-labelledby="special-kit-rules-title" class="m-auto w-[min(40rem,calc(100vw-2rem))] rounded-md border border-race-cyan/15 bg-white p-0 text-zinc-950 shadow-2xl shadow-amber-950/30 backdrop:bg-race-night/80">
             <div class="grid gap-5 p-6 sm:p-8">

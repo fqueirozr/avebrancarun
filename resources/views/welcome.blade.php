@@ -28,6 +28,7 @@
                     <a href="#provas" class="rounded-md px-4 py-2 transition hover:bg-white/10 hover:text-white">Provas</a>
                     <a href="#programacao" class="rounded-md px-4 py-2 transition hover:bg-white/10 hover:text-white">Evento</a>
                     <a href="{{ route('store.index') }}" class="rounded-md px-4 py-2 transition hover:bg-white/10 hover:text-white">Loja</a>
+                    <a href="{{ route('faq') }}" class="rounded-md px-4 py-2 transition hover:bg-white/10 hover:text-white">FAQ</a>
                     <a href="#contato" class="rounded-md px-4 py-2 transition hover:bg-white/10 hover:text-white">Contato</a>
                 </div>
 

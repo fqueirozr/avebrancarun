@@ -23,6 +23,7 @@ use Illuminate\Support\Carbon;
     'baggage_storage_information',
     'timing_information',
     'special_registrations_information',
+    'faq_items',
     'regulation',
 ])]
 class EventSetting extends Model
@@ -72,6 +73,7 @@ class EventSetting extends Model
         return [
             'registration_deadline' => 'datetime',
             'max_registrations' => 'integer',
+            'faq_items' => 'array',
         ];
     }
 }

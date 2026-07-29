@@ -44,6 +44,9 @@ Route::get('/inscricao', function () {
         'shirts' => Shirt::query()->where('is_active', true)->orderBy('name')->get(),
     ]);
 })->name('registration');
+Route::get('/faq', function () {
+    return view('faq', ['eventSetting' => EventSetting::current()]);
+})->name('faq');
 Route::post('/inscricao', [ParticipantRegistrationController::class, 'store'])
     ->middleware('throttle:30,1')
     ->name('registration.store');

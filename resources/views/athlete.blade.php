@@ -33,6 +33,25 @@
                 </div>
             </section>
 
+            @if ($pendingPaymentUrl)
+                <section class="rounded-2xl border border-amber-300 bg-amber-50 p-6 shadow-sm sm:p-8">
+                    <div class="flex flex-col justify-between gap-5 sm:flex-row sm:items-center">
+                        <div>
+                            <p class="text-sm font-black uppercase tracking-wide text-amber-800">Pagamento pendente</p>
+                            <h2 class="mt-1 text-2xl font-black text-race-night">
+                                {{ $usesManualPix ? 'Envie o comprovante do Pix' : 'Conclua o pagamento da inscrição' }}
+                            </h2>
+                            <p class="mt-2 max-w-2xl font-semibold leading-6 text-zinc-600">
+                                {{ $usesManualPix ? 'Acesse os dados do Pix para realizar o pagamento e enviar o comprovante.' : 'Acesse novamente o checkout seguro do provedor de pagamento.' }}
+                            </p>
+                        </div>
+                        <a href="{{ $pendingPaymentUrl }}" class="inline-flex min-h-12 shrink-0 items-center justify-center rounded-md bg-race-blue px-5 py-3 text-center text-sm font-black text-white transition hover:bg-race-night focus:outline-none focus:ring-3 focus:ring-amber-300">
+                            {{ $usesManualPix ? 'Pagar e enviar comprovante' : 'Ir para o checkout' }}
+                        </a>
+                    </div>
+                </section>
+            @endif
+
             <section class="grid grid-cols-1 gap-6 lg:grid-cols-2">
                 <article class="race-panel p-6 sm:p-8">
                     <h2 class="text-2xl font-black text-race-night">Dados da inscrição</h2>

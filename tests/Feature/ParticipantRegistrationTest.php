@@ -78,7 +78,7 @@ test('shirt size is required when the selected kit includes a shirt', function (
     ]))->assertSessionHasErrors('shirt_size');
 });
 
-test('child and XG shirt sizes are accepted while XGG is rejected', function (string $size, bool $isValid) {
+test('available shirt sizes are accepted while XGG is rejected', function (string $size, bool $isValid) {
     Mail::fake();
     $raceModality = RaceModality::factory()->create();
     $kit = Kit::factory()->create(['price' => 0, 'has_shirt' => true]);
@@ -94,6 +94,8 @@ test('child and XG shirt sizes are accepted while XGG is rejected', function (st
     'child size 6' => ['6', true],
     'child size 14' => ['14', true],
     'adult size XG' => ['XG', true],
+    'adult size 2XG' => ['2XG', true],
+    'adult size 3XG' => ['3XG', true],
     'removed size XGG' => ['XGG', false],
 ]);
 
