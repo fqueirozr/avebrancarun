@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['shirt_id', 'participant_registration_id', 'customer_name', 'customer_cpf', 'customer_email', 'customer_phone', 'size', 'sizes', 'quantity', 'unit_price', 'total_price', 'payment_status'])]
+#[Fillable(['shirt_id', 'participant_registration_id', 'customer_name', 'customer_cpf', 'customer_email', 'customer_phone', 'size', 'sizes', 'quantity', 'unit_price', 'total_price', 'payment_status', 'payment_gateway', 'payment_gateway_reference', 'payment_checkout_url', 'pix_receipt_path', 'pix_receipt_submitted_at'])]
 class ShirtOrder extends Model
 {
     /** @use HasFactory<ShirtOrderFactory> */
@@ -47,6 +47,12 @@ class ShirtOrder extends Model
 
     protected function casts(): array
     {
-        return ['sizes' => 'array', 'quantity' => 'integer', 'unit_price' => 'decimal:2', 'total_price' => 'decimal:2'];
+        return [
+            'sizes' => 'array',
+            'quantity' => 'integer',
+            'unit_price' => 'decimal:2',
+            'total_price' => 'decimal:2',
+            'pix_receipt_submitted_at' => 'datetime',
+        ];
     }
 }

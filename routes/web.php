@@ -54,6 +54,15 @@ Route::get('/loja', [ShirtOrderController::class, 'index'])->name('store.index')
 Route::post('/loja', [ShirtOrderController::class, 'store'])
     ->middleware('throttle:30,1')
     ->name('store.store');
+Route::get('/loja/pedido/{shirtOrder}/pix', [ShirtOrderController::class, 'showPix'])
+    ->middleware('signed')
+    ->name('store.pix.show');
+Route::post('/loja/pedido/{shirtOrder}/pix', [ShirtOrderController::class, 'storePixReceipt'])
+    ->middleware(['signed', 'throttle:10,1'])
+    ->name('store.pix.store');
+Route::get('/loja/pagamento/{status}', [ShirtOrderController::class, 'paymentReturn'])
+    ->whereIn('status', ['sucesso', 'cancelado', 'expirado'])
+    ->name('store.payment.return');
 Route::redirect('/camiseta', '/loja');
 Route::redirect('/camisetas', '/loja');
 Route::get('/inscricao/{registration}/pix', [ParticipantRegistrationController::class, 'showPix'])

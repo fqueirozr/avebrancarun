@@ -29,6 +29,9 @@
             @if (session('status'))
                 <div class="rounded-xl border border-emerald-300 bg-emerald-50 p-4 font-bold text-emerald-800">{{ session('status') }}</div>
             @endif
+            @error('checkout')
+                <div class="rounded-xl border border-red-300 bg-red-50 p-4 font-bold text-red-800">{{ $message }}</div>
+            @enderror
 
             <form method="POST" action="{{ route('store.store') }}" class="grid gap-8 lg:grid-cols-[1.25fr_0.75fr] lg:items-start">
                 @csrf

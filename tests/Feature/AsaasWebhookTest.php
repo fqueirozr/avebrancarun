@@ -2,6 +2,8 @@
 
 use App\Mail\ParticipantRegistrationUpdated;
 use App\Models\ParticipantRegistration;
+use App\Models\Shirt;
+use App\Models\ShirtOrder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
 
@@ -78,6 +80,33 @@ test('asaas repeated confirmation does not send another update email', function 
     expect($registration->refresh()->payment_status)->toBe('paid');
 
     Mail::assertNothingSent();
+});
+
+test('asaas payment confirmation marks a standalone shirt order as paid', function () {
+    Mail::fake();
+
+    $shirtOrder = ShirtOrder::factory()->create([
+        'shirt_id' => Shirt::factory(),
+        'customer_name' => 'Maria Silva',
+        'customer_email' => 'maria@example.com',
+        'customer_phone' => '11999999999',
+        'size' => 'M',
+        'quantity' => 1,
+        'unit_price' => 35,
+        'total_price' => 35,
+        'payment_status' => 'pending',
+        'payment_gateway' => 'asaas',
+        'payment_gateway_reference' => 'shirt_checkout_123',
+    ]);
+
+    $this->withHeader('asaas-access-token', 'test-webhook-token')->postJson(route('webhooks.asaas'), [
+        'event' => 'PAYMENT_CONFIRMED',
+        'payment' => [
+            'externalReference' => "shirt-order:{$shirtOrder->id}",
+        ],
+    ])->assertNoContent();
+
+    expect($shirtOrder->refresh()->payment_status)->toBe('paid');
 });
 
 test('asaas webhook rejects requests without a valid token', function (?string $token) {

@@ -62,9 +62,9 @@ class ShirtOrderForm
                     ->default('pending'),
                 FileUpload::make('payment_receipt_path')
                     ->label('Comprovante do Pix')
-                    ->helperText('Comprovante enviado na inscrição vinculada.')
+                    ->helperText('Comprovante enviado na inscrição vinculada ou no pedido avulso.')
                     ->afterStateHydrated(fn (FileUpload $component, ?ShirtOrder $record): FileUpload => $component->state(
-                        $record?->participantRegistration?->pix_receipt_path,
+                        $record?->pix_receipt_path ?: $record?->participantRegistration?->pix_receipt_path,
                     ))
                     ->disk('local')
                     ->visibility('private')

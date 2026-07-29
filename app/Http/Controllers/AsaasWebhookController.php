@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\ParticipantRegistration;
+use App\Models\ShirtOrder;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
@@ -31,10 +32,10 @@ class AsaasWebhookController extends Controller
             return response()->noContent();
         }
 
-        $registration = $this->findRegistration($request);
+        $payable = $this->findRegistration($request) ?? $this->findShirtOrder($request);
 
-        if (! $registration) {
-            Log::warning('Asaas payment webhook could not be matched to a participant registration.', [
+        if (! $payable) {
+            Log::warning('Asaas payment webhook could not be matched to an order.', [
                 'event' => $request->input('event'),
                 'payment_id' => $request->input('payment.id'),
                 'external_reference' => $request->input('payment.externalReference'),
@@ -43,11 +44,10 @@ class AsaasWebhookController extends Controller
             return response()->noContent();
         }
 
-        if ($registration->payment_status !== 'paid') {
-            $registration->update([
+        if ($payable->payment_status !== 'paid') {
+            $payable->update([
                 'payment_status' => 'paid',
             ]);
-
         }
 
         return response()->noContent();
@@ -98,5 +98,36 @@ class AsaasWebhookController extends Controller
             ->toString();
 
         return filter_var($registrationId, FILTER_VALIDATE_INT) ?: null;
+    }
+
+    private function findShirtOrder(Request $request): ?ShirtOrder
+    {
+        $externalReference = $request->string('payment.externalReference')->toString();
+
+        if (str($externalReference)->startsWith('shirt-order:')) {
+            $shirtOrderId = filter_var(
+                str($externalReference)->after('shirt-order:')->toString(),
+                FILTER_VALIDATE_INT,
+            );
+
+            if ($shirtOrderId !== false) {
+                return ShirtOrder::query()
+                    ->where('payment_gateway', 'asaas')
+                    ->find($shirtOrderId);
+            }
+        }
+
+        $gatewayReferences = collect([
+            $request->input('checkout.id'),
+            $request->input('checkoutSession.id'),
+            $request->input('payment.checkoutSession'),
+            $request->input('payment.checkout.id'),
+            $request->input('payment.checkoutSession.id'),
+        ])->filter()->map(fn (mixed $reference): string => (string) $reference);
+
+        return ShirtOrder::query()
+            ->where('payment_gateway', 'asaas')
+            ->whereIn('payment_gateway_reference', $gatewayReferences)
+            ->first();
     }
 }

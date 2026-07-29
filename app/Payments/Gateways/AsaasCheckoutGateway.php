@@ -79,11 +79,23 @@ class AsaasCheckoutGateway
      */
     private function payload(CheckoutRequest $request, PaymentGatewaySetting $settings): array
     {
+        if ($request->shirtOrder !== null) {
+            return $this->shirtOrderPayload($request, $settings);
+        }
+
+        $registration = $request->registration;
+        $raceModality = $request->raceModality;
+        $kit = $request->kit;
+
+        if ($registration === null || $raceModality === null || $kit === null) {
+            throw new \InvalidArgumentException('Os dados do pagamento são obrigatórios.');
+        }
+
         return [
             'billingTypes' => $settings->billing_types ?: ['PIX', 'CREDIT_CARD'],
             'chargeTypes' => $settings->charge_types ?: ['DETACHED'],
             'minutesToExpire' => $settings->checkout_minutes_to_expire ?: 60,
-            'externalReference' => "participant-registration:{$request->registration->id}",
+            'externalReference' => "participant-registration:{$registration->id}",
             'callback' => [
                 'successUrl' => $request->successUrl,
                 'cancelUrl' => $request->cancelUrl,
@@ -91,23 +103,60 @@ class AsaasCheckoutGateway
             ],
             'items' => [
                 [
-                    'externalReference' => (string) $request->registration->id,
-                    'name' => Str::limit($request->kit->name, 30, ''),
-                    'description' => Str::limit('Inscrição Ave Branca Run - '.$request->raceModality->displayName().' - '.$request->kit->name, 150, ''),
+                    'externalReference' => (string) $registration->id,
+                    'name' => Str::limit($kit->name, 30, ''),
+                    'description' => Str::limit('Inscrição Ave Branca Run - '.$raceModality->displayName().' - '.$kit->name, 150, ''),
                     'imageBase64' => $this->itemImageBase64(),
                     'quantity' => 1,
-                    'value' => $request->registration->priceFor($request->kit),
+                    'value' => $registration->priceFor($kit),
                 ],
             ],
             'customerData' => [
-                'name' => $request->registration->billing_name,
-                'cpfCnpj' => $request->registration->billing_document,
-                'email' => $request->registration->email,
-                'phone' => preg_replace('/\D+/', '', $request->registration->phone) ?: $request->registration->phone,
-                'address' => $request->registration->billing_address,
-                'addressNumber' => $request->registration->billing_address_number,
-                'province' => $request->registration->billing_province,
-                'postalCode' => preg_replace('/\D+/', '', $request->registration->billing_postal_code),
+                'name' => $registration->billing_name,
+                'cpfCnpj' => $registration->billing_document,
+                'email' => $registration->email,
+                'phone' => preg_replace('/\D+/', '', $registration->phone) ?: $registration->phone,
+                'address' => $registration->billing_address,
+                'addressNumber' => $registration->billing_address_number,
+                'province' => $registration->billing_province,
+                'postalCode' => preg_replace('/\D+/', '', $registration->billing_postal_code),
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function shirtOrderPayload(CheckoutRequest $request, PaymentGatewaySetting $settings): array
+    {
+        $shirtOrder = $request->shirtOrder;
+        $shirtOrder?->loadMissing('shirt');
+
+        return [
+            'billingTypes' => $settings->billing_types ?: ['PIX', 'CREDIT_CARD'],
+            'chargeTypes' => $settings->charge_types ?: ['DETACHED'],
+            'minutesToExpire' => $settings->checkout_minutes_to_expire ?: 60,
+            'externalReference' => "shirt-order:{$shirtOrder?->id}",
+            'callback' => [
+                'successUrl' => $request->successUrl,
+                'cancelUrl' => $request->cancelUrl,
+                'expiredUrl' => $request->expiredUrl,
+            ],
+            'items' => [
+                [
+                    'externalReference' => (string) $shirtOrder?->id,
+                    'name' => Str::limit((string) $shirtOrder?->shirt?->name, 30, ''),
+                    'description' => Str::limit('Pedido avulso Ave Branca Run - '.$shirtOrder?->shirt?->name, 150, ''),
+                    'imageBase64' => $this->itemImageBase64(),
+                    'quantity' => $shirtOrder?->quantity,
+                    'value' => (float) $shirtOrder?->unit_price,
+                ],
+            ],
+            'customerData' => [
+                'name' => $shirtOrder?->customer_name,
+                'cpfCnpj' => $shirtOrder?->customer_cpf,
+                'email' => $shirtOrder?->customer_email,
+                'phone' => preg_replace('/\D+/', '', (string) $shirtOrder?->customer_phone),
             ],
         ];
     }

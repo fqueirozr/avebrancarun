@@ -6,12 +6,18 @@ use App\Filament\Resources\ShirtOrders\ShirtOrderResource;
 use App\Mail\ShirtOrderReceived;
 use App\Mail\ShirtOrderUpdated;
 use App\Models\ParticipantRegistration;
+use App\Models\PaymentGatewaySetting;
 use App\Models\Shirt;
 use App\Models\ShirtOrder;
 use App\Models\User;
+use App\Payments\CheckoutRequest;
+use App\Payments\CheckoutResponse;
+use App\Payments\PaymentGateway;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\URL;
 use Livewire\Livewire;
 
 uses(RefreshDatabase::class);
@@ -202,6 +208,116 @@ it('registers a standalone shirt order and decrements stock', function () {
     Mail::assertSent(ShirtOrderReceived::class, 'maria@example.com');
 });
 
+it('redirects a standalone order to the manual pix receipt page', function () {
+    Mail::fake();
+
+    PaymentGatewaySetting::factory()->create([
+        'is_enabled' => false,
+        'manual_pix_enabled' => true,
+        'pix_key' => 'financeiro@example.com',
+    ]);
+    $shirt = Shirt::factory()->create(['price' => 35]);
+
+    $response = $this->post(route('store.store'), [
+        'shirt_id' => $shirt->id,
+        'customer_name' => 'Maria Silva',
+        'customer_cpf' => '52998224725',
+        'customer_email' => 'maria@example.com',
+        'customer_phone' => '11999999999',
+        'sizes' => ['M'],
+        'quantity' => 1,
+    ]);
+
+    $shirtOrder = ShirtOrder::query()->whereBelongsTo($shirt)->firstOrFail();
+
+    $response->assertRedirectContains("/loja/pedido/{$shirtOrder->id}/pix");
+
+    $this->get($response->headers->get('Location'))
+        ->assertSuccessful()
+        ->assertSee('Conclua seu pedido')
+        ->assertSee('financeiro@example.com');
+});
+
+it('redirects a standalone order to the active payment gateway checkout', function () {
+    Mail::fake();
+
+    PaymentGatewaySetting::factory()->create([
+        'is_enabled' => true,
+        'manual_pix_enabled' => false,
+        'api_key' => 'test-key',
+    ]);
+    $this->app->bind(PaymentGateway::class, fn (): PaymentGateway => new class implements PaymentGateway
+    {
+        public function createCheckout(CheckoutRequest $request): CheckoutResponse
+        {
+            expect($request->shirtOrder)->toBeInstanceOf(ShirtOrder::class);
+
+            return new CheckoutResponse(
+                gateway: 'fake',
+                reference: 'shirt_checkout_123',
+                checkoutUrl: 'https://checkout.example/shirt_checkout_123',
+            );
+        }
+    });
+    $shirt = Shirt::factory()->create(['price' => 35]);
+
+    $this->post(route('store.store'), [
+        'shirt_id' => $shirt->id,
+        'customer_name' => 'Maria Silva',
+        'customer_cpf' => '52998224725',
+        'customer_email' => 'maria@example.com',
+        'customer_phone' => '11999999999',
+        'sizes' => ['M'],
+        'quantity' => 1,
+    ])->assertRedirect('https://checkout.example/shirt_checkout_123');
+
+    $shirtOrder = ShirtOrder::query()->whereBelongsTo($shirt)->firstOrFail();
+
+    expect($shirtOrder->payment_gateway)->toBe('fake')
+        ->and($shirtOrder->payment_gateway_reference)->toBe('shirt_checkout_123')
+        ->and($shirtOrder->payment_checkout_url)->toBe('https://checkout.example/shirt_checkout_123');
+});
+
+it('stores a manual pix receipt for a standalone order', function () {
+    Storage::fake('local');
+
+    PaymentGatewaySetting::factory()->create([
+        'manual_pix_enabled' => true,
+        'pix_key' => 'financeiro@example.com',
+    ]);
+    $shirtOrder = ShirtOrder::factory()->create([
+        'shirt_id' => Shirt::factory(),
+        'participant_registration_id' => null,
+        'customer_name' => 'Maria Silva',
+        'customer_cpf' => '52998224725',
+        'customer_email' => 'maria@example.com',
+        'customer_phone' => '11999999999',
+        'size' => 'M',
+        'quantity' => 1,
+        'unit_price' => 35,
+        'total_price' => 35,
+        'payment_status' => 'pending',
+    ]);
+    $url = URL::temporarySignedRoute(
+        'store.pix.store',
+        now()->addHour(),
+        ['shirtOrder' => $shirtOrder],
+    );
+
+    $this->post($url, [
+        'billing_name' => 'Maria Silva',
+        'billing_document' => '52998224725',
+        'pix_receipt' => UploadedFile::fake()->image('comprovante.png'),
+        'payer_data_confirmed' => '1',
+    ])->assertRedirect(route('store.index'));
+
+    $shirtOrder->refresh();
+
+    expect($shirtOrder->payment_status)->toBe('under_review')
+        ->and($shirtOrder->pix_receipt_submitted_at)->not->toBeNull();
+    Storage::disk('local')->assertExists($shirtOrder->pix_receipt_path);
+});
+
 it('shows the customer cpf in the standalone order admin form', function () {
     $this->actingAs(User::factory()->create());
 
@@ -228,7 +344,6 @@ it('requires cpf and every shirt size for a standalone store order', function ()
     $this->post(route('store.store'), [
         'shirt_id' => $shirt->id,
         'customer_name' => 'Maria Silva',
-        'customer_cpf' => '52998224725',
         'customer_email' => 'maria@example.com',
         'customer_phone' => '11999999999',
         'quantity' => 1,
