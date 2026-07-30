@@ -82,6 +82,13 @@ class EditParticipantRegistration extends EditRecord
                 ->displayName();
         }
 
+        if (
+            filled($data['pix_receipt_path'])
+            && $data['pix_receipt_path'] !== $this->record->getOriginal('pix_receipt_path')
+        ) {
+            $data['pix_receipt_submitted_at'] = now();
+        }
+
         return $data;
     }
 }

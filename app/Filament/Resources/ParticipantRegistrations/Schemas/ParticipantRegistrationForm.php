@@ -168,12 +168,19 @@ class ParticipantRegistrationForm
                             ->dehydrated(false),
                         FileUpload::make('pix_receipt_path')
                             ->label('Comprovante do Pix')
+                            ->helperText('Envie um arquivo PDF, JPEG, PNG ou WebP de até 5 MB.')
                             ->disk('local')
+                            ->directory('pix-receipts')
                             ->visibility('private')
+                            ->acceptedFileTypes([
+                                'application/pdf',
+                                'image/jpeg',
+                                'image/png',
+                                'image/webp',
+                            ])
+                            ->maxSize(5120)
                             ->downloadable()
                             ->openable()
-                            ->disabled()
-                            ->dehydrated(false)
                             ->columnSpanFull(),
                     ])
                     ->columns(2)
