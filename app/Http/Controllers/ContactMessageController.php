@@ -21,6 +21,6 @@ class ContactMessageController extends Controller
         }
 
         return redirect(route('home').'#contato')
-            ->with('contact_status', 'Mensagem enviada com sucesso. A organizaÃ§Ã£o entrarÃ¡ em contato em breve.');
+            ->with('contact_status', 'Mensagem enviada com sucesso. A organização entrará em contato em breve.');
     }
 }

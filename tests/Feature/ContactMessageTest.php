@@ -38,7 +38,10 @@ test('a visitor can send a contact message to the event email', function () {
         'message' => 'Gostaria de saber o horário de retirada do kit.',
     ])
         ->assertRedirect(route('home').'#contato')
-        ->assertSessionHas('contact_status');
+        ->assertSessionHas(
+            'contact_status',
+            'Mensagem enviada com sucesso. A organização entrará em contato em breve.',
+        );
 
     $this->assertDatabaseHas(ContactMessage::class, [
         'name' => 'Maria Silva',
