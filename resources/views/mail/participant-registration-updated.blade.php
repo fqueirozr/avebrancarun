@@ -19,7 +19,15 @@ Temos uma novidade sobre sua inscrição na **Ave Branca Run**.
 </x-mail::table>
 
 @if ($registration->payment_status === 'cancelled')
-Esta inscrição foi cancelada. Em caso de dúvidas, entre em contato com a organização para revisar os detalhes.
+@if ($registration->cancellation_source === \App\Models\ParticipantRegistration::CancellationSourceAutomatic)
+Informamos que sua inscrição foi cancelada automaticamente porque não identificamos informações de pagamento dentro do prazo de 7 dias.
+
+Sabemos que imprevistos acontecem. Se você ainda deseja participar ou acredita que o pagamento já foi realizado, entre em contato com a organização para que possamos orientar você.
+@else
+Informamos que sua inscrição foi cancelada.
+
+Caso tenha dúvidas ou precise de maiores esclarecimentos, a equipe da **Ave Branca Run** está à disposição para ajudar.
+@endif
 @else
 Guarde esta mensagem como comprovante da atualização mais recente da sua inscrição.
 @endif

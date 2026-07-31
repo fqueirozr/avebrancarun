@@ -78,7 +78,10 @@ class ParticipantRegistrationFactory extends Factory
 
     public function cancelled(): static
     {
-        return $this->state(fn (array $attributes): array => ['payment_status' => 'cancelled']);
+        return $this->state(fn (array $attributes): array => [
+            'payment_status' => 'cancelled',
+            'cancellation_source' => ParticipantRegistration::CancellationSourceOrganization,
+        ]);
     }
 
     private function validCpf(): string

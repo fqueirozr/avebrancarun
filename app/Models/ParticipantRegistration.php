@@ -56,9 +56,11 @@ use Illuminate\Support\Carbon;
     'special_kit_rules_acceptance_ip',
     'special_kit_rules_acceptance_user_agent',
     'payment_status',
+    'cancellation_source',
     'payment_gateway',
     'payment_gateway_reference',
     'payment_checkout_url',
+    'payment_reminder_sent_at',
     'pix_receipt_path',
     'pix_receipt_submitted_at',
 ])]
@@ -70,6 +72,10 @@ class ParticipantRegistration extends Model
     public const PrivacyPolicyVersion = '2026-07-23';
 
     public const SpecialKitRulesVersion = '2026-07-11';
+
+    public const CancellationSourceAutomatic = 'automatic';
+
+    public const CancellationSourceOrganization = 'organization';
 
     protected $hidden = [
         'registration_identity',
@@ -256,6 +262,10 @@ class ParticipantRegistration extends Model
             }
 
             $registration->registration_identity = $registration->participant_cpf;
+
+            if ($registration->payment_status === 'cancelled' && blank($registration->cancellation_source)) {
+                $registration->cancellation_source = self::CancellationSourceOrganization;
+            }
         });
 
         static::updating(function (ParticipantRegistration $registration): void {
@@ -269,6 +279,12 @@ class ParticipantRegistration extends Model
                 if ($kit?->type !== Kit::TypePathfinder) {
                     $registration->pathfinder_id = null;
                 }
+            }
+
+            if ($registration->isDirty('payment_status')) {
+                $registration->cancellation_source = $registration->payment_status === 'cancelled'
+                    ? ($registration->cancellation_source ?: self::CancellationSourceOrganization)
+                    : null;
             }
         });
 
@@ -300,6 +316,7 @@ class ParticipantRegistration extends Model
             'sex_rank' => 'integer',
             'category_rank' => 'integer',
             'pix_receipt_submitted_at' => 'datetime',
+            'payment_reminder_sent_at' => 'datetime',
         ];
     }
 }

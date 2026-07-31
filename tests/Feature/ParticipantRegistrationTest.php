@@ -1194,7 +1194,7 @@ test('registration update email shows cancelled status', function () {
 
     $mail->assertSeeInHtml('Maria Silva');
     $mail->assertSeeInHtml('Cancelado');
-    $mail->assertSeeInHtml('Esta inscrição foi cancelada');
+    $mail->assertSeeInHtml('Informamos que sua inscrição foi cancelada');
 });
 
 test('an authenticated admin can print kits with linked and standalone shirts', function () {
