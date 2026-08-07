@@ -44,7 +44,7 @@
 
                 <div class="absolute inset-0 scale-110 parallax-layer" data-parallax-speed="0.14">
                     <img
-                        src="{{ asset('images/ave-branca-run-2026-hero-client.png') }}"
+                        src="{{ asset('images/ave-branca-run-home.png') }}"
                         alt="Arte da 2ª edição Ave Branca Run com data, horário, local e distâncias da corrida"
                         class="h-full w-full object-cover object-center"
                     >

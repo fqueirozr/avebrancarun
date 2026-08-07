@@ -50,7 +50,7 @@
             <aside class="grid content-start gap-5 lg:sticky lg:top-24 lg:self-start">
                 <div class="overflow-hidden rounded-3xl bg-race-night text-white shadow-2xl shadow-race-night/20 ring-1 ring-white/10">
                     <img
-                        src="{{ asset('images/ave-branca-run-2026-hero-client.png') }}"
+                        src="{{ asset('images/ave-branca-run-registration.png') }}"
                         alt="Arte da Ave Branca Run com informações da corrida"
                         class="h-auto w-full bg-race-night object-contain"
                     >
