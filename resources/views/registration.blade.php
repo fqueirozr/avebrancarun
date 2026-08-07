@@ -185,7 +185,7 @@
                                 <input type="checkbox" name="filled_by_legal_representative" value="1" @checked(old('filled_by_legal_representative')) class="mt-1 size-4 shrink-0 accent-race-cyan" data-legal-representative-checkbox>
                                 <span class="grid gap-1">
                                     <span class="text-sm font-bold leading-5 text-zinc-800">O preenchimento está sendo realizado pelo representante legal</span>
-                                    <span class="text-xs font-semibold leading-5 text-zinc-500">Em razão de menoridade, tutela, curatela ou impossibilidade do titular de responder por si.</span>
+                                    <span class="text-xs font-semibold leading-5 text-zinc-500">Marque somente se o preenchimento ocorrer em razão de menoridade, tutela, curatela ou impossibilidade do titular de responder por si.</span>
                                 </span>
                             </label>
                             @error('filled_by_legal_representative')

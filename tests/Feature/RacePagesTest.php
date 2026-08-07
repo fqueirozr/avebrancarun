@@ -147,6 +147,7 @@ test('registration page is available', function () {
         ->assertSeeText('Cookies e serviços externos')
         ->assertDontSeeText('Comunicações promocionais')
         ->assertSeeText('Contato de emergência')
+        ->assertSeeText('Marque somente se o preenchimento ocorrer em razão de menoridade, tutela, curatela ou impossibilidade do titular de responder por si.')
         ->assertSeeText('Declaro estar em boas condições de saúde e apto(a) para participar da corrida.')
         ->assertDontSeeText('Vai se inscrever como PCD, 60+ ou Meia Social? Confira as dicas:')
         ->assertDontSeeText('Meia Social: o desconto já está aplicado. Na retirada do kit, entregue um alimento não perecível para doação.')
