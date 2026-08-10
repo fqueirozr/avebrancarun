@@ -84,8 +84,22 @@ test('payment reminder email explains the deadline and contains the payment acti
 
     $mail->assertHasSubject('Lembrete de pagamento da inscrição - Ave Branca Run');
     $mail->assertSeeInHtml('Maria Silva');
+    $mail->assertSeeInHtml('checkout on-line ou a uma inscrição criada em fluxo anterior');
     $mail->assertSeeInHtml('7 dias após o cadastro');
     $mail->assertSeeInHtml('Realizar pagamento');
+});
+
+test('payment update emails distinguish confirmed and under review registrations', function () {
+    $paidMail = new ParticipantRegistrationUpdated(
+        ParticipantRegistration::factory()->paid()->create(),
+    );
+    $underReviewMail = new ParticipantRegistrationUpdated(
+        ParticipantRegistration::factory()->create(['payment_status' => 'under_review']),
+    );
+
+    $paidMail->assertSeeInHtml('O pagamento foi confirmado e sua inscrição está confirmada');
+    $underReviewMail->assertSeeInHtml('Seu comprovante foi recebido e permanece em conferência')
+        ->assertSeeInHtml('ainda não confirma o pagamento');
 });
 
 test('automatic cancellation email explains the missing payment information amicably', function () {

@@ -3,10 +3,16 @@
 
 Olá {{ $registration->athlete_name }},
 
-Recebemos sua inscrição para a **Ave Branca Run**. Agora ela está em análise pela organização.
+@if ($registration->payment_status === 'under_review')
+Recebemos sua inscrição e o comprovante do Pix para a **Ave Branca Run**. O pagamento agora será conferido pela organização.
+@elseif ($paymentUrl)
+Recebemos sua inscrição para a **Ave Branca Run**. Conclua o pagamento pelo link seguro abaixo para manter sua vaga.
+@else
+Recebemos sua inscrição para a **Ave Branca Run**. Acompanhe abaixo a situação registrada.
+@endif
 
 <x-mail::panel>
-**Status da inscrição:** Recebida<br>
+**Status da inscrição:** {{ $registration->payment_status === 'paid' ? 'Confirmada' : 'Recebida' }}<br>
 **Protocolo:** {{ $registration->protocol_number }}<br>
 **Status do pagamento:** {{ $registration->paymentStatusLabel() }}
 </x-mail::panel>
@@ -38,7 +44,15 @@ Recebemos sua inscrição para a **Ave Branca Run**. Agora ela está em análise
 **Situação do pagamento:** {{ $registration->paymentStatusLabel() }}
 </x-mail::panel>
 
-Este e-mail serve como recibo da inscrição e dos itens acima. A confirmação final será enviada assim que o pagamento for definido. Por segurança, dados pessoais e informações de saúde não são exibidos neste e-mail.
+Este e-mail serve como recibo da inscrição e dos itens acima.
+
+@if ($registration->payment_status === 'under_review')
+O comprovante foi recebido em área privada. O envio não confirma automaticamente o pagamento; você receberá uma atualização após a conferência da organização.
+@elseif ($registration->payment_status === 'pending')
+A inscrição permanece pendente até a confirmação do pagamento.
+@endif
+
+Por segurança, CPF/CNPJ, endereço, comprovante e informações de saúde não são exibidos neste e-mail.
 
 @if ($paymentUrl)
 <x-mail::button :url="$paymentUrl" color="success">

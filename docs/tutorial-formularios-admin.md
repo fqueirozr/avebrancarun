@@ -116,13 +116,13 @@ Em **Configurações > Pagamento**, escolha Pix manual ou pagamento on-line. Se 
 
 ### Pix manual
 
-- **Ativar Pix manual:** envia o participante à página de Pix e comprovante.
-- **Chave Pix:** dado usado no QR Code e copia e cola.
+- **Ativar Pix manual:** inclui a etapa de pagamento e comprovante no formulário público quando houver valor a pagar.
+- **Chave Pix:** dado apresentado no formulário para o participante realizar a transferência.
 - **Nome do recebedor:** nome do padrão Pix, com até 25 caracteres; deve corresponder ao recebedor esperado no banco.
 - **Cidade do recebedor:** cidade do padrão Pix, com até 15 caracteres.
 - **Banco, Agência, Conta e Titular:** dados exibidos para o pagador conferir antes da transferência. A conta deve incluir dígito quando houver.
 
-Com Pix manual ativo, teste o QR Code, o valor total, a chave e o armazenamento privado do comprovante. O envio muda o status para **Em análise**, não para Pago.
+Com Pix manual ativo, teste o valor total, a chave, os dados bancários e o armazenamento privado do comprovante dentro do formulário. A inscrição não pode ser gravada sem o arquivo exigido; quando o envio é válido, ela já é criada como **Em análise**, nunca como Paga.
 
 ### Pagamento on-line
 
@@ -172,6 +172,7 @@ Oriente o participante a separar:
 - CPF do atleta, pois cada CPF pode possuir somente uma inscrição;
 - nome e CPF do responsável legal, quando o atleta for menor de 18 anos ou não puder responder por si;
 - dados do pagador exigidos pelo fluxo de pagamento;
+- comprovante JPG, PNG ou PDF de até 5 MB, quando o Pix manual for usado;
 - telefone de um contato de emergência, quando houver;
 - CPF ativo no cadastro de desbravadores, quando esse pacote for usado.
 
@@ -206,7 +207,7 @@ Informe os dados da pessoa física ou jurídica responsável pelo pagamento:
 - bairro;
 - CEP com 8 dígitos.
 
-Esses campos só são obrigatórios no formulário inicial quando o checkout on-line estiver configurado. Eles são enviados ao Asaas no limite necessário para criar e reconciliar a cobrança. No Pix manual, nome e CPF do pagador são informados junto com o comprovante.
+Todos esses campos são obrigatórios quando o checkout on-line estiver configurado e são enviados ao Asaas no limite necessário para criar e reconciliar a cobrança. No Pix manual, uma etapa dentro do formulário solicita nome, CPF/CNPJ e comprovante do pagador quando houver valor a pagar.
 
 ### 9.5. Etapa Prova
 
@@ -241,7 +242,7 @@ Os campos são opcionais até que uma escolha os torne obrigatórios:
 
 - **Item avulso:** adiciona uma camiseta/produto ativo ao total.
 - **Tamanho adicional:** obrigatório ao escolher item.
-- **Quantidade adicional:** obrigatória, de 1 a 10 e limitada pelo estoque.
+- **Quantidade adicional:** no fluxo de inscrição é fixada em uma unidade e limitada pelo estoque.
 - **Contato de emergência:** nome e telefone de quem deve ser acionado.
 
 ### 9.8. Etapa Conferência e declarações
@@ -259,16 +260,16 @@ O Regulamento e a Política de Privacidade podem ser abertos no próprio formul�
 
 Ao clicar em **Enviar inscrição**, o servidor valida novamente documentos, idade, duplicidade, disponibilidade, limites, elegibilidade do desbravador, estoque do item e aceites. Se houver erro, a inscrição não é concluída; corrija os campos indicados e envie novamente.
 
-Quando os dados são válidos, o sistema cria a inscrição com um protocolo e pagamento inicialmente **Pendente**.
+Quando os dados são válidos, o sistema cria a inscrição com um protocolo. O status inicial depende do fluxo:
 
-- Se o kit tiver valor e Pix manual estiver ativo, o participante recebe um link assinado válido por sete dias, vê o QR Code e envia o comprovante. O status muda para **Em análise**.
+- Se o pacote ou item adicional tiver valor e o Pix manual estiver ativo, o participante paga e anexa o comprovante antes de enviar o formulário. Sem o arquivo, nada é gravado; com ele, a inscrição nasce **Em análise**.
 - Se o Pix manual estiver inativo, o kit tiver valor e o Asaas estiver configurado, o participante é redirecionado ao checkout.
 - Se o kit for gratuito ou não houver pagamento configurado, a inscrição permanece **Pendente** até ajuste administrativo.
 - Se o checkout for cancelado ou expirar, a inscrição continua registrada como **Pendente**.
 - O retorno de sucesso ou o webhook autenticado do Asaas atualiza o pagamento para **Pago**. O aviso de retorno sem identificação assinada apenas informa que a conciliação automática ainda ocorrerá.
 - Se o Asaas não conseguir criar o checkout, o sistema mantém a inscrição já gravada e exibe uma orientação para revisar os dados do pagador. Evite enviar o formulário repetidamente, pois o CPF já estará vinculado à inscrição criada.
 
-Após o registro, o atleta recebe um e-mail com seu nome, protocolo, prova, situação do pagamento e um link assinado para consultar a própria inscrição. CPF, endereço, dados de contato e informações de emergência não são reproduzidos nesse e-mail. Mudanças administrativas relevantes e cancelamentos também geram e-mail de atualização.
+Após o registro, o atleta recebe um e-mail com seu nome, protocolo, prova, situação do pagamento e um link assinado para consultar a própria inscrição. Para Pix manual, a mensagem confirma o recebimento privado do comprovante e explica que o pagamento está em análise; para checkout, apresenta a ação de pagamento enquanto estiver pendente. CPF/CNPJ, endereço, comprovante, dados de contato e informações de emergência não são reproduzidos. Mudanças administrativas relevantes e cancelamentos também geram e-mail de atualização.
 
 ### 9.10. Revisão no painel administrativo
 

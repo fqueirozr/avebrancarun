@@ -2,6 +2,7 @@
 
 use App\Models\EventSetting;
 use App\Models\Kit;
+use App\Models\ParticipantRegistration;
 use App\Models\RaceModality;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -140,7 +141,8 @@ test('registration page is available', function () {
         ->assertSee('data-modal-open="registration-privacy-policy-modal"', false)
         ->assertSeeText('Regulamento oficial da prova')
         ->assertSeeText('Política de Privacidade')
-        ->assertSeeText('Versão 2026-07-23')
+        ->assertSeeText('Versão '.ParticipantRegistration::PrivacyPolicyVersion)
+        ->assertSeeText('sem o arquivo obrigatório, o cadastro não é concluído')
         ->assertSeeText('Direitos LGPD')
         ->assertSeeText('Crianças e adolescentes')
         ->assertSeeText('Retenção e descarte')

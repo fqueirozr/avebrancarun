@@ -69,7 +69,7 @@
                         Pagamento por Pix
                     </p>
                     <p class="mt-2 text-sm leading-6">
-                        Após a inscrição, você verá a chave Pix e poderá enviar o comprovante para análise.
+                        O pagamento e o envio do comprovante fazem parte do formulário. A inscrição só é criada após o comprovante ser anexado.
                     </p>
                 </div>
             </aside>
@@ -107,7 +107,7 @@
                     </div>
                 @endif
 
-                <form id="registration-form" action="{{ route('registration.store') }}" method="POST" class="mt-7 grid grid-cols-1 gap-5" data-registration-form data-pathfinder-check-url="{{ route('registration.pathfinder.check') }}">
+                <form id="registration-form" action="{{ route('registration.store') }}" method="POST" enctype="multipart/form-data" class="mt-7 grid grid-cols-1 gap-5" data-registration-form data-pathfinder-check-url="{{ route('registration.pathfinder.check') }}">
                     @csrf
 
                     <div class="sticky top-20 z-20 grid gap-3 rounded-2xl border border-race-cyan/30 bg-white/95 p-4 shadow-lg shadow-race-night/8 backdrop-blur sm:p-5" data-registration-progress>
@@ -309,7 +309,7 @@
                             @forelse ($kits as $kit)
                                 <div data-package-option @if ($kit->type === \App\Models\Kit::TypePathfinder) data-pathfinder-package hidden @endif class="grid grid-cols-[1.2fr_0.8fr] overflow-hidden rounded-xl border border-race-blue/15 bg-white text-xs shadow-sm transition sm:grid-cols-[1.15fr_0.65fr_0.75fr_0.9fr] sm:divide-x sm:divide-race-blue/10">
                                     <label class="flex cursor-pointer items-center gap-2.5 border-b border-race-blue/10 p-3 sm:border-b-0">
-                                        <input type="radio" name="kit_id" value="{{ $kit->id }}" @checked((int) old('kit_id') === $kit->id) @if ($kit->requiresRulesAcknowledgement()) data-special-kit data-kit-name="{{ $kit->name }}" @endif data-has-shirt="{{ $kit->has_shirt ? 'true' : 'false' }}" data-kit-type="{{ $kit->type }}" class="size-4 shrink-0 accent-race-cyan" required>
+                                        <input type="radio" name="kit_id" value="{{ $kit->id }}" @checked((int) old('kit_id') === $kit->id) @if ($kit->requiresRulesAcknowledgement()) data-special-kit data-kit-name="{{ $kit->name }}" @endif data-has-shirt="{{ $kit->has_shirt ? 'true' : 'false' }}" data-kit-type="{{ $kit->type }}" data-price="{{ $kit->price }}" data-size-2xl-surcharge="{{ $kit->size_2xl_surcharge }}" data-size-3xl-surcharge="{{ $kit->size_3xl_surcharge }}" class="size-4 shrink-0 accent-race-cyan" required>
                                         <span class="grid gap-1">
                                             <span class="text-[0.62rem] font-black uppercase tracking-[0.14em] text-race-blue">Selecionar</span>
                                             <span class="text-sm font-black leading-tight text-race-ink">{{ $kit->name }}</span>
@@ -401,7 +401,7 @@
                                     </label>
                                     @foreach ($shirts as $shirt)
                                         <label class="grid min-h-18 cursor-pointer grid-cols-[auto_3.5rem_1fr] items-center gap-2.5 overflow-hidden rounded-lg border border-white/15 bg-white/8 p-2.5 transition has-checked:border-race-cyan has-checked:bg-race-cyan/15 has-checked:ring-2 has-checked:ring-race-cyan/15 hover:border-race-cyan/60">
-                                            <input type="radio" name="shirt_id" value="{{ $shirt->id }}" @checked((int) old('shirt_id') === $shirt->id) data-extra-shirt class="size-4 shrink-0 accent-race-cyan">
+                                            <input type="radio" name="shirt_id" value="{{ $shirt->id }}" @checked((int) old('shirt_id') === $shirt->id) data-extra-shirt data-price="{{ $shirt->priceForRegistration() }}" data-size-2xl-surcharge="{{ $shirt->size_2xl_surcharge }}" data-size-3xl-surcharge="{{ $shirt->size_3xl_surcharge }}" class="size-4 shrink-0 accent-race-cyan">
                                             @if ($shirt->photo_path)
                                                 <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($shirt->photo_path) }}" alt="Foto de {{ $shirt->name }}" class="size-14 rounded-md bg-white object-cover">
                                             @else
@@ -458,6 +458,57 @@
                         </div>
 
                     </fieldset>
+
+                    @if (\App\Models\PaymentGatewaySetting::current()->hasManualPix())
+                        @php($manualPixSettings = \App\Models\PaymentGatewaySetting::current())
+                        <fieldset class="grid min-w-0 gap-5 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6" data-registration-step data-manual-pix-step data-step-title="Pagamento Pix">
+                            <legend class="rounded-full bg-race-night px-4 py-1.5 text-sm font-black text-white shadow-sm">Pagamento por Pix</legend>
+
+                            <div class="grid gap-4 rounded-md border border-race-cyan/30 bg-amber-50 p-4 sm:grid-cols-2">
+                                <div>
+                                    <p class="text-xs font-bold uppercase text-race-blue">Valor a pagar</p>
+                                    <p class="mt-1 text-3xl font-black text-race-ink" data-manual-pix-amount>R$ 0,00</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs font-bold uppercase text-race-blue">Chave Pix</p>
+                                    <p class="mt-1 break-all text-lg font-black text-race-ink">{{ $manualPixSettings->pix_key }}</p>
+                                </div>
+                                <dl class="grid grid-cols-2 gap-3 text-sm sm:col-span-2">
+                                    <div><dt class="font-bold text-zinc-500">Banco</dt><dd class="font-black text-race-ink">{{ $manualPixSettings->pix_bank }}</dd></div>
+                                    <div><dt class="font-bold text-zinc-500">Titular</dt><dd class="font-black text-race-ink">{{ $manualPixSettings->pix_account_holder }}</dd></div>
+                                    <div><dt class="font-bold text-zinc-500">Agência</dt><dd class="font-black text-race-ink">{{ $manualPixSettings->pix_agency }}</dd></div>
+                                    <div><dt class="font-bold text-zinc-500">Conta</dt><dd class="font-black text-race-ink">{{ $manualPixSettings->pix_account }}</dd></div>
+                                </dl>
+                            </div>
+
+                            <div class="grid min-w-0 grid-cols-1 gap-5 md:grid-cols-2">
+                                <label class="grid gap-2">
+                                    <span class="text-sm font-bold text-zinc-800">Nome completo do pagador</span>
+                                    <input type="text" name="billing_name" value="{{ old('billing_name') }}" class="rounded-md border border-zinc-300 px-4 py-3 text-base outline-none focus:border-race-cyan focus:ring-3 focus:ring-amber-100" required>
+                                    @error('billing_name')<span class="text-sm font-semibold text-red-700">{{ $message }}</span>@enderror
+                                </label>
+                                <label class="grid gap-2">
+                                    <span class="text-sm font-bold text-zinc-800">CPF/CNPJ do pagador</span>
+                                    <input type="text" name="billing_document" value="{{ old('billing_document') }}" inputmode="numeric" data-mask="cpfCnpj" class="rounded-md border border-zinc-300 px-4 py-3 text-base outline-none focus:border-race-cyan focus:ring-3 focus:ring-amber-100" required>
+                                    @error('billing_document')<span class="text-sm font-semibold text-red-700">{{ $message }}</span>@enderror
+                                </label>
+                            </div>
+
+                            <label class="grid gap-2">
+                                <span class="text-sm font-bold text-zinc-800">Comprovante do Pix</span>
+                                <input type="file" name="pix_receipt" accept=".jpg,.jpeg,.png,.pdf" data-max-file-size="5242880" data-max-file-message="O comprovante não pode ter mais de 5 MB." class="rounded-md border border-zinc-300 bg-white px-4 py-3 text-sm" required>
+                                <span hidden data-file-size-error class="text-sm font-semibold text-red-700"></span>
+                                <span class="text-xs text-zinc-500">JPG, PNG ou PDF, com até 5 MB.</span>
+                                @error('pix_receipt')<span class="text-sm font-semibold text-red-700">{{ $message }}</span>@enderror
+                            </label>
+
+                            <label class="flex items-start gap-3 rounded-md border border-zinc-200 bg-zinc-50 p-4">
+                                <input type="checkbox" name="payer_data_confirmed" value="1" class="mt-1 size-4 accent-race-cyan" required @checked(old('payer_data_confirmed'))>
+                                <span class="text-sm font-semibold leading-6 text-zinc-800">Confirmo que realizei o Pix no valor indicado e conferi os dados do recebedor e do pagador.</span>
+                            </label>
+                            @error('payer_data_confirmed')<span class="text-sm font-semibold text-red-700">{{ $message }}</span>@enderror
+                        </fieldset>
+                    @endif
 
                     <fieldset class="grid min-w-0 gap-4 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6" data-registration-step data-step-title="Conferencia">
                         <legend class="rounded-full bg-race-night px-4 py-1.5 text-sm font-black text-white shadow-sm">Declarações obrigatórias</legend>
@@ -656,7 +707,7 @@
                     <p>Conforme a finalidade, as bases podem incluir execução de contrato e procedimentos preliminares, obrigação legal ou regulatória, exercício regular de direitos, proteção da vida, legítimo interesse avaliado e consentimento quando adequado. O aceite desta política registra ciência e não transforma em consentimento tratamentos apoiados em outra base.</p>
 
                     <h3>4. Pagamentos</h3>
-                    <p>No Pix manual, exibimos os dados do recebedor e guardamos o nome, CPF e comprovante do pagador em área privada para conferência. No pagamento on-line, enviamos ao Asaas somente os dados necessários para criar e conciliar a cobrança; o provedor também aplica sua própria política. Não armazenamos credenciais bancárias.</p>
+                    <p>No Pix manual, os dados do recebedor, o valor e o campo de comprovante são apresentados durante o formulário. Para inscrições com valor, coletamos nome, CPF/CNPJ e comprovante do pagador antes de criar a inscrição; sem o arquivo obrigatório, o cadastro não é concluído. O comprovante é mantido em área privada para conferência e a inscrição é criada com pagamento em análise, sem confirmação automática. No pagamento on-line, enviamos ao Asaas somente os dados necessários para criar e conciliar a cobrança; o provedor também aplica sua própria política. Não armazenamos credenciais bancárias.</p>
 
                     <h3>5. Compartilhamento</h3>
                     <p>Podemos compartilhar o mínimo necessário com equipe autorizada, hospedagem, e-mail e suporte, Asaas e outros operadores de pagamento, cronometragem, resultados, fornecedores de pacotes e logística, equipes emergenciais, seguradoras, assessorias profissionais e autoridades quando houver fundamento válido. Não vendemos dados pessoais.</p>
@@ -668,7 +719,7 @@
                     <p>O sistema aplica regras de idade, documento, duplicidade, vagas, pacote, preço, categoria e ranking. Elas não criam perfil comportamental. O titular pode pedir explicação e revisão de decisão automatizada que afete seus interesses, quando aplicável.</p>
 
                     <h3>8. Retenção e descarte</h3>
-                    <p>Os dados são mantidos pelo período necessário à inscrição, pagamento, operação, suporte e aos prazos legais, fiscais, contratuais e de defesa de direitos. Depois, serão eliminados, anonimizados ou mantidos de forma restrita quando existir fundamento legal. Backups podem conservar cópias até seu ciclo normal de substituição.</p>
+                    <p>Dados e comprovantes de uma inscrição concluída são mantidos pelo período necessário ao pagamento, operação, suporte e aos prazos legais, fiscais, contratuais e de defesa de direitos. Arquivos temporários de tentativas que não resultem em inscrição devem ser descartados pelo sistema. Depois dos prazos aplicáveis, os dados serão eliminados, anonimizados ou mantidos de forma restrita quando existir fundamento legal. Backups podem conservar cópias até seu ciclo normal de substituição.</p>
 
                     <h3>9. Segurança e incidentes</h3>
                     <p>Adotamos validação, proteção CSRF, limitação de requisições, URLs assinadas, painel restrito, proteção de credenciais, arquivos privados e redução de dados em e-mails e logs. Se for confirmado incidente que possa causar risco ou dano relevante, o controlador deverá comunicar a ANPD e os titulares afetados em até três dias úteis, ressalvado prazo legal específico, e manter o registro do incidente pelo período regulamentar.</p>

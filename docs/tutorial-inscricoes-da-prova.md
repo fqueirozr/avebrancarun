@@ -64,7 +64,7 @@ Uma prova pode desaparecer ou ser recusada se estiver inativa, esgotada ou incom
 | Campo | Regra | Por que é solicitado |
 | --- | --- | --- |
 | Pacote | Obrigatório, ativo e com estoque | Define itens, preço, camiseta e regras especiais. |
-| Tamanho da camiseta | Obrigatório somente se o pacote incluir camiseta; PP, P, M, G, GG ou XGG | Reserva o tamanho para separação do pacote. Se o pacote não inclui camiseta, o campo é removido e não é salvo. |
+| Tamanho da camiseta | Obrigatório somente se o pacote incluir camiseta; opções infantis 6 a 14 e adultas PP a 3XG | Reserva o tamanho para separação do pacote. Se o pacote não inclui camiseta, o campo é removido e não é salvo. |
 | Ciência das regras especiais | Obrigatória para pacote PCD/60+, Social ou Desbravador | Registra que o participante leu as condições específicas exibidas no modal. |
 
 Regras por tipo:
@@ -81,8 +81,8 @@ O preço mostrado é final. Não existe desconto automático posterior por tipo 
 Quando houver item ativo e com estoque, o atleta pode adicioná-lo à inscrição:
 
 - a escolha do item é opcional;
-- ao escolher, tamanho e quantidade tornam-se obrigatórios;
-- a quantidade deve ficar entre 1 e 10 e não pode superar o estoque;
+- ao escolher, o tamanho torna-se obrigatório;
+- a inclusão junto da inscrição aceita uma unidade e respeita o estoque;
 - o preço usado é o **valor junto da inscrição**; se ele estiver vazio, vale o preço normal da loja;
 - o total do Pix ou checkout soma pacote e item;
 - o pedido recebe o mesmo status de pagamento da inscrição.
@@ -100,7 +100,7 @@ Informe alguém que saiba sobre o atleta e possa atender no dia. Esses dados nã
 
 ## 8. Dados de cobrança
 
-Os campos de cobrança do formulário inicial aparecem e tornam-se obrigatórios quando o checkout on-line está configurado:
+Os dados do pagador fazem parte do formulário, mas os campos exigidos dependem do meio de pagamento:
 
 | Campo | Regra | Motivo |
 | --- | --- | --- |
@@ -111,7 +111,7 @@ Os campos de cobrança do formulário inicial aparecem e tornam-se obrigatórios
 | Bairro | Obrigatório, até 255 caracteres | Completa o endereço de cobrança. |
 | CEP | Obrigatório, 8 dígitos | Valida a localização de cobrança. |
 
-Se o Pix manual estiver ativo, nome e CPF do pagador são confirmados na página do Pix. O fluxo manual aceita CPF, não CNPJ.
+No checkout on-line, todos os campos da tabela são obrigatórios e enviados ao provedor no limite necessário. No Pix manual, a etapa de pagamento aparece dentro do próprio formulário quando o total for maior que zero; nela, nome e CPF/CNPJ do pagador são obrigatórios junto com o comprovante.
 
 ## 9. Declarações obrigatórias
 
@@ -133,13 +133,13 @@ A declaração de aptidão é obrigatória, mas não possui uma trilha separada 
 
 ## 10. Envio e protocolo
 
-Ao selecionar **Enviar inscrição**, todos os documentos, aceites, limites e vínculos são validados novamente. Se houver erro, nada é criado e o formulário indica o que corrigir.
+Ao selecionar **Enviar inscrição**, todos os documentos, aceites, limites, vínculos e, no Pix manual, o comprovante são validados novamente. Se houver erro ou faltar o comprovante obrigatório, nada é criado e o formulário indica o que corrigir.
 
 Quando tudo estiver correto:
 
 1. é criada a inscrição com protocolo `AVR-` e seis dígitos aleatórios;
 2. é gerado um número de peito de quatro dígitos, sem repetição;
-3. o pagamento começa como **Pendente**;
+3. o pagamento começa como **Em análise** quando o Pix manual e seu comprovante forem enviados, ou como **Pendente** nos demais fluxos;
 4. o pedido de item adicional, se houver, é vinculado;
 5. o atleta recebe um e-mail sem CPF, endereço ou dados de emergência.
 
@@ -149,17 +149,19 @@ Guarde o protocolo e o link assinado recebido por e-mail.
 
 ### Pix manual
 
-Para pacote com valor, o Pix manual tem prioridade quando estiver ativo.
+Para pacote ou item adicional com valor, o Pix manual tem prioridade quando estiver ativo e integra o fluxo de inscrição.
 
-1. confira valor, chave, banco, agência, conta e titular;
-2. pague pelo QR Code ou Pix copia e cola;
-3. informe nome completo e CPF válido do pagador;
-4. envie comprovante JPG, JPEG, PNG ou PDF de até 5 MB;
-5. confirme que conferiu recebedor e pagador.
+1. escolha a prova, o pacote, o tamanho e eventuais itens adicionais;
+2. na etapa **Pagamento Pix**, confira o valor total, a chave, o banco, a agência, a conta e o titular;
+3. realize o Pix no aplicativo do banco;
+4. informe nome completo e CPF/CNPJ válido do pagador;
+5. anexe comprovante JPG, JPEG, PNG ou PDF de até 5 MB;
+6. confirme que conferiu recebedor, valor e pagador;
+7. envie o formulário completo.
 
-Após o envio, o status muda para **Em análise**. A organização deve conferir o comprovante e alterar para **Pago** ou **Cancelado**. O envio do comprovante não confirma automaticamente o pagamento.
+Sem o comprovante, a validação é recusada e **nenhuma inscrição é gravada**. Com o envio válido, a inscrição e o item adicional são criados, o arquivo fica em armazenamento privado e o status inicial é **Em análise**. A organização deve conferir o comprovante e alterar para **Pago** ou **Cancelado**. O envio do comprovante não confirma automaticamente o pagamento.
 
-O link da página Pix é assinado e expira em sete dias. O comprovante fica em armazenamento privado.
+Links assinados de Pix continuam disponíveis somente para inscrições pendentes criadas por versões anteriores do fluxo.
 
 ### Checkout on-line
 
@@ -173,8 +175,8 @@ Não há redirecionamento. A inscrição permanece **Pendente** até a conferên
 
 ## 12. Status
 
-- **Pendente:** inscrição criada, sem confirmação.
-- **Em análise:** comprovante Pix enviado e aguardando conferência.
+- **Pendente:** inscrição criada por checkout on-line, gratuidade, ausência de pagamento configurado ou fluxo legado, ainda sem confirmação.
+- **Em análise:** inscrição Pix criada com comprovante obrigatório e aguardando conferência.
 - **Pago:** pagamento confirmado; inscrição confirmada para as operações do evento.
 - **Cancelado:** inscrição cancelada; deixa de ocupar os limites.
 
@@ -206,8 +208,7 @@ Atletas abaixo de 6 anos não recebem categoria automática. Somente participant
 - **Prova ou pacote esgotado:** a última vaga pode ter sido ocupada durante o preenchimento.
 - **CPF não habilitado como desbravador:** o CPF do atleta precisa estar ativo no cadastro e sem outra inscrição.
 - **Tamanho da camiseta não aparece:** o pacote selecionado não inclui camiseta.
-- **Item adicional recusado:** confira atividade, estoque, tamanho e quantidade máxima de 10.
-- **Comprovante recusado:** use JPG, JPEG, PNG ou PDF com até 5 MB.
+- **Item adicional recusado:** confira atividade, estoque e tamanho; junto da inscrição é aceita uma unidade.
+- **Comprovante ausente ou recusado:** no Pix manual pago, a inscrição não é gravada sem um JPG, JPEG, PNG ou PDF válido de até 5 MB; anexe o arquivo e envie novamente.
 - **Pagamento em análise:** aguarde conferência administrativa; comprovante não marca a inscrição como paga.
 - **E-mail não recebido:** confira spam e o endereço cadastrado; peça à organização para localizar pelo CPF/protocolo sem enviar dados sensíveis em canais públicos.
-

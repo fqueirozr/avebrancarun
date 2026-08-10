@@ -10,7 +10,7 @@ Notamos que o pagamento da sua inscrição na **Ave Branca Run** ainda não foi 
 **Status do pagamento:** {{ $registration->paymentStatusLabel() }}
 </x-mail::panel>
 
-Para manter sua vaga, conclua o pagamento pelo link abaixo. Inscrições que permanecerem com o pagamento pendente por **7 dias após o cadastro** serão canceladas automaticamente.
+Para manter sua vaga, conclua o pagamento pelo link abaixo. No fluxo atual de Pix manual, o comprovante é obrigatório antes da criação da inscrição; por isso, este lembrete normalmente se aplica ao checkout on-line ou a uma inscrição criada em fluxo anterior. Inscrições que permanecerem com o pagamento pendente por **7 dias após o cadastro** serão canceladas automaticamente.
 
 Se você já realizou o pagamento, desconsidere este lembrete. A confirmação pode levar algum tempo para ser processada.
 

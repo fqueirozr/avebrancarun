@@ -8,6 +8,7 @@ use App\Models\ParticipantRegistration;
 use App\Models\Pathfinder;
 use App\Models\PaymentGatewaySetting;
 use App\Models\RaceModality;
+use App\Models\Shirt;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Carbon;
@@ -34,7 +35,10 @@ class RegisterParticipantRequest extends FormRequest
         $kitHasShirt = (bool) Kit::query()
             ->whereKey($this->input('kit_id'))
             ->value('has_shirt');
-        $requiresCheckoutData = PaymentGatewaySetting::current()->isConfigured();
+        $paymentSettings = PaymentGatewaySetting::current();
+        $requiresManualPixPayment = $this->requiresManualPixPayment($paymentSettings);
+        $requiresCheckoutData = $paymentSettings->isConfigured();
+        $requiresPayerData = $requiresCheckoutData || $requiresManualPixPayment;
 
         return [
             'athlete_name' => ['required', 'string', 'max:255'],
@@ -51,12 +55,22 @@ class RegisterParticipantRequest extends FormRequest
             'filled_by_legal_representative' => ['required', 'boolean'],
             'phone' => ['required', 'string', 'regex:/^\d{10,11}$/'],
             'email' => ['required', 'email', 'max:255'],
-            'billing_document' => [Rule::requiredIf($requiresCheckoutData), 'nullable', 'string', 'regex:/^\d{11}(\d{3})?$/'],
-            'billing_name' => [Rule::requiredIf($requiresCheckoutData), 'nullable', 'string', 'max:255'],
+            'billing_document' => [Rule::requiredIf($requiresPayerData), 'nullable', 'string', 'regex:/^\d{11}(\d{3})?$/'],
+            'billing_name' => [Rule::requiredIf($requiresPayerData), 'nullable', 'string', 'max:255'],
             'billing_address' => [Rule::requiredIf($requiresCheckoutData), 'nullable', 'string', 'max:255'],
             'billing_address_number' => [Rule::requiredIf($requiresCheckoutData), 'nullable', 'string', 'max:20'],
             'billing_province' => [Rule::requiredIf($requiresCheckoutData), 'nullable', 'string', 'max:255'],
             'billing_postal_code' => [Rule::requiredIf($requiresCheckoutData), 'nullable', 'string', 'regex:/^\d{8}$/'],
+            'pix_receipt' => [
+                Rule::excludeIf(! $requiresManualPixPayment),
+                Rule::when($requiresManualPixPayment, ['required', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:5120']),
+                'nullable',
+            ],
+            'payer_data_confirmed' => [
+                Rule::excludeIf(! $requiresManualPixPayment),
+                Rule::when($requiresManualPixPayment, ['required', 'accepted']),
+                'nullable',
+            ],
             'race_modality_id' => ['required', Rule::exists('race_modalities', 'id')->where('is_active', true)],
             'kit_id' => ['required', Rule::exists('kits', 'id')->where('is_active', true)],
             'shirt_id' => ['nullable', Rule::exists('shirts', 'id')->where('is_active', true)],
@@ -87,6 +101,11 @@ class RegisterParticipantRequest extends FormRequest
             'regex' => 'Informe um valor válido para :attribute.',
             'race_modality_id.exists' => 'Escolha uma prova ativa.',
             'kit_id.exists' => 'Escolha um pacote ativo.',
+            'pix_receipt.required' => 'Envie o comprovante do Pix para concluir a inscrição.',
+            'pix_receipt.mimes' => 'O comprovante deve ser uma imagem JPG, PNG ou um PDF.',
+            'pix_receipt.max' => 'O comprovante não pode ter mais de 5 MB.',
+            'payer_data_confirmed.required' => 'Confirme que os dados do pagamento foram conferidos.',
+            'payer_data_confirmed.accepted' => 'Confirme que os dados do recebedor e do pagador foram conferidos.',
             'accepted' => 'Você precisa aceitar :attribute.',
         ];
     }
@@ -112,6 +131,7 @@ class RegisterParticipantRequest extends FormRequest
             'billing_address_number' => 'o número do endereço',
             'billing_province' => 'o bairro do pagador',
             'billing_postal_code' => 'o CEP do pagador',
+            'pix_receipt' => 'o comprovante do Pix',
             'race_modality_id' => 'a prova',
             'kit_id' => 'o pacote',
             'emergency_contact_name' => 'o nome do contato de emergência',
@@ -251,6 +271,22 @@ class RegisterParticipantRequest extends FormRequest
         $birthDate = Carbon::parse($birthDateValue);
 
         return $birthDate->isAfter(today()->subYears(18));
+    }
+
+    private function requiresManualPixPayment(PaymentGatewaySetting $settings): bool
+    {
+        if (! $settings->hasManualPix()) {
+            return false;
+        }
+
+        $kit = Kit::query()->find($this->input('kit_id'));
+        $shirt = Shirt::query()->find($this->input('shirt_id'));
+        $amount = (float) ($kit?->price ?? 0)
+            + ($kit?->has_shirt ? $kit->surchargeForSize($this->input('shirt_size')) : 0)
+            + ($shirt?->priceForRegistration() ?? 0)
+            + ($shirt?->surchargeForSize((string) $this->input('extra_shirt_size')) ?? 0);
+
+        return $amount > 0;
     }
 
     private function requiresLegalRepresentative(): bool

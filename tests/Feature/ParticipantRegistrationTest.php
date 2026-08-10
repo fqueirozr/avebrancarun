@@ -675,6 +675,25 @@ test('the registration receipt includes the payment link when available', functi
     $mail->assertSeeInHtml($paymentUrl, false);
 });
 
+test('the registration receipt explains a manual pix payment under review without exposing the receipt', function () {
+    $registration = ParticipantRegistration::factory()->create([
+        'kit_id' => Kit::factory()->create(['price' => 50]),
+        'payment_status' => 'under_review',
+        'pix_receipt_path' => 'pix-receipts/private-receipt.pdf',
+        'pix_receipt_submitted_at' => now(),
+    ]);
+
+    $mail = new ParticipantRegistrationReceived(
+        $registration->load('kit', 'shirtOrders.shirt'),
+    );
+
+    $mail->assertSeeInHtml('Recebemos sua inscrição e o comprovante do Pix')
+        ->assertSeeInHtml('O comprovante foi recebido em área privada')
+        ->assertSeeInHtml('não confirma automaticamente o pagamento')
+        ->assertDontSeeInHtml('private-receipt.pdf')
+        ->assertDontSeeInHtml('Realizar pagamento');
+});
+
 test('registrations receive unique random four digit bib numbers', function () {
     $registrations = ParticipantRegistration::factory()->count(25)->create();
     $bibNumbers = $registrations->pluck('bib_number');
@@ -683,8 +702,9 @@ test('registrations receive unique random four digit bib numbers', function () {
     expect($bibNumbers->unique())->toHaveCount(25);
 });
 
-test('a paid registration uses the manual pix screen when configured', function () {
+test('a paid manual pix registration is only stored with its receipt', function () {
     Mail::fake();
+    Storage::fake('local');
 
     PaymentGatewaySetting::factory()->create([
         'manual_pix_enabled' => true,
@@ -700,25 +720,39 @@ test('a paid registration uses the manual pix screen when configured', function 
     $raceModality = RaceModality::factory()->create();
     $kit = Kit::factory()->create(['price' => 25]);
 
-    $response = $this->post(route('registration.store'), validRegistrationPayload($raceModality, $kit));
+    $this->post(route('registration.store'), validRegistrationPayload($raceModality, $kit))
+        ->assertSessionHasErrors(['pix_receipt', 'payer_data_confirmed']);
+
+    expect(ParticipantRegistration::query()->count())->toBe(0);
+
+    $response = $this->post(route('registration.store'), validRegistrationPayload($raceModality, $kit, [
+        'pix_receipt' => UploadedFile::fake()->image('comprovante.png'),
+        'payer_data_confirmed' => '1',
+    ]));
     $registration = ParticipantRegistration::query()->sole();
 
-    $response->assertRedirectContains("/inscricao/{$registration->id}/pix");
-    expect($registration->payment_status)->toBe('pending');
+    $response->assertRedirectContains("/atleta/{$registration->id}");
+    expect($registration->payment_status)->toBe('under_review')
+        ->and($registration->pix_receipt_submitted_at)->not->toBeNull();
+    Storage::disk('local')->assertExists($registration->pix_receipt_path);
+});
 
-    $this->get($response->headers->get('Location'))
+test('the registration form includes manual pix payment and receipt fields', function () {
+    PaymentGatewaySetting::factory()->create([
+        'manual_pix_enabled' => true,
+        'pix_key' => 'financeiro@example.com',
+        'pix_bank' => 'Banco do Brasil',
+    ]);
+
+    RaceModality::factory()->create();
+    Kit::factory()->create(['price' => 25]);
+
+    $this->get(route('registration'))
         ->assertSuccessful()
+        ->assertSee('Pagamento por Pix')
         ->assertSee('financeiro@example.com')
-        ->assertSee('R$ 25,00')
-        ->assertSee('Pix copia e cola')
         ->assertSee('Banco do Brasil')
-        ->assertSee('1234-5')
-        ->assertSee('98765-4')
-        ->assertSee('Associação Ave Branca')
-        ->assertSee('5921ASSOCIACAO AVE BRANCA')
-        ->assertSee('confirme no aplicativo do seu banco')
-        ->assertSee('Confira também o nome e o CPF do pagador')
-        ->assertSee($registration->protocol_number);
+        ->assertSee('name="pix_receipt"', false);
 });
 
 test('a pix receipt is stored privately and puts the registration under review', function () {

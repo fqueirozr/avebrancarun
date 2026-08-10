@@ -24,6 +24,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
@@ -49,9 +50,15 @@ class ParticipantRegistrationController extends Controller
             $validated['accepted_fitness_declaration'],
             $validated['accepted_data_confirmation'],
             $validated['accepted_special_kit_rules'],
+            $validated['payer_data_confirmed'],
         );
+        $pixReceiptPath = isset($validated['pix_receipt'])
+            ? $validated['pix_receipt']->store('pix-receipts', 'local')
+            : null;
+        unset($validated['pix_receipt']);
+
         try {
-            [$registration, $raceModality, $kit] = DB::transaction(function () use ($request, $validated, $shirtId, $extraShirtSize, $extraShirtQuantity): array {
+            [$registration, $raceModality, $kit] = DB::transaction(function () use ($request, $validated, $shirtId, $extraShirtSize, $extraShirtQuantity, $pixReceiptPath): array {
                 $eventSetting = EventSetting::query()->lockForUpdate()->first();
                 $raceModality = RaceModality::query()->lockForUpdate()->findOrFail($validated['race_modality_id']);
                 $kit = Kit::query()->lockForUpdate()->findOrFail($validated['kit_id']);
@@ -110,6 +117,9 @@ class ParticipantRegistrationController extends Controller
 
                 $registration = ParticipantRegistration::create([
                     ...$validated,
+                    'pix_receipt_path' => $pixReceiptPath,
+                    'pix_receipt_submitted_at' => $pixReceiptPath !== null ? now() : null,
+                    'payment_status' => $pixReceiptPath !== null ? 'under_review' : 'pending',
                     'pathfinder_id' => $pathfinder?->id,
                     'shirt_size' => $kit->has_shirt ? ($validated['shirt_size'] ?? null) : null,
                     'regulation_accepted_at' => now(),
@@ -150,8 +160,18 @@ class ParticipantRegistrationController extends Controller
                 return [$registration, $raceModality, $kit];
             }, attempts: 3);
         } catch (QueryException $exception) {
+            if ($pixReceiptPath !== null) {
+                Storage::disk('local')->delete($pixReceiptPath);
+            }
+
             if ($exception->getCode() === '23000' && str_contains($exception->getMessage(), 'registration_identity')) {
                 throw ValidationException::withMessages(['participant_cpf' => 'Este atleta já possui uma inscrição.']);
+            }
+
+            throw $exception;
+        } catch (Throwable $exception) {
+            if ($pixReceiptPath !== null) {
+                Storage::disk('local')->delete($pixReceiptPath);
             }
 
             throw $exception;
@@ -159,21 +179,14 @@ class ParticipantRegistrationController extends Controller
 
         $registration->load('kit', 'shirtOrders.shirt');
 
-        if ((float) $kit->price > 0 && PaymentGatewaySetting::current()->hasManualPix()) {
-            $paymentUrl = URL::temporarySignedRoute(
-                'registration.pix.show',
+        if ($registration->pix_receipt_path !== null) {
+            Mail::to($registration->email)->send(new ParticipantRegistrationReceived($registration));
+
+            return redirect()->to(URL::temporarySignedRoute(
+                'athlete.show',
                 now()->addDays(7),
                 ['registration' => $registration],
-            );
-            $emailPaymentUrl = URL::temporarySignedRoute(
-                'registration.payment.show',
-                now()->addDays(7),
-                ['registration' => $registration],
-            );
-
-            Mail::to($registration->email)->send(new ParticipantRegistrationReceived($registration, $emailPaymentUrl));
-
-            return redirect()->to($paymentUrl);
+            ))->with('status', 'Comprovante enviado. Sua inscrição está em análise.');
         }
 
         if ($this->shouldCreateCheckout($kit)) {

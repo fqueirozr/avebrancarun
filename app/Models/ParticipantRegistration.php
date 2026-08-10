@@ -69,7 +69,7 @@ class ParticipantRegistration extends Model
     /** @use HasFactory<ParticipantRegistrationFactory> */
     use HasFactory;
 
-    public const PrivacyPolicyVersion = '2026-07-23';
+    public const PrivacyPolicyVersion = '2026-08-10';
 
     public const SpecialKitRulesVersion = '2026-07-11';
 

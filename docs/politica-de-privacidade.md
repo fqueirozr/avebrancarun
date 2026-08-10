@@ -1,6 +1,6 @@
 # Política de Privacidade da Ave Branca Run
 
-**Versão:** 2026-07-23
+**Versão:** 2026-08-10
 
 Esta Política de Privacidade explica como a organização da Ave Branca Run trata dados pessoais no site, na inscrição, no pagamento e na realização do evento. O tratamento observa a Lei nº 13.709/2018 (Lei Geral de Proteção de Dados Pessoais — LGPD).
 
@@ -33,7 +33,7 @@ Conforme o serviço utilizado, o sistema pode tratar:
 - **representação legal:** indicação de preenchimento por representante, nome e CPF do responsável;
 - **inscrição:** prova, pacote, tamanho de camiseta, item avulso, quantidade e vínculo de desbravador;
 - **pagamento:** nome e CPF/CNPJ do pagador, endereço, bairro, CEP, situação, referência e link do gateway;
-- **Pix manual:** chave e dados da conta recebedora apresentados ao participante, nome e CPF do pagador, comprovante e data de envio;
+- **Pix manual:** chave e dados da conta recebedora apresentados ao participante, nome e CPF/CNPJ do pagador, comprovante e data de envio;
 - **segurança e emergência:** nome e telefone do contato de emergência;
 - **resultado esportivo:** situação na prova, tempo, categoria e classificações;
 - **aceites e segurança:** data e hora, versão ou resumo criptográfico do texto aceito, endereço IP e identificação do navegador;
@@ -73,10 +73,10 @@ O aceite da Política de Privacidade confirma que o participante tomou ciência 
 
 Há dois fluxos possíveis:
 
-- **Pix manual:** o sistema exibe os dados do recebedor, gera QR Code/copia e cola e armazena o comprovante em área privada para conferência;
+- **Pix manual:** para inscrições com valor, o sistema exibe o valor e os dados do recebedor dentro do formulário, exige nome, CPF/CNPJ e comprovante do pagador e armazena o arquivo em área privada para conferência;
 - **pagamento on-line:** os dados necessários são enviados ao Asaas para criar e conciliar a cobrança. O processamento financeiro também segue a política do provedor.
 
-Quando ambos estiverem configurados, o Pix manual é usado nas inscrições com valor. Dados de cobrança só são exigidos no formulário inicial quando o checkout on-line estiver configurado; no Pix manual, nome e CPF do pagador são confirmados na etapa do comprovante.
+Quando ambos estiverem configurados, o Pix manual é usado nas inscrições com valor. Nesse fluxo, pagamento e comprovante integram a submissão: sem um arquivo válido, a inscrição não é criada. Quando a validação passa, a inscrição nasce com pagamento **Em análise**, sem confirmação automática. No checkout on-line, os dados de cobrança necessários são coletados para criar e conciliar a cobrança externa.
 
 ## 7. Compartilhamento
 
@@ -106,7 +106,7 @@ O titular pode pedir esclarecimentos e revisão de decisão automatizada que afe
 
 ## 10. Retenção e descarte
 
-Os dados serão mantidos pelo tempo necessário para cumprir as finalidades desta política e os prazos legais, fiscais, contratuais e de defesa de direitos. Os períodos podem variar conforme a categoria do dado e a situação da inscrição.
+Os dados e comprovantes vinculados a uma inscrição concluída serão mantidos pelo tempo necessário para cumprir as finalidades desta política e os prazos legais, fiscais, contratuais e de defesa de direitos. Arquivos temporários de tentativas que não resultem em inscrição devem ser descartados pelo sistema. Os períodos podem variar conforme a categoria do dado e a situação da inscrição.
 
 Depois do período aplicável, os dados serão eliminados, anonimizados ou mantidos de forma restrita quando houver fundamento legal. Comprovantes, exportações e listas impressas devem ter acesso limitado e descarte seguro. Backups podem conservar dados por ciclos adicionais até sua substituição normal.
 

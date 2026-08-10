@@ -130,6 +130,8 @@ document.querySelectorAll('[data-image-expand]').forEach((button) => {
 document.querySelectorAll('[data-registration-form]').forEach((form) => {
     const steps = Array.from(form.querySelectorAll('[data-registration-step]'));
     const guardianStep = form.querySelector('[data-guardian-step]');
+    const manualPixStep = form.querySelector('[data-manual-pix-step]');
+    const manualPixAmount = form.querySelector('[data-manual-pix-amount]');
     const birthDateInput = form.querySelector('input[name="birth_date"]');
     const modalityOptions = Array.from(form.querySelectorAll('[data-modality-option]'));
     const noCompatibleModality = form.querySelector('[data-no-compatible-modality]');
@@ -176,6 +178,48 @@ document.querySelectorAll('[data-registration-form]').forEach((form) => {
     };
 
     const visibleSteps = () => steps.filter((step) => !step.dataset.skipStep);
+
+    const selectedSurcharge = (option, size) => {
+        if (size === '2XG') {
+            return Number(option?.dataset.size2xlSurcharge || 0);
+        }
+
+        if (size === '3XG') {
+            return Number(option?.dataset.size3xlSurcharge || 0);
+        }
+
+        return 0;
+    };
+
+    const syncManualPixStep = () => {
+        if (!manualPixStep) {
+            return;
+        }
+
+        const kit = form.querySelector('input[name="kit_id"]:checked');
+        const shirt = form.querySelector('input[name="shirt_id"]:checked');
+        const kitSize = form.querySelector('input[name="shirt_size"]:checked')?.value;
+        const extraShirtSize = form.querySelector('input[name="extra_shirt_size"]:checked')?.value;
+        const amount = Number(kit?.dataset.price || 0)
+            + selectedSurcharge(kit, kitSize)
+            + Number(shirt?.dataset.price || 0)
+            + selectedSurcharge(shirt, extraShirtSize);
+        const requiresPayment = amount > 0;
+
+        manualPixStep.dataset.skipStep = requiresPayment ? '' : 'true';
+        manualPixStep.hidden = !requiresPayment;
+        manualPixStep.querySelectorAll('input, textarea, select').forEach((field) => {
+            field.required = requiresPayment;
+            field.disabled = !requiresPayment;
+        });
+
+        if (manualPixAmount) {
+            manualPixAmount.textContent = amount.toLocaleString('pt-BR', {
+                style: 'currency',
+                currency: 'BRL',
+            });
+        }
+    };
 
     const isMinorBirthDate = () => {
         if (!birthDateInput?.value) {
@@ -410,6 +454,9 @@ document.querySelectorAll('[data-registration-form]').forEach((form) => {
                     }
                 });
             }
+
+            syncManualPixStep();
+            renderStep();
         });
     });
 
@@ -433,8 +480,19 @@ document.querySelectorAll('[data-registration-form]').forEach((form) => {
         });
     };
 
-    extraShirts.forEach((extraShirt) => extraShirt.addEventListener('change', syncExtraShirtSize));
+    extraShirts.forEach((extraShirt) => extraShirt.addEventListener('change', () => {
+        syncExtraShirtSize();
+        syncManualPixStep();
+        renderStep();
+    }));
+    form.querySelectorAll('input[name="shirt_size"], input[name="extra_shirt_size"]').forEach((size) => {
+        size.addEventListener('change', () => {
+            syncManualPixStep();
+            renderStep();
+        });
+    });
     syncExtraShirtSize();
+    syncManualPixStep();
 
     const participantCpfInput = form.querySelector('input[name="participant_cpf"]');
     const packageOptions = Array.from(form.querySelectorAll('[data-package-option]'));

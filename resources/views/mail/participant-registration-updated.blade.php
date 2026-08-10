@@ -29,7 +29,13 @@ Informamos que sua inscrição foi cancelada.
 Caso tenha dúvidas ou precise de maiores esclarecimentos, a equipe da **Ave Branca Run** está à disposição para ajudar.
 @endif
 @else
+@if ($registration->payment_status === 'paid')
+O pagamento foi confirmado e sua inscrição está confirmada para as operações do evento.
+@elseif ($registration->payment_status === 'under_review')
+Seu comprovante foi recebido e permanece em conferência pela organização. Esse status ainda não confirma o pagamento.
+@else
 Guarde esta mensagem como comprovante da atualização mais recente da sua inscrição.
+@endif
 @endif
 
 <x-mail::button :url="URL::signedRoute('athlete.show', ['registration' => $registration])">
