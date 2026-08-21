@@ -24,7 +24,8 @@ it('preserves a cpf beginning with zero when registering a pathfinder', function
         ->assertFormFieldExists(
             'cpf',
             fn (TextInput $field): bool => $field->getType() === 'text'
-                && $field->getMask() === '999.999.999-99',
+                && $field->getMask() === '999.999.999-99'
+                && $field->getLength() === null,
         )
         ->fillForm([
             'name' => 'Maria Silva',

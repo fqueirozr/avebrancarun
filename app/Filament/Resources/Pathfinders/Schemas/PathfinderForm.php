@@ -19,7 +19,6 @@ class PathfinderForm
                     ->mask('999.999.999-99')
                     ->stripCharacters(['.', '-'])
                     ->extraInputAttributes(['inputmode' => 'numeric'])
-                    ->length(11)
                     ->regex('/^\d{11}$/')
                     ->unique(ignoreRecord: true)
                     ->required(),
