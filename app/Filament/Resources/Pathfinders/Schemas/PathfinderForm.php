@@ -16,8 +16,11 @@ class PathfinderForm
                 TextInput::make('cpf')
                     ->label('CPF')
                     ->helperText('Informe somente os 11 dígitos.')
-                    ->numeric()
+                    ->mask('999.999.999-99')
+                    ->stripCharacters(['.', '-'])
+                    ->extraInputAttributes(['inputmode' => 'numeric'])
                     ->length(11)
+                    ->regex('/^\d{11}$/')
                     ->unique(ignoreRecord: true)
                     ->required(),
                 Toggle::make('is_active')->label('Ativo')->default(true)->required(),
