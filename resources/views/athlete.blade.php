@@ -61,7 +61,18 @@
                         <div><dt class="text-xs font-black uppercase text-zinc-500">E-mail</dt><dd class="mt-1 break-all font-bold">{{ $registration->email }}</dd></div>
                         <div><dt class="text-xs font-black uppercase text-zinc-500">Telefone</dt><dd class="mt-1 font-bold">{{ $registration->phone }}</dd></div>
                         <div><dt class="text-xs font-black uppercase text-zinc-500">Pacote</dt><dd class="mt-1 font-bold">{{ $registration->kit?->name ?? 'Não informado' }}</dd></div>
+                        @if ($registration->kit?->has_shirt && filled($registration->shirt_size))
+                            <div><dt class="text-xs font-black uppercase text-zinc-500">Camiseta do pacote</dt><dd class="mt-1 font-bold">Tamanho {{ $registration->shirt_size }}</dd></div>
+                        @endif
                         <div><dt class="text-xs font-black uppercase text-zinc-500">Número de peito</dt><dd class="mt-1 font-bold">{{ $registration->bib_number ?: 'A definir' }}</dd></div>
+                        @foreach ($registration->shirtOrders as $shirtOrder)
+                            <div class="sm:col-span-2">
+                                <dt class="text-xs font-black uppercase text-zinc-500">Item avulso</dt>
+                                <dd class="mt-1 font-bold">
+                                    {{ $shirtOrder->shirt?->name ?? 'Camiseta' }} — tamanho {{ $shirtOrder->sizeSummary() }} — {{ $shirtOrder->quantity }} {{ $shirtOrder->quantity === 1 ? 'unidade' : 'unidades' }}
+                                </dd>
+                            </div>
+                        @endforeach
                     </dl>
                 </article>
 

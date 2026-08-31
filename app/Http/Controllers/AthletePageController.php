@@ -12,7 +12,7 @@ class AthletePageController extends Controller
 {
     public function __invoke(ParticipantRegistration $registration): View
     {
-        $registration->load(['raceModality', 'kit']);
+        $registration->load(['raceModality', 'kit', 'shirtOrders.shirt']);
         $pendingPaymentUrl = null;
 
         if ($registration->payment_status === 'pending') {

@@ -4,6 +4,8 @@ use App\Models\EventSetting;
 use App\Models\ParticipantRegistration;
 use App\Models\PaymentGatewaySetting;
 use App\Models\RaceModality;
+use App\Models\Shirt;
+use App\Models\ShirtOrder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\URL;
 
@@ -66,6 +68,35 @@ test('athlete can see official time and rankings after finishing', function () {
         ->assertSeeText('12º')
         ->assertSeeText('9º')
         ->assertSeeText('3º');
+});
+
+test('athlete can see shirt sizes from the package and linked standalone items', function () {
+    $registration = ParticipantRegistration::factory()->create([
+        'shirt_size' => 'GG',
+    ]);
+    $shirt = Shirt::factory()->create([
+        'name' => 'Camiseta comemorativa',
+    ]);
+
+    ShirtOrder::factory()->create([
+        'shirt_id' => $shirt,
+        'participant_registration_id' => $registration,
+        'customer_name' => $registration->athlete_name,
+        'customer_email' => $registration->email,
+        'customer_phone' => $registration->phone,
+        'size' => 'P',
+        'sizes' => ['P', 'G'],
+        'quantity' => 2,
+        'unit_price' => 35,
+        'total_price' => 70,
+    ]);
+
+    $this->get(URL::signedRoute('athlete.show', ['registration' => $registration]))
+        ->assertSuccessful()
+        ->assertSeeText('Camiseta do pacote')
+        ->assertSeeText('Tamanho GG')
+        ->assertSeeText('Item avulso')
+        ->assertSeeText('Camiseta comemorativa — tamanho 1: P; 2: G — 2 unidades');
 });
 
 test('athlete with pending manual pix payment can access receipt submission', function () {

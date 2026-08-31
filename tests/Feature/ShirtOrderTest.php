@@ -13,6 +13,7 @@ use App\Models\User;
 use App\Payments\CheckoutRequest;
 use App\Payments\CheckoutResponse;
 use App\Payments\PaymentGateway;
+use Filament\Forms\Components\Select;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Mail;
@@ -102,6 +103,47 @@ it('allows an admin to update a standalone shirt payment', function () {
         return $mail->hasTo('avulso@example.com')
             && $mail->shirtOrder->payment_status === 'paid';
     });
+});
+
+it('allows an admin to update each standalone shirt size', function () {
+    config(['app.env' => 'local']);
+    Mail::fake();
+
+    $this->actingAs(User::factory()->create());
+
+    $shirtOrder = ShirtOrder::factory()->create([
+        'shirt_id' => Shirt::factory(),
+        'customer_name' => 'João Avulso',
+        'customer_email' => 'avulso@example.com',
+        'customer_phone' => '11888888888',
+        'size' => 'GG',
+        'sizes' => ['GG', 'M'],
+        'quantity' => 2,
+        'unit_price' => 35,
+        'total_price' => 70,
+        'payment_status' => 'pending',
+    ]);
+
+    Livewire::test(EditShirtOrder::class, ['record' => $shirtOrder->getRouteKey()])
+        ->assertFormFieldExists(
+            'sizes.0.value',
+            fn (Select $field): bool => $field->getOptions() === ParticipantRegistration::shirtSizeOptions(),
+        )
+        ->assertSchemaStateSet(['sizes' => [
+            ['value' => 'GG'],
+            ['value' => 'M'],
+        ]])
+        ->fillForm(['sizes' => [
+            ['value' => 'G'],
+            ['value' => 'XG'],
+        ]])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    expect($shirtOrder->refresh())
+        ->size->toBe('G')
+        ->sizes->toBe(['G', 'XG'])
+        ->sizeSummary()->toBe('1: G; 2: XG');
 });
 
 it('does not email a payment update when the standalone shirt status is unchanged', function () {

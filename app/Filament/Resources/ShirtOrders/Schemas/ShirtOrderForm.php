@@ -2,8 +2,10 @@
 
 namespace App\Filament\Resources\ShirtOrders\Schemas;
 
+use App\Models\ParticipantRegistration;
 use App\Models\ShirtOrder;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
@@ -38,11 +40,39 @@ class ShirtOrderForm
                     ->label('Telefone do cliente')
                     ->tel()
                     ->required(),
-                TextInput::make('size')
+                Select::make('size')
                     ->label('Tamanho')
+                    ->options(ParticipantRegistration::shirtSizeOptions())
+                    ->visibleOn('create')
+                    ->required(),
+                Repeater::make('sizes')
+                    ->label('Tamanho de cada camiseta')
+                    ->simple(
+                        Select::make('value')
+                            ->options(ParticipantRegistration::shirtSizeOptions())
+                            ->required(),
+                    )
+                    ->afterStateHydrated(function (Repeater $component, ?ShirtOrder $record): void {
+                        if ($record === null) {
+                            return;
+                        }
+
+                        $sizes = $record->sizes ?: array_fill(0, $record->quantity, $record->size);
+
+                        $component->state(
+                            collect($sizes)
+                                ->map(fn (string $size): array => ['value' => $size])
+                                ->all(),
+                        );
+                    })
+                    ->addable(false)
+                    ->deletable(false)
+                    ->reorderable(false)
+                    ->visibleOn('edit')
                     ->required(),
                 TextInput::make('quantity')
                     ->label('Quantidade')
+                    ->disabledOn('edit')
                     ->required()
                     ->numeric(),
                 TextInput::make('unit_price')
